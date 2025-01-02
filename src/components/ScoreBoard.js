@@ -65,7 +65,11 @@ const ScoreBoard = (props) => {
   const toggleSlide2 = () => {
     setIsSlideOpen2(!isSlideOpen2); // Toggle the slide state
   };
+//////
 
+
+
+//////
   useEffect(() => {
     console.log('Props received in ScoreBoard:', props);
   }, [props]);
@@ -228,13 +232,30 @@ const ScoreBoard = (props) => {
         setRemainingBalls(maxOver * 6)
         setRemainingRuns(totalRuns + 1)
         const bowlerNameElement = document.querySelector('.react-autosuggest__input')
-        bowlerNameElement.disabled = false
+       /////
+        if (bowlerNameElement) {
+          bowlerNameElement.value = '';
+          bowlerNameElement.disabled = false;
+        }
+       /////
+        // bowlerNameElement.value = ''
+        // bowlerNameElement.disabled = false
         const batter1NameElement = document.getElementById('batter1Name')
-        batter1NameElement.value = ''
-        batter1NameElement.disabled = false
+       /////
+        if (batter1NameElement) {
+          batter1NameElement.value = '';
+          batter1NameElement.disabled = false
+        }
+       /////
+        // batter1NameElement.value = ''
+        // batter1NameElement.disabled = false
         const batter2NameElement = document.getElementById('batter2Name')
-        batter2NameElement.value = ''
-        batter2NameElement.disabled = false
+        if (batter2NameElement) {
+          batter2NameElement.value = '';
+          batter2NameElement.disabled = false
+        }
+        // batter2NameElement.value = ''
+        // batter2NameElement.disabled = false
         setStrikeValue('strike')
         endInningButton.disabled = true
       } else {
@@ -1086,6 +1107,12 @@ const ScoreBoard = (props) => {
     }
   }
 
+  const tossContent = (
+    <>
+      <p>{props.toss} won the toss & choose {props.win}</p>
+    </>
+  )
+
   const welcomeContent = (
     <>
       <div></div>
@@ -1110,6 +1137,18 @@ const ScoreBoard = (props) => {
     </>
   )
   
+  const winnerCard3= (
+    <>
+      <p>{winningMessage}</p>
+    </>
+  )
+
+  const winnerCard2 = (
+    <>
+      <p>Break Time</p>
+    </>
+  )
+
   return (
     // main container
     <div className='container'>
@@ -1316,8 +1355,40 @@ const ScoreBoard = (props) => {
         </table>
       </div>
          </div></div>}
+       
         {activeSection === "liveScore" && <div id="liveScore">        
           {/* User panel */}
+      <div className="score-container1">
+      
+      <div className='Tag'>
+        <div className='First'>
+          <div className="Circle"></div>
+          <div className="upcoming">Live</div>
+        </div>
+      </div>
+
+      <div className="team-score1">
+      {scoringTeam}
+        <span className="score1">{inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
+          {inningNo === 1 ? totalOvers : inning1.overs})</span>
+      </div>
+
+      <div className="team-score1">
+      {chessingTeam}
+      <span className="score1">
+      {inningNo === 1
+      ? '0-0 (0)'
+      : `${hasMatchEnded ? inning2.runs : totalRuns}-${
+          hasMatchEnded ? inning2.wickets : wicketCount
+        } (${hasMatchEnded ? inning2.overs : totalOvers})`}
+      </span>
+      </div>
+
+      <div className='line'></div>
+      <hr/>
+      {/* <button onClick={endMatch1}>End Match</button> */}
+      <div className="result">        {inningNo === 2 ? winnerCard3 : overCount === maxOver || wicketCount === 10 ? winnerCard2 : tossContent}</div>
+</div>
           {/* Admin panel */}
 <div className='score'>
   <div>
@@ -1521,6 +1592,7 @@ const ScoreBoard = (props) => {
     </table>
   </div>
          </div></div>}
+
         {activeSection === "scoreCard" && <div id="scoreCard">        
           {/* Scorecard */}
         <div className='score-board-container'>
@@ -1528,7 +1600,7 @@ const ScoreBoard = (props) => {
           {/* Inning1 Starts here */}
           <div>
             <div className='score-board-innings' onClick={toggleSlide1}>
-              <div>{scoringTeam} Innings</div>
+              <div>{scoringTeam}  ( 1st Innings )</div>
               <div>
                 {inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
                 {inningNo === 1 ? totalOvers : inning1.overs} Ov)
@@ -1636,7 +1708,7 @@ const ScoreBoard = (props) => {
           {/* {inningNo === 2 && ( */}
             <div>
               <div className='score-board-innings' onClick={toggleSlide2}>
-                <div>{chessingTeam} Innings</div>
+                <div>{chessingTeam} ( 2nd Innings )</div>
                 <div>
                   {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
                   {hasMatchEnded ? inning2.overs : totalOvers} Ov)
@@ -1739,9 +1811,10 @@ const ScoreBoard = (props) => {
             </div>
           {/* )} */}
          </div></div>}
-        {activeSection === "result" && <div id="matchinfo">   
-          work in progress
-       </div>}
+
+        {activeSection === "result" && <div id="matchinfo1">   
+          work in progress (Ashutosh Birje@)
+         </div>}
 
       </div>
 
