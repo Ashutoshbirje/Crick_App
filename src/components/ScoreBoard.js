@@ -18,43 +18,117 @@ import './ScoreBoard.css'
 import { radioGroupBoxstyle } from './ui/RadioGroupBoxStyle'
 
 const ScoreBoard = (props) => {
-  const [inningNo, setInningNo] = useState(1)
-  const [match, setMatch] = useState({ inning1: { batters: [], bowlers: [] }, inning2: { batters: [], bowlers: [] } })
-  const [currentRunStack, setCurrentRunStack] = useState([])
-  const [totalRuns, setTotalRuns] = useState(0)
-  const [extras, setExtras] = useState({ total: 0, wide: 0, noBall: 0 })
-  const [runsByOver, setRunsByOver] = useState(0)
-  const [wicketCount, setWicketCount] = useState(0)
-  const [totalOvers, setTotalOvers] = useState(0)
-  const [batters, setBatters] = useState([])
-  const [ballCount, setBallCount] = useState(0)
-  const [overCount, setOverCount] = useState(0)
-  const [recentOvers, setRecentOvers] = useState([])
-  const [batter1, setBatter1] = useState({})
-  const [batter2, setBatter2] = useState({})
-  const [battingOrder, setBattingOrder] = useState(0)
-  const [isBatter1Edited, setBatter1Edited] = useState(false)
-  const [isBatter2Edited, setBatter2Edited] = useState(false)
-  const [isBowlerEdited, setBowlerEdited] = useState(false)
-  const [bowler, setBowler] = useState({})
-  const [bowlers, setBowlers] = useState([])
-  const [inputBowler, setInputBowler] = useState('')
-  const [isModalOpen, setModalOpen] = React.useState(false)
-  const [outType, setOutType] = React.useState('')
-  const [runOutPlayerId, setRunOutPlayerId] = React.useState('')
-  const [remainingBalls, setRemainingBalls] = useState(0)
-  const [remainingRuns, setRemainingRuns] = useState(0)
-  const [strikeValue, setStrikeValue] = React.useState('strike')
-  const [isNoBall, setNoBall] = useState(false)
+
+/////
+
+const getStoredData = (key, defaultValue) => {
+  const storedValue = localStorage.getItem(key);
+  return (storedValue && props.Globalstate) ? JSON.parse(storedValue) : defaultValue;
+};
+
+const [inningNo, setInningNo] = useState(getStoredData('inningNo', 1));
+const [totalRuns, setTotalRuns] = useState(getStoredData('totalRuns', 0));
+const [wicketCount, setWicketCount] = useState(getStoredData('wicketCount', 0));
+const [totalOvers, setTotalOvers] = useState(getStoredData('totalOvers', 0));
+const [ballCount, setBallCount] = useState(getStoredData('ballCount', 0));
+const [match, setMatch] = useState(getStoredData("match", { inning1: { runs: 0, wickets: 0, overs: 0, batters: [], bowlers: [] }, inning2: { runs: 0, wickets: 0, overs: 0, batters: [], bowlers: [] } }));
+const [isBatter1Edited, setBatter1Edited] = useState(getStoredData('isBatter1Edited', false))
+const [isBatter2Edited, setBatter2Edited] = useState(getStoredData('isBatter2Edited', false))
+const [isBowlerEdited, setBowlerEdited] = useState(getStoredData('isBowlerEdited', false))
+const [batter1, setBatter1] = useState(getStoredData("batter1", {}));
+const [batter2, setBatter2] = useState(getStoredData("batter2", {}));
+const [batters, setBatters] = useState(getStoredData("batters", []))
+const [strikeValue, setStrikeValue] = useState(getStoredData("strikeValue", 'strike'))
+const [bowler, setBowler] = useState(getStoredData("bowler", {}))
+const [bowlers, setBowlers] = useState(getStoredData("bowlers", []))
+const [overCount, setOverCount] = useState(getStoredData('overCount', 0));
+const [inputBowler, setInputBowler] = useState(getStoredData("inputBowler", ''))
+const [currentRunStack, setCurrentRunStack] = useState(getStoredData("currentRunStack", []))
+const [extras, setExtras] = useState(getStoredData("extras", { total: 0, wide: 0, noBall: 0 }))
+const [recentOvers, setRecentOvers] = useState(getStoredData("recentOvers", []))
+const [runsByOver, setRunsByOver] = useState(getStoredData("runsByOver", 0))
+const [remainingBalls, setRemainingBalls] = useState(getStoredData("remainingBalls", 0))
+const [remainingRuns, setRemainingRuns] = useState(getStoredData("remainingRuns", 0))
+const [activeSection, setActiveSection] = useState(getStoredData("activeSection", "matchInfo"));
+const [battingOrder, setBattingOrder] = useState(getStoredData("battingOrder", 0))
+const [isModalOpen, setModalOpen] = useState(getStoredData('isModalOpen', false))
+const [runOutPlayerId, setRunOutPlayerId] = useState(getStoredData("runOutPlayerId", ''))
+const [hasMatchEnded, setMatchEnded] = useState(getStoredData('hasMatchEnded', false))
+const [isNoBall, setNoBall] = useState(getStoredData('isNoBall', false))
+const [outType, setOutType] = useState(getStoredData("outType", ''))
+
+useEffect(() => {
+  localStorage.setItem("match", JSON.stringify(match));
+  localStorage.setItem('inningNo', JSON.stringify(inningNo));
+  localStorage.setItem('totalRuns', JSON.stringify(totalRuns));
+  localStorage.setItem('wicketCount', JSON.stringify(wicketCount));
+  localStorage.setItem('totalOvers', JSON.stringify(totalOvers));
+  localStorage.setItem('ballCount', JSON.stringify(ballCount));
+  localStorage.setItem('isBatter1Edited', JSON.stringify(isBatter1Edited));
+  localStorage.setItem('isBatter2Edited', JSON.stringify(isBatter2Edited));
+  localStorage.setItem('isBowlerEdited', JSON.stringify(isBowlerEdited));
+  localStorage.setItem('batter1', JSON.stringify(batter1));
+  localStorage.setItem('batter2', JSON.stringify(batter2));
+  localStorage.setItem('batters', JSON.stringify(batters));
+  localStorage.setItem('strikeValue', JSON.stringify(strikeValue));
+  localStorage.setItem('bowler', JSON.stringify(bowler));
+  localStorage.setItem('inputBowler', JSON.stringify(inputBowler));
+  localStorage.setItem('currentRunStack', JSON.stringify(currentRunStack));
+  localStorage.setItem('extras', JSON.stringify(extras));
+  localStorage.setItem('recentOvers', JSON.stringify(recentOvers));
+  localStorage.setItem('bowlers', JSON.stringify(bowlers));
+  localStorage.setItem('overCount', JSON.stringify(overCount));
+  localStorage.setItem('runsByOver', JSON.stringify(runsByOver));
+  localStorage.setItem('remainingBalls', JSON.stringify(remainingBalls));
+  localStorage.setItem('remainingRuns', JSON.stringify(remainingRuns));
+  localStorage.setItem('activeSection', JSON.stringify(activeSection));
+  localStorage.setItem('battingOrder', JSON.stringify(battingOrder));
+  localStorage.setItem('isModalOpen', JSON.stringify(isModalOpen));
+  localStorage.setItem('runOutPlayerId', JSON.stringify(runOutPlayerId));
+  localStorage.setItem('hasMatchEnded', JSON.stringify(hasMatchEnded));
+  localStorage.setItem('isNoBall', JSON.stringify(isNoBall));
+  localStorage.setItem('outType', JSON.stringify(outType));
+}, [match,inningNo, totalRuns, wicketCount, totalOvers, ballCount,isBowlerEdited,isBatter2Edited,isBatter1Edited,batter2,batter1,strikeValue,bowler,inputBowler,currentRunStack,extras,recentOvers,bowlers,overCount,batters,runsByOver,remainingBalls,remainingRuns,activeSection,battingOrder,isModalOpen,runOutPlayerId,hasMatchEnded,isNoBall,outType]);
+
+/////
+
+  // const [extras, setExtras] = useState({ total: 0, wide: 0, noBall: 0 })
+  // const [match, setMatch] = useState({ inning1: { batters: [], bowlers: [] }, inning2: { batters: [], bowlers: [] } })
+  // const [inningNo, setInningNo] = useState(1)
+  // const [totalRuns, setTotalRuns] = useState(0)
+  // const [wicketCount, setWicketCount] = useState(0)
+  // const [totalOvers, setTotalOvers] = useState(0)
+  // const [ballCount, setBallCount] = useState(0)
+  // const [currentRunStack, setCurrentRunStack] = useState([])
+  // const [runsByOver, setRunsByOver] = useState(0)
+  // const [batters, setBatters] = useState([])
+  // const [overCount, setOverCount] = useState(0)
+  // const [recentOvers, setRecentOvers] = useState([])
+  // const [batter1, setBatter1] = useState({})
+  // const [batter2, setBatter2] = useState({})
+  // const [battingOrder, setBattingOrder] = useState(0)
+  // const [isBatter1Edited, setBatter1Edited] = useState(false)
+  // const [isBatter2Edited, setBatter2Edited] = useState(false)
+  // const [isBowlerEdited, setBowlerEdited] = useState(false)
+  // const [bowler, setBowler] = useState({})
+  // const [bowlers, setBowlers] = useState([])
+  // const [inputBowler, setInputBowler] = useState('')
+  // const [isModalOpen, setModalOpen] = useState(false)
+  // const [outType, setOutType] = useState('')
+  // const [runOutPlayerId, setRunOutPlayerId] = useState('')
+  // const [remainingBalls, setRemainingBalls] = useState(0)
+  // const [remainingRuns, setRemainingRuns] = useState(0)
+  // const [strikeValue, setStrikeValue] = React.useState('strike')
+  // const [isNoBall, setNoBall] = useState(false)
   const [suggestions, setSuggestions] = useState([])
   const [hasNameSuggested, setNameSuggested] = useState(false)
-  const [hasMatchEnded, setMatchEnded] = useState(false)
-  const [activeSection, setActiveSection] = useState("matchInfo");
-  const [currentDate, setCurrentDate] = useState("");
-  const [currentTime, setCurrentTime] = useState("");
+  // const [hasMatchEnded, setMatchEnded] = useState(false)
   const [isSlideOpen1, setIsSlideOpen1] = useState(false);
   const [isSlideOpen2, setIsSlideOpen2] = useState(false);
-
+  // const [activeSection, setActiveSection] = useState("matchInfo");
+  const [currentDate, setCurrentDate] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
+  
   let data = JSON.parse(localStorage.getItem('data'))
   const { batting, team1, team2 } = data
   const maxOver = parseInt(data.maxOver)
@@ -65,11 +139,7 @@ const ScoreBoard = (props) => {
   const toggleSlide2 = () => {
     setIsSlideOpen2(!isSlideOpen2); // Toggle the slide state
   };
-//////
 
-
-
-//////
   useEffect(() => {
     console.log('Props received in ScoreBoard:', props);
   }, [props]);
@@ -101,11 +171,13 @@ const ScoreBoard = (props) => {
     endInningButton.disabled = true
   }, [])
 
+  //  Handle the all effect
   const handleEndInning = (e) => {
     const endInningButton = document.getElementById('end-inning')
     if (endInningButton.textContent === 'Reset') {
       history.push('/')
     } else {
+      // real - time add kar sakte heai
       if (batter1.id !== undefined) {
         const { id, name, run, ball, four, six, strikeRate, onStrike } = batter1
         batters.push({
@@ -283,6 +355,7 @@ const ScoreBoard = (props) => {
     }
   }
 
+  // Keypad blur
   const handleBatter1Blur = (e) => {
     let name = e.target.value
     name = name.charAt(0).toUpperCase() + name.slice(1)
@@ -311,7 +384,7 @@ const ScoreBoard = (props) => {
       setBattingOrder(battingOrder + 1)
     }
   }
-
+  // Keypad blur
   const handleBatter2Blur = (e) => {
     let name = e.target.value
     name = name.charAt(0).toUpperCase() + name.slice(1)
@@ -340,7 +413,7 @@ const ScoreBoard = (props) => {
       setBattingOrder(battingOrder + 1)
     }
   }
-
+  // Keypad blur
   const handleBowlerBlur = (e) => {
     let name = e.target.value
     if (name !== '') {
@@ -384,6 +457,7 @@ const ScoreBoard = (props) => {
     return suggestion.name
   }
 
+  // Keypad blur
   const inputProps = {
     value: inputBowler,
     onChange: (e, { newValue }) => {
@@ -507,7 +581,8 @@ const ScoreBoard = (props) => {
     ])
     setBatter2({})
   }
-
+  
+  // About Edit the batter1 name
   const editBatter1Name = () => {
     if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
       const batter1NameElement = document.getElementById('batter1Name')
@@ -516,6 +591,7 @@ const ScoreBoard = (props) => {
     }
   }
 
+  // About Edit the batter2 name
   const editBatter2Name = () => {
     if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
       const batter2NameElement = document.getElementById('batter2Name')
@@ -523,7 +599,7 @@ const ScoreBoard = (props) => {
       setBatter2Edited(true)
     }
   }
-
+  // About Edit the bowler name
   const editBowlerName = () => {
     if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
       const bowlerNameElement = document.querySelector('.react-autosuggest__input')
@@ -539,6 +615,13 @@ const ScoreBoard = (props) => {
     }
     setWicketCount(wicketCount - 1)
     const batter = batters[batters.length - 1]
+
+    // if(true){
+        // work on this
+    // } else {
+      batter.ball = batter.ball - 1
+    // }
+
     const { id, name, run, ball, four, six, strikeRate, onStrike } = batter
     if (batter1.name === undefined || batter1.onStrike) {
       const batter1NameElement = document.getElementById('batter1Name')
@@ -591,6 +674,46 @@ const ScoreBoard = (props) => {
     setBatters(batters)
   }
 
+//////
+  // Handle wicket delivery in batsman account
+
+  // Done
+  const handleCurrentBall = (run) => {
+
+    // console.log("Added Entry to batter1");
+    
+    if(!isNoBall){
+      if (batter1.onStrike) {
+        setBatter1((state) => {
+          const updatedRun = state.run + run
+          const updatedBall = state.ball + 1
+          const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
+          return {
+            ...state,
+            run: updatedRun,
+            ball: updatedBall,
+            strikeRate: sr,
+          }
+        })
+      } else {
+        setBatter2((state) => {
+          const updatedRun = state.run + run
+          const updatedBall = state.ball + 1
+          const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
+          return {
+            ...state,
+            run: updatedRun,
+            ball: updatedBall,
+            strikeRate: sr,
+          }
+        })
+      }
+    } 
+  }
+
+//////
+
+  // Base Logic
   const undoRun = (run, isNoBallParam) => {
     if (isNoBallParam) {
       setTotalRuns(totalRuns - (run + 1))
@@ -741,6 +864,7 @@ const ScoreBoard = (props) => {
     }
   }
 
+  // Strick Rotation 
   const handleStrikeChange = (e) => {
     changeStrikeRadio(e.target.value)
     if (e.target.value === 'strike') {
@@ -750,6 +874,7 @@ const ScoreBoard = (props) => {
     }
   }
 
+  // Strick Rotation 
   const changeStrikeRadio = (strikeParam) => {
     if (strikeParam === undefined) {
       setStrikeValue(strikeValue === 'strike' ? 'non-strike' : 'strike')
@@ -758,6 +883,7 @@ const ScoreBoard = (props) => {
     }
   }
 
+  // Strick Rotation 
   const switchBatterStrike = (strikeParam) => {
     if (strikeParam === undefined) {
       setBatter1((state) => ({
@@ -792,6 +918,7 @@ const ScoreBoard = (props) => {
   }
 
   const handleRun = (run) => {
+
     if (isNoBall) {
       setCurrentRunStack((state) => [...state, 'nb' + run])
       removeNoBallEffect()
@@ -829,6 +956,7 @@ const ScoreBoard = (props) => {
         changeStrikeRadio()
       }
     }
+
     if (batter1.onStrike) {
       setBatter1((state) => {
         const updatedRun = state.run + run
@@ -886,8 +1014,11 @@ const ScoreBoard = (props) => {
         switchBatterStrike()
       }
     }
-  }
 
+  }
+  
+
+  
   const handleNoBall = () => {
     if (inningNo === 2) {
       setRemainingRuns(remainingRuns - 1)
@@ -1061,14 +1192,15 @@ const ScoreBoard = (props) => {
       endInningButton.disabled = false
     }
   }
-
+ 
+  // INACTIVE KEYPAD
   const disableAllScoreButtons = () => {
     const scoreTypesButtons = document.querySelectorAll('.score-types-button')
     for (let i = 0; i < scoreTypesButtons.length; i++) {
       scoreTypesButtons[i].disabled = true
     }
   }
-
+  // ACTIVE KEYPAD
   const enableAllScoreButtons = () => {
     const scoreTypesButtons = document.querySelectorAll('.score-types-button')
     for (let i = 0; i < scoreTypesButtons.length; i++) {
@@ -1079,18 +1211,23 @@ const ScoreBoard = (props) => {
   if (batter1.name !== undefined && batter2.name !== undefined && inputBowler !== '') {
     enableAllScoreButtons()
   }
+
   let rrr = (remainingRuns / (remainingBalls / 6)).toFixed(2)
   rrr = isFinite(rrr) ? rrr : 0
   const overs = overCount + ballCount / 6
   let crr = (totalRuns / overs).toFixed(2)
   crr = isFinite(crr) ? crr : 0
+
   const inning1 = match.inning1
   const inning2 = match.inning2
+
   const scoringTeam = batting === team1 ? team1 : team2
   const chessingTeam = scoringTeam === team1 ? team2 : team1
+
   let winningMessage = `${inningNo === 1 ? scoringTeam : chessingTeam} needs ${remainingRuns} ${
     remainingRuns <= 1 ? 'run' : 'runs'
   } in ${remainingBalls} ${remainingBalls <= 1 ? 'ball' : 'balls'} to win`
+  
   if (inningNo === 2) {
     var target = inning1.runs + 1
     if (wicketCount < 10 && overCount <= maxOver && totalRuns >= target) {
@@ -1113,6 +1250,7 @@ const ScoreBoard = (props) => {
     </>
   )
 
+  // Notice
   const welcomeContent = (
     <>
       <div></div>
@@ -1121,6 +1259,7 @@ const ScoreBoard = (props) => {
     </>
   )
 
+  // Notice
   const firstInningCompletedContent = (
     <>
       {overCount === maxOver && <div>1st inning completed</div>}
@@ -1129,6 +1268,7 @@ const ScoreBoard = (props) => {
     </>
   )
 
+  // Notice
   const remainingRunsContent = (
     <>
       <div>Target: {target}</div>
@@ -1136,7 +1276,7 @@ const ScoreBoard = (props) => {
       <div>RRR: {isNaN(rrr) ? 0 : rrr}</div>
     </>
   )
-  
+
   const winnerCard3= (
     <>
       <p>{winningMessage}</p>
@@ -1185,12 +1325,12 @@ const ScoreBoard = (props) => {
             <Box sx={radioGroupBoxstyle} >
               <FormControl component='fieldset'
                 sx={{
-      display: 'flex',
-      flexDirection: 'column', // Ensure radio buttons are stacked vertically
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: 2,
-    }}>
+                  display: 'flex',
+                  flexDirection: 'column', // Ensure radio buttons are stacked vertically
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: 2,
+                }}>
                 <RadioGroup
                   row
                   aria-label='wicket'
@@ -1286,109 +1426,114 @@ const ScoreBoard = (props) => {
         </div>
         {/* Navigation */}
         <div className="tabs">
-        <button className={`tab ${activeSection === "matchInfo" ? "active-tab" : ""}`}
- onClick={() => setActiveSection("matchInfo")}>Match Info</button>
+        <button className={`tab ${activeSection === "matchInfo" ? "active-tab" : ""}`} onClick={() => setActiveSection("matchInfo")}>Match Info</button>
         <button className={`tab ${activeSection === "liveScore" ? "active-tab" : ""}`} onClick={() => setActiveSection("liveScore")}>Live Score</button>
         <button className={`tab ${activeSection === "scoreCard" ? "active-tab" : ""}`} onClick={() => setActiveSection("scoreCard")}>Scorecard</button>
         <button className={`tab ${activeSection === "result" ? "active-tab" : ""}`} onClick={() => setActiveSection("result")}>Results</button>
         </div>
-      <div>
 
+        {/* All section */}
+        <div>
+           {/*Section 1 :  Match Info */}
         {activeSection === "matchInfo" && <div id="matchinfo">   
           <div className="container1">
-      <div className="info-container">
-        <table className="info-table">
-          <tbody>
-            <tr>
-              <td className="label1">Info</td>
-              <td className="label1" ></td>
-            </tr>
-            <tr>
-              <td className="label">Match</td>
-              <td className="value">
-              {team1} vs {team2}             
-               </td>
-            </tr>
-            <tr>
-              <td className="label">Inning</td>
-              <td className="value">
-              {inningNo === 1 ? '1st' : '2nd'}         
-               </td>
-            </tr>
-            <tr>
-              <td className="label">Series</td>
-              <td className="value">IPL</td>
-            </tr>
-            <tr>
-              <td className="label">Match Type</td>
-              <td className="value">UnderArm</td>
-            </tr>
-            <tr>
-              <td className="label">Date</td>
-              <td className="value">{currentDate}</td>
-            </tr>
-            <tr>
-              <td className="label">Time</td>
-              <td className="value">{currentTime}</td>
-            </tr>
-            <tr>
-              <td className="label">Toss</td>
-              <td className="value">{props.toss} won & choose {props.win} </td>
-            </tr>
-            <tr >
-              <td className="label1" >Venue Guide</td>
-              <td className="label1" ></td>
-            </tr>
-            <tr>
-              <td className="label">Stadium</td>
-              <td className="value">SuperSport Park</td>
-            </tr>
-            <tr>
-              <td className="label">City</td>
-              <td className="value">Centurion</td>
-            </tr>
-            <tr>
-              <td className="label">Country</td>
-              <td className="value">South Africa</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-         </div></div>}
-       
+          <div className="info-container">
+            <table className="info-table">
+              <tbody>
+                <tr>
+                  <td className="label1">Info</td>
+                  <td className="label1" ></td>
+                </tr>
+                <tr>
+                  <td className="label">Match</td>
+                  <td className="value">
+                  {team1} vs {team2}             
+                   </td>
+                </tr>
+                <tr>
+                  <td className="label">Inning</td>
+                  <td className="value">
+                  {inningNo === 1 ? '1st' : '2nd'}         
+                   </td>
+                </tr>
+                <tr>
+                  <td className="label">Series</td>
+                  <td className="value">IPL</td>
+                </tr>
+                <tr>
+                  <td className="label">Match Type</td>
+                  <td className="value">UnderArm</td>
+                </tr>
+                <tr>
+                  <td className="label">Date</td>
+                  <td className="value">{currentDate}</td>
+                </tr>
+                <tr>
+                  <td className="label">Time</td>
+                  <td className="value">{currentTime}</td>
+                </tr>
+                <tr>
+                  <td className="label">Toss</td>
+                  <td className="value">{props.toss} won & choose {props.win} </td>
+                </tr>
+                <tr >
+                  <td className="label1" >Venue Guide</td>
+                  <td className="label1" ></td>
+                </tr>
+                <tr>
+                  <td className="label">Stadium</td>
+                  <td className="value">SuperSport Park</td>
+                </tr>
+                <tr>
+                  <td className="label">City</td>
+                  <td className="value">Centurion</td>
+                </tr>
+                <tr>
+                  <td className="label">Country</td>
+                  <td className="value">South Africa</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          </div></div>}
+
+           {/*Section 2 :  Live Score */}
         {activeSection === "liveScore" && <div id="liveScore">        
+         
           {/* User panel */}
-      <div className="score-container1">
+         <div className="score-container1">
       
-      <div className='Tag'>
-        <div className='First'>
+         <div className='Tag'>
+         <div className='First'>
           <div className="Circle"></div>
           <div className="upcoming">Live</div>
-        </div>
-      </div>
+         </div>
+         </div>
 
-      <div className="team-score1">
-      {scoringTeam}
-        <span className="score1">{inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
+         <div className="team-score1">
+         {scoringTeam}
+         <span className="score1">{inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
           {inningNo === 1 ? totalOvers : inning1.overs})</span>
-      </div>
+         </div>
 
-      <div className="team-score1">
-      {chessingTeam}
-      <span className="score1">
-      {inningNo === 1
-      ? '0-0 (0)'
-      : `${hasMatchEnded ? inning2.runs : totalRuns}-${
+         <div className="team-score1">
+        {chessingTeam}
+        <span className="score1">
+        {inningNo === 1
+        ? '0-0 (0)'
+        : `${hasMatchEnded ? inning2.runs : totalRuns}-${
           hasMatchEnded ? inning2.wickets : wicketCount
         } (${hasMatchEnded ? inning2.overs : totalOvers})`}
-      </span>
-      </div>
+        </span>
+         </div>
 
-      <div className='line'></div>
-      <hr/>
-      {/* <button onClick={endMatch1}>End Match</button> */}
-      <div className="result">        {inningNo === 2 ? winnerCard3 : overCount === maxOver || wicketCount === 10 ? winnerCard2 : tossContent}</div>
-</div>
+         <div className='line'></div>
+
+         <div className="result">{inningNo === 2 ? winnerCard3 : overCount === maxOver || wicketCount === 10 ? winnerCard2 : tossContent}</div>
+      
+         
+         </div>
+
           {/* Admin panel */}
 <div className='score'>
   <div>
@@ -1396,6 +1541,7 @@ const ScoreBoard = (props) => {
   </div>
   <div>CRR : {isNaN(crr) ? 0 : crr}</div>
 </div>
+{/* Batter */}
 <div className='batting-container'>
   <table>
     <thead>
@@ -1416,8 +1562,8 @@ const ScoreBoard = (props) => {
             <Radio
               size='small'
               checked={strikeValue === 'strike'}
-              onChange={handleStrikeChange}
               value='strike'
+              onChange={handleStrikeChange}
               name='radio-buttons'
               inputProps={{ 'aria-label': 'strike' }}
               style={{ padding: '0 4px 0 2px' }}
@@ -1441,8 +1587,8 @@ const ScoreBoard = (props) => {
             <Radio
               size='small'
               checked={strikeValue === 'non-strike'}
-              onChange={handleStrikeChange}
               value='non-strike'
+              onChange={handleStrikeChange}
               name='radio-buttons'
               inputProps={{ 'aria-label': 'non-strike' }}
               style={{ padding: '0 4px 0 2px' }}
@@ -1462,6 +1608,7 @@ const ScoreBoard = (props) => {
     </tbody>
   </table>
 </div>
+{/* Bowler */}
 <div className='bowler-container'>
   <div className='bowler'>
     <div className='One'>
@@ -1491,9 +1638,9 @@ const ScoreBoard = (props) => {
     {currentRunStack.map((run, i) => (
       <div key={i}>{run}</div>
     ))}
-
   </div>
 </div>
+{/* Keypad */}
 <div className='score-types-container'>
   <table>
     <tbody>
@@ -1518,7 +1665,7 @@ const ScoreBoard = (props) => {
             nb
           </button>
         </td>
-        <td rowSpan='2' className='score-types' onClick={() => setModalOpen(true)}>
+        <td rowSpan='2' className='score-types' onClick={() => {setModalOpen(true); handleCurrentBall(0)}}>
           <button className='score-types-button' disabled>
             W
           </button>
@@ -1593,6 +1740,7 @@ const ScoreBoard = (props) => {
   </div>
          </div></div>}
 
+           {/*Section 3 :  Score Card*/}
         {activeSection === "scoreCard" && <div id="scoreCard">        
           {/* Scorecard */}
         <div className='score-board-container'>
@@ -1684,38 +1832,46 @@ const ScoreBoard = (props) => {
                 <div>Wd: {inningNo === 1 ? extras.wide : inning1.extra.wide}</div>
                 <div>Nb:{inningNo === 1 ? extras.noBall : inning1.extra.noBall}</div>
               </div>
-           </div>
-           {/* Run Rate */}
-           <div className='extras-container'>
+            </div>
+            {/* Run Rate */}
+            <div className='extras-container'>
               <div>Run Rate</div>
               <div className='extra'>
                 <div>{inningNo === 1 ? crr : inning1.runRate}</div>
               </div>
-           </div>
-           {/* Total */}
-           <div className='extras-container'>
+            </div>
+            {/* Total */}
+            <div className='extras-container'>
               <div>Total</div>
               <div className='extra'>
                 <div>{inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
                   {inningNo === 1 ? totalOvers : inning1.overs} Ov)</div>
               </div>
-           </div>
+            </div>
           </div>
           )}
 
           </div>
           {/* Inning2 Starts here */}
           {/* {inningNo === 2 && ( */}
-            <div>
+          <div>
               <div className='score-board-innings' onClick={toggleSlide2}>
                 <div>{chessingTeam} ( 2nd Innings )</div>
                 <div>
-                  {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
-                  {hasMatchEnded ? inning2.overs : totalOvers} Ov)
+                {inningNo === 1
+        ? '0-0 (0 Ov)'
+        : `${hasMatchEnded ? inning2.runs : totalRuns}-${
+  hasMatchEnded ? inning2.wickets : wicketCount
+} (${hasMatchEnded ? inning2.overs : totalOvers} Ov)`
+}
+      
+                  {/* {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
+                  {hasMatchEnded ? inning2.overs : totalOvers} Ov) */}
                 </div>
               </div>
               {isSlideOpen2 && (
         <div className="sliding-panel">
+              {/* batting 2 */}
               <div className='sb-batting'>
                 <table>
                   <thead className='sb-bat'>
@@ -1748,6 +1904,7 @@ const ScoreBoard = (props) => {
                   </tbody>
                 </table>
               </div>
+              {/* bowling 2 */}
               <div className='sb-bowling'>
                 <table>
                   <thead>
@@ -1782,6 +1939,7 @@ const ScoreBoard = (props) => {
                   </tbody>
                 </table>
               </div>
+              {/* Extra */}
               <div className='extras-container'>
               <div>Extras</div>
               <div className='extra'>
@@ -1797,29 +1955,35 @@ const ScoreBoard = (props) => {
                 <div> {inningNo === 2 ? crr : inning2.runRate}</div>
               </div>
               </div>
-           {/* Total */}
-           <div className='extras-container'>
+              {/* Total */}
+              <div className='extras-container'>
               <div>Total</div>
               <div className='extra'>
-                <div> {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
-                  {hasMatchEnded ? inning2.overs : totalOvers} Ov)</div>
+                <div> 
+                {inningNo === 1
+        ? '0-0 (0 Ov)'
+        : `${hasMatchEnded ? inning2.runs : totalRuns}-${
+  hasMatchEnded ? inning2.wickets : wicketCount
+} (${hasMatchEnded ? inning2.overs : totalOvers} Ov)`
+}
+                  {/* {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
+                  {hasMatchEnded ? inning2.overs : totalOvers} Ov) */}
+                </div>
               </div>
-           </div>
+              </div>
         </div>
       )}
 
-            </div>
+          </div>
           {/* )} */}
          </div></div>}
 
+           {/*Section 4 :  Result */}
         {activeSection === "result" && <div id="matchinfo1">   
           work in progress (Ashutosh Birje@)
          </div>}
 
-      </div>
-
-
-
+        </div>
       </div>
     </div>
   )

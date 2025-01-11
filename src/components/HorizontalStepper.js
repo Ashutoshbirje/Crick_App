@@ -1,25 +1,25 @@
+// Done
 import React from 'react';
 import { TextField, Button, Step, StepLabel, Stepper, Typography, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, makeStyles } from '@material-ui/core';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useHistory } from 'react-router-dom';
 import tennisBall from '../Images/tennis-ball.png';
-
 const useStyles = makeStyles((theme) => ({
   main: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center', // Centering the child elements horizontally
-    justifyContent: 'center', // Centering the child elements vertically
-    boxSizing: 'border-box', // Ensures padding does not affect width
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    boxSizing: 'border-box', 
     height: '88vh',
   },
 
   mainContainer1: {
-    width: '100%', // Ensures the container takes up the full width of the screen
-    maxWidth: '100%', // Prevents it from exceeding the width of the screen
-    padding: '1rem', // Adds padding inside the container
-    boxSizing: 'border-box', // Ensures padding does not affect the width
+    width: '100%',
+    maxWidth: '100%',
+    padding: '1rem',
+    boxSizing: 'border-box',
   },
 
   '@media (max-width: 490px)': {
@@ -28,39 +28,39 @@ const useStyles = makeStyles((theme) => ({
       margin: '2px',
     },
     mainContainer1: {
-      padding: '2px', // Adds padding inside the container
-      boxSizing: 'border-box', // Ensures padding does not affect the width
+      padding: '2px',
+      boxSizing: 'border-box',
       margin: '2px',
     },
   },
 
   mainContainer2: {
-    margin: 'auto', // Centers the container horizontally
+    margin: 'auto',
     border: '1px solid #ccc',
     borderRadius: '4px',
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-    maxWidth: '600px', // Maximum width of the second container
-    width: '100%', // Makes sure the container can shrink on smaller screens
-    height:'400px',
+    maxWidth: '600px',
+    width: '100%',
+    height: '400px',
     padding: '2rem',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center', // Centering the child elements horizontally
-    justifyContent: 'center', // Centering the child elements vertically
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  '@media (max-width: 768px)': { // For smaller screens like tablets and phones
+  '@media (max-width: 768px)': {
     mainContainer2: {
       padding: '1rem',
     },
   },
 
-  '@media (max-width: 480px)': { // For very small screens (phones in portrait mode)
+  '@media (max-width: 480px)': {
     mainContainer2: {
       padding: '0.5rem',
     },
   },
-  
+
   team1: {
     width: 200,
   },
@@ -72,14 +72,14 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '25px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center', // Centering the child elements horizontally
+    alignItems: 'center',
     justifyContent: 'center',
     color: 'white',
     margin: '20px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', // Adds a subtle shadow to make it stand out
-    transition: 'transform 0.3s ease', // Adds smooth animation on hover
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+    transition: 'transform 0.3s ease',
     '&:hover': {
-      transform: 'scale(1.1)', // Slightly enlarges the div on hover
+      transform: 'scale(1.1)',
     },
   },
 
@@ -100,18 +100,18 @@ const useStyles = makeStyles((theme) => ({
 
   overcircle: {
     display: 'flex',
-    justifyContent: 'center', // Centers the icon horizontally
-    alignItems: 'center', // Centers the icon vertically
+    justifyContent: 'center',
+    alignItems: 'center',
     height: '120px',
     width: '120px',
-    borderRadius: '60px',// Makes the div circular
+    borderRadius: '60px',
     margin: '20px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', // Adds a subtle shadow to make it stand out
-    color: 'white', // Icon color
-    fontSize: '2rem', // Icon size
-    transition: 'transform 0.3s ease', // Adds smooth animation on hover
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+    color: 'white',
+    fontSize: '2rem',
+    transition: 'transform 0.3s ease',
     '&:hover': {
-      transform: 'scale(1.1)', // Slightly enlarges the div on hover
+      transform: 'scale(1.1)',
     },
   },
 
@@ -137,21 +137,22 @@ const useStyles = makeStyles((theme) => ({
   },
 
   mainContainer3: {
-    margin: 'auto', // Centers the container horizontally
+    margin: 'auto',
     border: '1px solid #ccc',
     borderRadius: '4px',
-    maxWidth: '600px', // Maximum width of the second container
-    width: '100%', // Makes sure the container can shrink on smaller screens
+    maxWidth: '600px',
+    width: '100%',
     padding: '2rem',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center', // Centering the child elements horizontally
-    justifyContent: 'center', // Centering the child elements vertically
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
 }));
 
-const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
+
+const HorizontalStepper = ({toss, win,setToss, setDecision, Globalstate, setGlobalstate }) => {
   const history = useHistory();
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
@@ -166,6 +167,7 @@ const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
     tossWinner: '',
     decision: '',
   };
+
 
   const validationSchema = [
     Yup.object().shape({
@@ -236,7 +238,11 @@ const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
                         name="team1"
                         label="Team 1 Name*"
                         value={values.team1}
-                        onChange={handleChange}
+                        // onChange={handleChange}
+                        onChange={(e) => {
+                          handleChange(e);
+                          localStorage.setItem('team1', e.target.value);  // Save input to localStorage
+                        }}
                         onBlur={handleBlur}
                         helperText={errors.team1 && touched.team1 && errors.team1}
                         error={errors.team1 && touched.team1}
@@ -250,7 +256,11 @@ const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
                         name="team2"
                         label="Team 2 Name*"
                         value={values.team2}
-                        onChange={handleChange}
+                        // onChange={handleChange}
+                        onChange={(e) => {
+                          handleChange(e);
+                          localStorage.setItem('team2', e.target.value);  // Save input to localStorage
+                        }}
                         onBlur={handleBlur}
                         helperText={errors.team2 && touched.team2 && errors.team2}
                         error={errors.team2 && touched.team2}
@@ -266,14 +276,17 @@ const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
                       name="maxOver"
                       label="Overs*"
                       value={values.maxOver}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        handleChange(e);
+                        localStorage.setItem('maxOver', e.target.value);  // Save input to localStorage
+                      }}
                       onBlur={handleBlur}
                       helperText={errors.maxOver && touched.maxOver && errors.maxOver}
                       error={errors.maxOver && touched.maxOver}
                       className={classes.overs}
                     />
 <div className={classes.overcircle}>
-  <img src={tennisBall} alt="Tennis Ball" style={{ width: '130px', height: '130px' }} />
+  <img src={tennisBall} alt="Tennis Ball" style={{ width: '130px', height: '130px' }} /> 
 </div>
 
                     </div>
@@ -331,6 +344,7 @@ const HorizontalStepper = ({toss, win,setToss, setDecision }) => {
                       disabled={isSubmitting}
                     >
                       {isLastStep() ? 'Start' : 'Next'}
+                      {isLastStep() ? setGlobalstate(false):''}
                     </Button>
                   </div>
                 </div>

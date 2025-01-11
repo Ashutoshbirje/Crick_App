@@ -1,8 +1,9 @@
+// Done
 import React  from 'react';
 import { AppBar, Box, Container, Toolbar, Typography } from '@material-ui/core';
 import HorizontalStepper from './HorizontalStepper';
 
-const StepperContainer = ({ toss, win, setToss, setWin }) => {
+const StepperContainer = ({ toss, win, setToss, setWin, Globalstate, setGlobalstate }) => {
 
   return (
     <div>
@@ -13,12 +14,13 @@ const StepperContainer = ({ toss, win, setToss, setWin }) => {
       </AppBar>
       <Container>
         <Box marginTop={10}>
-          {/* Pass tossWinner and decision as props */}
           <HorizontalStepper 
             toss={toss} 
             win={win} 
             setToss={setToss} 
             setDecision={setWin} 
+            Globalstate={Globalstate}
+            setGlobalstate={setGlobalstate}
           />
         </Box>
       </Container>

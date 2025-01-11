@@ -1,7 +1,29 @@
-import React from 'react'
+import React from 'react';
 
 const NotFound = () => {
-  return <h2>NotFound</h2>
-}
+  const goToHome = () => {
+    window.location.href = '/';
+  };
 
-export default NotFound
+  return (
+    <div style={{ textAlign: 'center', marginTop: '20%', color: '#555' }}>
+      <h1 style={{ fontSize: '3rem' }}>404</h1>
+      <h2>Page Not Found</h2>
+      <button
+        onClick={goToHome}
+        style={{
+          backgroundColor: 'transparent',
+          color: '#007bff',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '1rem',
+          marginTop: '10px'
+        }}
+      >
+        Go Back Home
+      </button>
+    </div>
+  );
+};
+
+export default NotFound;
