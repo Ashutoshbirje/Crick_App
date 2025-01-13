@@ -8,9 +8,15 @@ const StepperContainer = ({ toss, win, setToss, setWin, Globalstate, setGlobalst
   return (
     <div>
       <AppBar position="fixed">
-        <Toolbar>
-          <Typography variant="h6">Multi Step Form</Typography>
-        </Toolbar>
+      <Toolbar
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Typography variant="h6">Welcome</Typography>
+    </Toolbar>
       </AppBar>
       <Container>
         <Box marginTop={10}>

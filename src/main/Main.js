@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import NotFound from '../components/NotFound';
 import StepperContainer from '../components/StepperContainer';
 import ScoreBoard from '../components/ScoreBoard';
+import LandingPage from '../components/LandingPage';
 
 const Main = () => {
   const [toss, setToss] = useState();
@@ -29,9 +30,15 @@ const Main = () => {
     <BrowserRouter>
       <Switch>
       {/* // Done */}
-        <Route
+      <Route
           exact
           path='/'
+          component={LandingPage} 
+        />
+
+        <Route
+          exact
+          path='/form'
           render={(props) => (
             <StepperContainer
               {...props}
@@ -53,6 +60,7 @@ const Main = () => {
         
       {/* // Done */}
         <Route path='*' component={NotFound} />
+
       </Switch>
     </BrowserRouter>
   );

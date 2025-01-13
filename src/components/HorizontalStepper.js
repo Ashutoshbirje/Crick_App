@@ -355,7 +355,7 @@ const HorizontalStepper = ({toss, win,setToss, setDecision, Globalstate, setGlob
       </div>
       {/* Part C (About) */}
       <div className={classes.mainContainer3}>
-          <p>IPL</p>
+          <p>VIJAYDURG PREMIER LEAGUE</p>
       </div>
     </div>
   );

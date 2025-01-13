@@ -16,6 +16,7 @@ import { BOLD, CATCH, HIT_WICKET, RUN_OUT, STUMP } from '../constants/OutType'
 import MathUtil from '../util/MathUtil'
 import './ScoreBoard.css'
 import { radioGroupBoxstyle } from './ui/RadioGroupBoxStyle'
+import SportsCricketIcon from "@mui/icons-material/SportsCricket"; // Import the icon
 
 const ScoreBoard = (props) => {
 
@@ -728,8 +729,6 @@ useEffect(() => {
 //////
 
   // Handle wicket delivery in batsman account
-
-  // Done
   const handleCurrentBall = (run) => {
 
     // console.log("Added Entry to batter1");
@@ -1415,6 +1414,7 @@ useEffect(() => {
         {/* <button id='end-inning' onClick={handleEndInning}>
           {inningNo === 1 ? 'End Inning' : 'Score Board'}
         </button> */}
+
         {!buttonstate && <div className='Active'>
           LIVE
         </div>}
@@ -1577,7 +1577,7 @@ useEffect(() => {
                 </tr>
                 <tr>
                   <td className="label">Series</td>
-                  <td className="value">IPL</td>
+                  <td className="value">VPL</td>
                 </tr>
                 <tr>
                   <td className="label">Match Type</td>
@@ -1601,15 +1601,15 @@ useEffect(() => {
                 </tr>
                 <tr>
                   <td className="label">Stadium</td>
-                  <td className="value">SuperSport Park</td>
+                  <td className="value">Vijaydurg fort</td>
                 </tr>
                 <tr>
                   <td className="label">City</td>
-                  <td className="value">Centurion</td>
+                  <td className="value">Vijaydurg</td>
                 </tr>
                 <tr>
                   <td className="label">Country</td>
-                  <td className="value">South Africa</td>
+                  <td className="value">India</td>
                 </tr>
               </tbody>
             </table>
@@ -1630,13 +1630,24 @@ useEffect(() => {
          </div>
 
          <div className="team-score1">
-         {scoringTeam}
+          <div style={{display: "flex", alignItems: "center",justifyContent: "center"  }}>
+          {scoringTeam}
+         {inningNo === 1 && (
+    <SportsCricketIcon style={{ marginLeft: "8px", display: "flex", alignItems: "center",justifyContent: "center"  }}/> // Bat symbol for scoring team
+  )}
+          </div>
+
          <span className="score1">{inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
           {inningNo === 1 ? totalOvers : inning1.overs})</span>
          </div>
 
          <div className="team-score1">
-        {chessingTeam}
+          <div style={{display: "flex", alignItems: "center",justifyContent: "center"  }}>
+          {chessingTeam}
+        {inningNo !== 1 && (
+    <SportsCricketIcon style={{ marginLeft: "8px" }} /> // Bat symbol for chasing team
+  )}
+          </div>
         <span className="score1">
         {inningNo === 1
         ? '0-0 (0)'
