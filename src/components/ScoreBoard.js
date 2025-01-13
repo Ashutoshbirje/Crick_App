@@ -55,8 +55,9 @@ const [isModalOpen, setModalOpen] = useState(getStoredData('isModalOpen', false)
 const [runOutPlayerId, setRunOutPlayerId] = useState(getStoredData("runOutPlayerId", ''))
 const [hasMatchEnded, setMatchEnded] = useState(getStoredData('hasMatchEnded', false))
 const [isNoBall, setNoBall] = useState(getStoredData('isNoBall', false))
+const [iswideball, setwideBall] = useState(getStoredData('iswideball', false))
 const [outType, setOutType] = useState(getStoredData("outType", ''))
-
+const [buttonstate, setButtonstate] = useState(getStoredData("buttonstate", false));
 useEffect(() => {
   localStorage.setItem("match", JSON.stringify(match));
   localStorage.setItem('inningNo', JSON.stringify(inningNo));
@@ -87,8 +88,10 @@ useEffect(() => {
   localStorage.setItem('runOutPlayerId', JSON.stringify(runOutPlayerId));
   localStorage.setItem('hasMatchEnded', JSON.stringify(hasMatchEnded));
   localStorage.setItem('isNoBall', JSON.stringify(isNoBall));
+  localStorage.setItem('iswideball', JSON.stringify(iswideball));
   localStorage.setItem('outType', JSON.stringify(outType));
-}, [match,inningNo, totalRuns, wicketCount, totalOvers, ballCount,isBowlerEdited,isBatter2Edited,isBatter1Edited,batter2,batter1,strikeValue,bowler,inputBowler,currentRunStack,extras,recentOvers,bowlers,overCount,batters,runsByOver,remainingBalls,remainingRuns,activeSection,battingOrder,isModalOpen,runOutPlayerId,hasMatchEnded,isNoBall,outType]);
+  localStorage.setItem('buttonstate', JSON.stringify(buttonstate)); 
+}, [match,inningNo, totalRuns, wicketCount, totalOvers, ballCount,isBowlerEdited,isBatter2Edited,isBatter1Edited,batter2,batter1,strikeValue,bowler,inputBowler,currentRunStack,extras,recentOvers,bowlers,overCount,batters,runsByOver,remainingBalls,remainingRuns,activeSection,battingOrder,isModalOpen,runOutPlayerId,hasMatchEnded,isNoBall,iswideball,outType,buttonstate]);
 
 /////
 
@@ -165,18 +168,43 @@ useEffect(() => {
 
     return () => clearInterval(intervalId); // Cleanup
   }, []);
+
+  // useEffect(() => {
+  //   const endInningButton = document.getElementById('end-inning');
+  //   if (endInningButton) {
+  //     endInningButton.disabled = true;
+  //   }
+  // }, []);
   
   useEffect(() => {
-    const endInningButton = document.getElementById('end-inning')
-    endInningButton.disabled = true
-  }, [])
+    // main tain state
+
+    if (inningNo === 2) {
+      if (remainingRuns <= 0 || overCount === maxOver || wicketCount === 10) {
+        setButtonstate(true);
+      } else {
+        setButtonstate(false);
+      }
+    } else {
+      if (overCount === maxOver || wicketCount === 10) {
+        setButtonstate(true);
+      } else {
+        setButtonstate(false);
+      }
+    }
+    
+  }, [inningNo,overCount, maxOver,wicketCount,remainingRuns])
+
 
   //  Handle the all effect
   const handleEndInning = (e) => {
+
     const endInningButton = document.getElementById('end-inning')
     if (endInningButton.textContent === 'Reset') {
-      history.push('/')
+     history.push('/')
     } else {
+
+      // set data in Scorebord after press on end-inning and scorecard
       // real - time add kar sakte heai
       if (batter1.id !== undefined) {
         const { id, name, run, ball, four, six, strikeRate, onStrike } = batter1
@@ -265,6 +293,7 @@ useEffect(() => {
           }
         }
       }
+
       if (inningNo === 1) {
         setMatch((state) => {
           const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
@@ -329,8 +358,13 @@ useEffect(() => {
         // batter2NameElement.value = ''
         // batter2NameElement.disabled = false
         setStrikeValue('strike')
-        endInningButton.disabled = true
+        
+        ////
+        // endInningButton.disabled = true;
+        ////
+
       } else {
+
         setMatch((state) => {
           const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
           const totalSixes = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
@@ -349,12 +383,27 @@ useEffect(() => {
             },
           }
         })
+
         endInningButton.textContent = 'Reset'
         setMatchEnded(true)
+        // setreset(false);
       }
+
     }
   }
 
+  const endMatch = () => {
+    disableAllScoreButtons(); // Assuming this is defined elsewhere
+    
+    // const endInningButton = document.getElementById('end-inning');
+    // if (buttonstate && endInningButton.textContent === 'Score Board') {
+    //   if(endInningButton){
+    //     endInningButton.disabled = false;
+    //   }
+    // }
+    // setreset(true);
+  };
+  
   // Keypad blur
   const handleBatter1Blur = (e) => {
     let name = e.target.value
@@ -470,7 +519,9 @@ useEffect(() => {
     const bowlerNameElement = document.querySelector('.react-autosuggest__input')
     if (overCount + 1 === maxOver) {
       const endInningButton = document.getElementById('end-inning')
-      endInningButton.disabled = false
+      if(endInningButton){
+        endInningButton.disabled = false
+      }
     } else {
       bowlerNameElement.disabled = false
     }
@@ -675,6 +726,7 @@ useEffect(() => {
   }
 
 //////
+
   // Handle wicket delivery in batsman account
 
   // Done
@@ -730,8 +782,8 @@ useEffect(() => {
       if (run % 2 === 0) {
         setBatter1((state) => {
           const updatedRun = state.run - run
-          const updatedBall = state.ball - 1
-          const updatedSr = updatedRun / updatedBall
+          const updatedBall = (state.ball > 0) ? state.ball - 1 : 0 
+          const updatedSr = (updatedBall !== 0) ? updatedRun / updatedBall : 0
           const sr = Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100
           let four = state.four
           if (run === 4) {
@@ -755,8 +807,8 @@ useEffect(() => {
         switchBatterStrike()
         setBatter2((state) => {
           const updatedRun = state.run - run
-          const updatedBall = state.ball - 1
-          const updatedSr = updatedRun / updatedBall
+          const updatedBall = (state.ball > 0) ? state.ball - 1 : 0 
+          const updatedSr = (updatedBall !== 0) ? updatedRun / updatedBall : 0
           const sr = Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100
           let four = state.four
           if (run === 4) {
@@ -780,8 +832,8 @@ useEffect(() => {
       if (run % 2 === 0) {
         setBatter2((state) => {
           const updatedRun = state.run - run
-          const updatedBall = state.ball - 1
-          const updatedSr = updatedRun / updatedBall
+          const updatedBall = (state.ball > 0) ? state.ball - 1 : 0 
+          const updatedSr = (updatedBall !== 0) ? updatedRun / updatedBall : 0
           const sr = Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100
           let four = state.four
           if (run === 4) {
@@ -805,8 +857,8 @@ useEffect(() => {
         switchBatterStrike()
         setBatter1((state) => {
           const updatedRun = state.run - run
-          const updatedBall = state.ball - 1
-          const updatedSr = updatedRun / updatedBall
+          const updatedBall = (state.ball > 0) ? state.ball - 1 : 0 
+          const updatedSr = (updatedBall !== 0) ? updatedRun / updatedBall : 0
           const sr = Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100
           let four = state.four
           if (run === 4) {
@@ -833,12 +885,20 @@ useEffect(() => {
     if (currentRunStack.length > 0) {
       const last = currentRunStack[currentRunStack.length - 1]
       if (typeof last === 'number') {
+        console.log("num backup")
         const run = parseInt(last)
         undoRun(run, false)
+        /////
+        if(inningNo === 2 ){
+          setRemainingBalls(remainingBalls+1)
+          setRemainingRuns(remainingRuns+run)
+        }
+        /////
       } else {
         currentRunStack.pop()
         setCurrentRunStack(currentRunStack)
         if (last === 'wd') {
+          console.log("Wide backup")
           setTotalRuns(totalRuns - 1)
           setExtras((state) => ({
             ...state,
@@ -846,10 +906,36 @@ useEffect(() => {
             wide: state.wide - 1,
           }))
         } else if (last === 'W') {
+          console.log("wicket backup")
           undoWicket(false)
+          if(inningNo === 2 ){
+            setRemainingBalls(remainingBalls+1)
+          }
         } else {
+          console.log("No ball backup")
           const lastChar = last.substr(last.length - 1)
           const run = parseInt(lastChar)
+          /////
+        /////
+        if(inningNo === 2 ){
+          setRemainingBalls(remainingBalls+1)
+          setRemainingRuns(remainingRuns+run+1)
+        }
+        /////
+          const firstTwoEntries = last.slice(0, 2);
+          if(firstTwoEntries === 'wd'){
+            setExtras((state) => ({
+              ...state,
+              total: state.total - 1,
+              wide: state.wide - 1,
+            }))
+          } else {
+            setExtras((state) => ({
+              ...state,
+              total: state.total - 1,
+              noBall: state.noBall - 1,
+            }))
+          }
           if (isNaN(run)) {
             setTotalRuns(totalRuns - 1)
             setRunsByOver(runsByOver - 1)
@@ -920,22 +1006,28 @@ useEffect(() => {
   const handleRun = (run) => {
 
     if (isNoBall) {
+      console.log("No")
       setCurrentRunStack((state) => [...state, 'nb' + run])
       removeNoBallEffect()
+    } else if (iswideball) {
+      console.log("wide")
+      setCurrentRunStack((state) => [...state, 'wd' + run])
+      removeWideBallEffect()
     } else {
+      console.log("simple")
       setBallCount(ballCount + 1)
       setCurrentRunStack((state) => [...state, run])
     }
     setTotalRuns(totalRuns + run)
     setRunsByOver(runsByOver + run)
     if (inningNo === 2) {
-      if (!isNoBall) {
+      if (!isNoBall || !iswideball) {
         setRemainingBalls(remainingBalls - 1)
       }
       setRemainingRuns(remainingRuns - run)
     }
     if (ballCount === 5) {
-      if (isNoBall) {
+      if (isNoBall || iswideball) {
         if (run % 2 !== 0) {
           changeStrikeRadio()
         }
@@ -949,9 +1041,12 @@ useEffect(() => {
         }
       }
     } else {
-      if (!isNoBall) {
+      if (!isNoBall && !iswideball ) {
         setTotalOvers(Math.round((totalOvers + 0.1) * 10) / 10)
       }
+      // if (!iswideball) {
+      //   setTotalOvers(Math.round((totalOvers + 0.1) * 10) / 10)
+      // }
       if (run % 2 !== 0) {
         changeStrikeRadio()
       }
@@ -960,7 +1055,11 @@ useEffect(() => {
     if (batter1.onStrike) {
       setBatter1((state) => {
         const updatedRun = state.run + run
-        const updatedBall = state.ball + 1
+        var updatedBall
+        if(!isNoBall){
+          updatedBall = state.ball + 1
+        }
+        // const updatedBall = state.ball + 1
         const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
         let four = state.four
         if (run === 4) {
@@ -991,7 +1090,11 @@ useEffect(() => {
     } else {
       setBatter2((state) => {
         const updatedRun = state.run + run
-        const updatedBall = state.ball + 1
+        var updatedBall
+        if(!isNoBall){
+          updatedBall = state.ball + 1
+        }
+        // const updatedBall = state.ball + 1
         const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
         let four = state.four
         if (run === 4) {
@@ -1016,8 +1119,6 @@ useEffect(() => {
     }
 
   }
-  
-
   
   const handleNoBall = () => {
     if (inningNo === 2) {
@@ -1057,7 +1158,7 @@ useEffect(() => {
       if (inningNo === 2) {
         setRemainingRuns(remainingRuns - 1)
       }
-      setCurrentRunStack((state) => [...state, 'wd'])
+      // setCurrentRunStack((state) => [...state, 'wd'])
       setTotalRuns(totalRuns + 1)
       setRunsByOver(runsByOver + 1)
       setExtras((state) => ({
@@ -1066,6 +1167,23 @@ useEffect(() => {
         wide: state.wide + 1,
       }))
     }
+    addWideBallEffect()
+  }
+
+  const addWideBallEffect = () => {
+    const scoreTypesButtons = document.querySelectorAll('.score-types-button')
+    for (let i = 0; i < scoreTypesButtons.length; i++) {
+      scoreTypesButtons[i].classList.add('score-types-button-noball')
+    }
+    setwideBall(true)
+  }
+
+  const removeWideBallEffect = () => {
+    const scoreTypesButtons = document.querySelectorAll('.score-types-button')
+    for (let i = 0; i < scoreTypesButtons.length; i++) {
+      scoreTypesButtons[i].classList.remove('score-types-button-noball')
+    }
+    setwideBall(false)
   }
 
   const handleWicket = (isRunOut, playerId) => {
@@ -1184,14 +1302,6 @@ useEffect(() => {
     runOutPlayerErrorElement.classList.add('hide')
     setRunOutPlayerId(playerId)
   }
-
-  const endMatch = () => {
-    disableAllScoreButtons()
-    const endInningButton = document.getElementById('end-inning')
-    if (endInningButton.textContent === 'Score Board') {
-      endInningButton.disabled = false
-    }
-  }
  
   // INACTIVE KEYPAD
   const disableAllScoreButtons = () => {
@@ -1259,7 +1369,7 @@ useEffect(() => {
     </>
   )
 
-  // Notice
+  // Notice overCount === maxOver wicketCount === 10 cnd for innning completed
   const firstInningCompletedContent = (
     <>
       {overCount === maxOver && <div>1st inning completed</div>}
@@ -1298,16 +1408,25 @@ useEffect(() => {
         <div>
           {team1} vs {team2} 
         </div>
-        <div className='Active'>
-          LIVE
-        </div>
+
         </div>
         <div>
-          <button id='end-inning' onClick={handleEndInning}>
+
+        {/* <button id='end-inning' onClick={handleEndInning}>
+          {inningNo === 1 ? 'End Inning' : 'Score Board'}
+        </button> */}
+        {!buttonstate && <div className='Active'>
+          LIVE
+        </div>}
+          {/* ///// */}
+          {buttonstate && <button id='end-inning' onClick={handleEndInning}>
             {inningNo === 1 ? 'End Inning' : 'Score Board'}
-          </button>
+          </button>} 
+          {/* ///// */}
         </div>
       </div>
+
+
       {/* Notice */}
       <div id='badge' className='badge badge-flex'>
         {inningNo === 2 ? remainingRunsContent : overCount === maxOver || wicketCount === 10 ? firstInningCompletedContent : welcomeContent}

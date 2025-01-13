@@ -1,0 +1,20 @@
+set NODE_OPTIONS=--openssl-legacy-provider
+npm start
+
+issue 1 
+// reset 
+// Refresh state is lost
+
+issue 3
+// No ball is count in batter individual ball count
+
+
+
+Pending 
+Result section frontend
+DB / backend to live card and Result 
+login signup frontend / backend
+Landing page 
+
+
+
