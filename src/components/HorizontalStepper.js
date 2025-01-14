@@ -151,7 +151,6 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-
 const HorizontalStepper = ({toss, win,setToss, setDecision, Globalstate, setGlobalstate }) => {
   const history = useHistory();
   const classes = useStyles();
@@ -167,7 +166,6 @@ const HorizontalStepper = ({toss, win,setToss, setDecision, Globalstate, setGlob
     tossWinner: '',
     decision: '',
   };
-
 
   const validationSchema = [
     Yup.object().shape({

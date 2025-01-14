@@ -1054,10 +1054,7 @@ useEffect(() => {
     if (batter1.onStrike) {
       setBatter1((state) => {
         const updatedRun = state.run + run
-        var updatedBall
-        if(!isNoBall){
-          updatedBall = state.ball + 1
-        }
+        var updatedBall = (!isNoBall && !iswideball) ? state.ball + 1 : state.ball
         // const updatedBall = state.ball + 1
         const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
         let four = state.four
@@ -1089,10 +1086,8 @@ useEffect(() => {
     } else {
       setBatter2((state) => {
         const updatedRun = state.run + run
-        var updatedBall
-        if(!isNoBall){
-          updatedBall = state.ball + 1
-        }
+        var updatedBall = (!isNoBall && !iswideball) ? state.ball + 1 : state.ball
+
         // const updatedBall = state.ball + 1
         const sr = Math.round((updatedRun / updatedBall) * 100 * 100) / 100
         let four = state.four
