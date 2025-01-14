@@ -67,6 +67,7 @@ const LandingPage = () => {
               alignItems: "center",
               justifyContent: "center",
               marginBottom: "30px",
+              marginTop: "30px",
             }}
           >
             <img
