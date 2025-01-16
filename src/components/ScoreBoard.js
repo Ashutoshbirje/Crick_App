@@ -59,6 +59,8 @@ const [isNoBall, setNoBall] = useState(getStoredData('isNoBall', false))
 const [iswideball, setwideBall] = useState(getStoredData('iswideball', false))
 const [outType, setOutType] = useState(getStoredData("outType", ''))
 const [buttonstate, setButtonstate] = useState(getStoredData("buttonstate", false));
+const [reset, setreset] = useState(getStoredData("reset", true));
+
 useEffect(() => {
   localStorage.setItem("match", JSON.stringify(match));
   localStorage.setItem('inningNo', JSON.stringify(inningNo));
@@ -92,7 +94,8 @@ useEffect(() => {
   localStorage.setItem('iswideball', JSON.stringify(iswideball));
   localStorage.setItem('outType', JSON.stringify(outType));
   localStorage.setItem('buttonstate', JSON.stringify(buttonstate)); 
-}, [match,inningNo, totalRuns, wicketCount, totalOvers, ballCount,isBowlerEdited,isBatter2Edited,isBatter1Edited,batter2,batter1,strikeValue,bowler,inputBowler,currentRunStack,extras,recentOvers,bowlers,overCount,batters,runsByOver,remainingBalls,remainingRuns,activeSection,battingOrder,isModalOpen,runOutPlayerId,hasMatchEnded,isNoBall,iswideball,outType,buttonstate]);
+  localStorage.setItem('reset', JSON.stringify(reset)); 
+}, [match,inningNo, totalRuns, wicketCount, totalOvers, ballCount,isBowlerEdited,isBatter2Edited,isBatter1Edited,batter2,batter1,strikeValue,bowler,inputBowler,currentRunStack,extras,recentOvers,bowlers,overCount,batters,runsByOver,remainingBalls,remainingRuns,activeSection,battingOrder,isModalOpen,runOutPlayerId,hasMatchEnded,isNoBall,iswideball,outType,buttonstate,reset]);
 
 /////
 
@@ -384,10 +387,10 @@ useEffect(() => {
             },
           }
         })
-
+        // ek state mentain kar
+        setreset(false)
         endInningButton.textContent = 'Reset'
         setMatchEnded(true)
-        // setreset(false);
       }
 
     }
@@ -1415,7 +1418,7 @@ useEffect(() => {
         </div>}
           {/* ///// */}
           {buttonstate && <button id='end-inning' onClick={handleEndInning}>
-            {inningNo === 1 ? 'End Inning' : 'Score Board'}
+          {reset === true ? (inningNo === 1 ? 'End Inning' : 'Score Board') : 'Reset'}
           </button>} 
           {/* ///// */}
         </div>
