@@ -2192,15 +2192,10 @@ const remainingRunsContent2 = (
 
   const winnerCard3 = (
     <>
-      <p>{winningMessage}</p>
+     <p> {winningMessage}</p>
     </>
   );
 
-  const winnerCard31 = (
-    <>
-      <p>{liveData?.winningMessage}</p>
-    </>
-  );
 
   const winnerCard2 = (
     <>
@@ -2592,7 +2587,7 @@ const remainingRunsContent2 = (
                       : overCount === maxOver || wicketCount === TotalWicket
                       ? winnerCard2
                       : tossContent) : (liveData.inningNo === 2
-                      ? winnerCard31
+                      ? winnerCard3
                       : liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket
                       ? winnerCard2
                       : tossContent)}

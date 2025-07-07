@@ -4,6 +4,8 @@
 set NODE_OPTIONS=--openssl-legacy-provider
 npm start
 
+// NO + RUN + WICKET (RUN OUT)
+// WICKET (RUN OUT) + RUN
 
 // Feature acpects 
 // Real-time batsman / bawler in scorecard (New Feature)
@@ -11,3 +13,4 @@ npm start
 // States (New Feature)
 // Team Runrate (New Feature)
 // Single admin (New Feature)
+
