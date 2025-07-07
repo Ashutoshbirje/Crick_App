@@ -242,9 +242,9 @@ const ScoreBoard = (props) => {
         console.error("Error fetching scores:", error);
       }
     };
-
     fetchScores();
   }, []);
+
   // Local Storage 
   useEffect(() => {
     // localStorage.setItem("Admin", JSON.stringify(Admin));
@@ -2189,7 +2189,22 @@ const remainingRunsContent2 = (
         <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr >=0 ? liveData?.rrr  : 0}</div>
       </>
 );
+  
+  // User
+  // Try to implement winning msg for user 
+  const winnerCard5 = (
+    <>
+     <p> {liveData?.winningMessage}</p>
+    </>
+  );
 
+  const winnerCard4 = (
+    <>
+     <p> Match Ended</p>
+    </>
+  );
+ 
+  // Admin
   const winnerCard3 = (
     <>
      <p> {winningMessage}</p>
@@ -2587,7 +2602,7 @@ const remainingRunsContent2 = (
                       : overCount === maxOver || wicketCount === TotalWicket
                       ? winnerCard2
                       : tossContent) : (liveData.inningNo === 2
-                      ? winnerCard3
+                      ? (liveData.remainingBalls === 0 || liveData.remainingRuns <= 0 || liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket ? winnerCard4 : winnerCard5 )
                       : liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket
                       ? winnerCard2
                       : tossContent)}
