@@ -1382,7 +1382,9 @@ const handleDelete = async (id) => {
       }
     }
     if(inningNo === 2){
-      setRemainingBalls(remainingBalls-1);
+      if(!isNoBall){
+        setRemainingBalls(remainingBalls-1);
+      }
     }
   };
 
@@ -1398,14 +1400,16 @@ const handleDelete = async (id) => {
       setRunsByOver(runsByOver - run);
       setBallCount(ballCount - 1);
       setTotalOvers(Math.round((totalOvers - 0.1) * 10) / 10);
-      currentRunStack.pop();
-      setCurrentRunStack(currentRunStack);
+      if(!isLbParam){
+       currentRunStack.pop();
+       setCurrentRunStack(currentRunStack);
+      }
     }
     if (batter1.onStrike) {
       if (run % 2 === 0) {
         setBatter1((state) => {
           const updatedRun = (!iswideballParam && !isLbParam)?((state.run>=run) ? state.run - run : 0):state.run;
-          const updatedBall = state.ball > 0 ? state.ball - 1 : state.ball;
+          const updatedBall = (!isNoBallParam && !iswideballParam && state.ball > 0) ? state.ball - 1 : state.ball;
           const updatedSr = updatedBall !== 0 ? updatedRun / updatedBall : 0;
           const sr =
             Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100;
@@ -1431,7 +1435,7 @@ const handleDelete = async (id) => {
         switchBatterStrike();
         setBatter2((state) => {
           const updatedRun = (!iswideballParam && !isLbParam)?((state.run>=run) ? state.run - run : 0):state.run;
-          const updatedBall = state.ball > 0 ? state.ball - 1 : state.ball;
+          const updatedBall = (!isNoBallParam && !iswideballParam && state.ball > 0) ? state.ball - 1 : state.ball;
           const updatedSr = updatedBall !== 0 ? updatedRun / updatedBall : 0;
           const sr =
             Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100;
@@ -1457,7 +1461,7 @@ const handleDelete = async (id) => {
       if (run % 2 === 0) {
         setBatter2((state) => {
           const updatedRun = (!iswideballParam && !isLbParam)?((state.run>=run) ? state.run - run : 0):state.run;
-          const updatedBall = state.ball > 0 ? state.ball - 1 : state.ball;
+          const updatedBall = (!isNoBallParam && !iswideballParam && state.ball > 0) ? state.ball - 1 : state.ball;
           const updatedSr = updatedBall !== 0 ? updatedRun / updatedBall : 0;
           const sr =
             Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100;
@@ -1483,7 +1487,7 @@ const handleDelete = async (id) => {
         switchBatterStrike();
         setBatter1((state) => {
           const updatedRun = (!iswideballParam && !isLbParam)?((state.run>=run) ? state.run - run : 0):state.run;
-          const updatedBall = state.ball > 0 ? state.ball - 1 : state.ball;
+          const updatedBall = (!isNoBallParam && !iswideballParam && state.ball > 0) ? state.ball - 1 : state.ball;
           const updatedSr = updatedBall !== 0 ? updatedRun / updatedBall : 0;
           const sr =
             Math.round(isNaN(updatedSr) ? 0 : updatedSr * 100 * 100) / 100;
@@ -1584,7 +1588,11 @@ const handleDelete = async (id) => {
             /////
             if (inningNo === 2) {
               // setRemainingBalls(remainingBalls + 1);
-              setRemainingRuns(remainingRuns + run + 1);
+              if (isNaN(run)){
+                setRemainingRuns(remainingRuns + 1);
+              } else {
+                setRemainingRuns(remainingRuns + run + 1);
+              }
             }
             /////
             // setTotalRuns(totalRuns - 1);
