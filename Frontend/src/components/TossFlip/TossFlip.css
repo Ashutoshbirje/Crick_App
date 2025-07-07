@@ -1,0 +1,46 @@
+/* TossFlip.css */
+
+.container9 {
+  background-color: white;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content {
+  text-align: center;
+}
+
+.text {
+  font-size: 1.8rem;
+  margin-top: 20px;
+  color: #333;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards;
+  animation-delay: 1s; /* show after flip ends */
+}
+
+.image {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  animation: flip 1.5s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+/* 6-7 flips = 6*360 = 2160 degrees */
+@keyframes flip {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(4320deg); /* 6 full flips */
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}

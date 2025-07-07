@@ -1,0 +1,244 @@
+.navbar {
+  padding: 10px 20px;
+  width: 100vw;
+  height: 100px;
+  z-index: 1000;
+  background-color: #180056; 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
+
+.navbar1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 100px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.logo img {
+  height: 70px;
+  margin-right: 10px;
+}
+
+
+.navbar-menu {
+  color: #ffffff;
+  display: flex;
+  list-style: none;
+  margin-left: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.navbar-item1 {
+  margin-right: 20px;
+  position: relative;
+}
+
+/* ////////////// */
+.navbar-item a {
+  color: black;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.navbar-item a:hover {
+  color: #00a6ed; /* Light Blue */
+}
+/* ////////////// */
+
+.navbar-item:hover {
+  display: block;
+}
+
+.navbar-right {
+  display: flex;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 5px;
+  margin-left: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  height: 40px;
+  font-size: 15px;
+}
+
+.logout-btn {
+  color: #180056;
+  background-color: #cec816;
+}
+
+/* General Hover Effect for Login and Signup Buttons */
+.logout-btn:hover {
+  color: white;
+  background-color: #919b03; /* Darker shade on hover */
+}
+
+.Inner h1,
+.Inner h4,
+.no-margin {
+  margin: 0;
+  padding: 0; /* Optional, if padding is added by default theme */
+}
+
+.Inner h4 {
+  color: #cec816;
+}
+
+
+/* Hide hamburger on large screens */
+.hamburger {
+  display: none;
+}
+
+.hamburger-menu-container {
+  display: none;
+  /* position: absolute; */
+  top: 70px;
+  right: auto;
+  background-color: #001f3f;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: transform 0.3s ease-in-out;
+}
+
+.hamburger-menu-container.active {
+  display: block;
+}
+
+.hamburger-menu {
+  list-style: none;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin: auto;
+}
+
+.navbar-item{
+  width: 100%;
+}
+
+.hamburger-menu .navbar-item {
+  padding: 15px 0px;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.hamburger-menu .navbar-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .navbar {
+    height: 55px;
+    padding: 8px 10px;
+  }
+
+  .navbar1 {
+    margin: 0px
+  }
+
+  .logo > img {
+    height: 40px;
+    margin-right: 5px;
+  }
+
+  .logout-btn {
+    padding: 5px 15px;
+    border-radius: 5px;
+    margin-left: 15px;
+    height: 35px;
+    font-size: 10px;
+  }
+
+  .icon1 {
+    font-size: 25px;
+  }
+  
+}
+
+@media (max-width: 500px) {
+
+  .navbar1 {
+    margin: 0px
+  }
+
+  .Inner{
+    display: none;
+  }
+}
+
+
+/* Responsive for small screens */
+@media (max-width: 1224px) {
+  .navbar-menu {
+    display: none;
+    flex-direction: column;
+    background-color: #333;
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .navbar-menu.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: block;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+
+  /* Hide logout button and hamburger when menu is open */
+  .navbar-right .logout-btn,
+  .navbar-right .hamburger {
+    display: block;
+  }
+
+  .navbar-menu.active ~ .hamburger {
+    display: none;
+  }
+
+  .navbar-menu.active ~ .logout-btn {
+    display: none;
+  }
+
+  .navbar-item {
+    border-top: 1px solid #555;
+    color: white;
+  }
+
+  .logo-img {
+    width: 60px;
+  }
+
+  .Inner h1 {
+    font-size: 16px;
+  }
+
+  .Inner h4 {
+    font-size: 12px;
+  }
+}

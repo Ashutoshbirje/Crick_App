@@ -1,0 +1,13 @@
+
+# CMD
+
+set NODE_OPTIONS=--openssl-legacy-provider
+npm start
+
+
+// Feature acpects 
+// Real-time batsman / bawler in scorecard (New Feature)
+// Pointable (New Feature)
+// States (New Feature)
+// Team Runrate (New Feature)
+// Single admin (New Feature)
