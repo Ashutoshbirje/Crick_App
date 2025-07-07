@@ -2178,7 +2178,7 @@ const remainingRunsContent1 = (
       <>
         <div>Target: {liveData?.target}</div>
         <div>{liveData?.winningMessage}</div>
-        <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr}</div>
+        <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr >=0 ? liveData?.rrr  : 0}</div>
       </>
 );
 
@@ -2186,7 +2186,7 @@ const remainingRunsContent2 = (
       <>
         <div>Target: {liveData?.target}</div>
         <div>Match Ended</div>
-        <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr}</div>
+        <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr >=0 ? liveData?.rrr  : 0}</div>
       </>
 );
 
@@ -2261,7 +2261,7 @@ const remainingRunsContent2 = (
             : overCount === maxOver || wicketCount === TotalWicket
             ? firstInningCompletedContent
             : welcomeContent
-          : welcomeContent):(liveData && matchData && props.newMatch ? (liveData.inningNo === 2 ? (liveData.remainingBalls === 0 ? remainingRunsContent2 : remainingRunsContent1 ): (liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket  ? firstInningCompletedContent1: welcomeContent)): welcomeContent)}
+          : welcomeContent):(liveData && matchData && props.newMatch ? (liveData.inningNo === 2 ? (liveData.remainingBalls === 0 || liveData.remainingRuns <=0 || liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket ? remainingRunsContent2 : remainingRunsContent1 ): (liveData.overCount === matchData.maxOver || liveData.wicketCount === TotalWicket  ? firstInningCompletedContent1: welcomeContent)): welcomeContent)}
       </div>
       
       {/* edit*/}
