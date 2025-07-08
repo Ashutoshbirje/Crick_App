@@ -4,8 +4,10 @@
 set NODE_OPTIONS=--openssl-legacy-provider
 npm start
 
-// NO + RUN + WICKET (RUN OUT)
-// WICKET (RUN OUT) + RUN
+// NO + 1 RUN + WICKET (RUN OUT)
+// WICKET (RUN OUT) + 1 RUN
+// Non-Strick Runout UNDO WILL SHOW -ve ballcount of batsman account
+// Push half stack into recent overs
 
 // Feature acpects 
 // Real-time batsman / bawler in scorecard (New Feature)

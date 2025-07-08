@@ -2191,7 +2191,7 @@ const remainingRunsContent2 = (
 );
   
   // User
-  // Try to implement winning msg for user 
+  // Try to implement winning msg for user // create extra field in live schema with current message
   const winnerCard5 = (
     <>
      <p> {liveData?.winningMessage}</p>
