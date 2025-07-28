@@ -613,7 +613,7 @@ const HorizontalStepper = ({
       </div>
       {/* Part C (About) */}
       <div className={classes.mainContainer3}>
-        <p>TRAINING PREMIER LEAGUE</p>
+        <p>INDIAN PREMIER LEAGUE</p>
       </div>
     </div>
   );

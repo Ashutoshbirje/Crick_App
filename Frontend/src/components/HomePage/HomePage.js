@@ -34,7 +34,7 @@ const LandingPage = ({ Admin, setIsAdmin, setNewMatch }) => {
       {/* Fixed AppBar */}
       <AppBar position="fixed" className="appbar">
         <Toolbar>
-          <Typography variant="h6">Training Premier League</Typography>
+          <Typography variant="h6">Indian Premier League</Typography>
         </Toolbar>
       </AppBar>
 

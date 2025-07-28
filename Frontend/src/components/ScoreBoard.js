@@ -642,7 +642,7 @@ const updateLiveMatch = async () => {
         navigate("/form", { state: { newMatch: true } });
         break;
       case "edit":
-        navigate("/EditPassward");
+        // navigate("/EditPassward");
         break;
       case "help":
         navigate("/help");
