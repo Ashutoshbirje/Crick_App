@@ -90,11 +90,17 @@ export NODE_OPTIONS=--openssl-legacy-provider
 Home 
 ![CrickApp UI Preview](./Images/Home.png)
 
+TOSS
+![CrickApp UI Preview](./Images/TOSS.png)
+
 HELP 
 ![CrickApp UI Preview](./Images/HELP_1.png)
 ![CrickApp UI Preview](./Images/HELP_2.png)
 ![CrickApp UI Preview](./Images/HELP_3.png)
 ![CrickApp UI Preview](./Images/HELP_4.png)
+
+ADMIN 
+![CrickApp UI Preview](./Images/ADMIN_1.png)
 
 ## 🔮 Future Enhancements
 
