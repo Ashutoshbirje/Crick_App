@@ -4,6 +4,11 @@
 **Domain**: Sports Management & Live Scoring  
 **Tech Stack**: MERN (MongoDB, Express.js, React.js, Node.js)
 
+## 🧩 Problem Statement
+Gully and grassroots cricket lack proper digital tools for live score management. Organizers often rely on manual methods, leading to errors, poor engagement, and no player history. There's also no platform to showcase local sponsors or advertisements.
+
+CrickApp solves this by offering a real-time scoring app for local matches, with features for score updates, player stats, and in-app ad placements—connecting sports and local businesses in one platform.
+
 ## 💡 Project Idea
 
 CrickApp is a dynamic and interactive cricket scoring application built for real-time match tracking. It allows authenticated admins to create matches, update live scores, and manage player statistics, while users can view live updates, detailed scorecards, and historical match data. The platform supports user-friendly interface and instant data refresh, CrickApp delivers a responsive and engaging experience for both cricket fans and match administrators.
