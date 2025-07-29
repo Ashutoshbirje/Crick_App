@@ -83,12 +83,8 @@ export NODE_OPTIONS=--openssl-legacy-provider
 
 ## 🖼️ Screenshot Preview
 
-![CrickApp UI Preview](./images/screenshot_readme.png)
-
-> 📁 Includes: Admin panel, forms, inning screens, help center, user views, toss, save, keyboard and interval modules
-
 HOME
-![CrickApp UI Preview](./Images/Home.png)
+![CrickApp UI Preview](./Images/HOME.png)
 
 TOSS
 ![CrickApp UI Preview](./Images/TOSS.png)
@@ -117,7 +113,7 @@ NEW-MATCH
 ADMIN-VIEW
 ![CrickApp UI Preview](./Images/ADMIN_3.png)
 ![CrickApp UI Preview](./Images/ADMIN_4.png)
-![CrickApp UI Preview](./Images/KEYBOARD.png)
+![CrickApp UI Preview](./Images/KEYBORAD.png)
 ![CrickApp UI Preview](./Images/ADMIN_5.png)
 
 USER-VIEW
