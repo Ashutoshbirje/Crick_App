@@ -85,7 +85,7 @@ export NODE_OPTIONS=--openssl-legacy-provider
 ## 🖼️ Screenshot Preview
 
 HOME
-![CrickApp UI Preview](./Images/HOME.png)
+![CrickApp UI Preview](./Images/Home.png)
 
 TOSS
 ![CrickApp UI Preview](./Images/TOSS.png)
