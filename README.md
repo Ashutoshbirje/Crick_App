@@ -6,7 +6,7 @@
 
 ## 💡 Project Idea
 
-CrickApp is a dynamic and interactive cricket scoring application built for real-time match tracking. It allows authenticated admins to create matches, update live scores, and manage player statistics, while users can view live updates, scorecards, and historical match data.
+CrickApp is a dynamic and interactive cricket scoring application built for real-time match tracking. It allows authenticated admins to create matches, update live scores, and manage player statistics, while users can view live updates, detailed scorecards, and historical match data. The platform supports multiple matches simultaneously, ensuring seamless tracking across various tournaments and formats. With a user-friendly interface and instant data refresh, CrickApp delivers a responsive and engaging experience for both cricket fans and match administrators.
 
 ## ✨ Features
 
@@ -70,22 +70,31 @@ export NODE_OPTIONS=--openssl-legacy-provider
 
 ## 🔁 Project Workflow
 
-1. **Admin Login**: Secure entry for authorized personnel  
-2. **Match Creation**: Add match details, teams, and players  
-3. **Toss Screen**: Choose toss winner and decision  
-4. **Form Setup**: Input players for both teams  
-5. **Match Start**: Enter scores ball-by-ball using keyboard or UI  
-6. **Interval**: Break between innings  
-7. **Second Innings**: Score entry continues  
-8. **Save Match**: Finalize match and store data  
-9. **User View**: View scores live with historical data  
-10. **Help Center**: Instructions and screenshots  
+- **Admin Login**: Secure entry for authorized personnel  
+- **Match Creation**: Add match details, teams, and players  
+- **Toss Screen**: Choose toss winner and decision  
+- **Form Setup**: Input players for both teams  
+- **Match Start**: Enter scores ball-by-ball using keyboard or UI  
+- **Interval**: Break between innings  
+- **Second Innings**: Score entry continues  
+- **Save Match**: Finalize match and store data  
+- **User View**: View scores live with historical data  
+- **Help Center**: Instructions and screenshots  
 
 ## 🖼️ Screenshot Preview
 
 ![CrickApp UI Preview](./images/screenshot_readme.png)
 
 > 📁 Includes: Admin panel, forms, inning screens, help center, user views, toss, save, keyboard and interval modules
+
+Home 
+![CrickApp UI Preview](./Images/Home.png)
+
+HELP 
+![CrickApp UI Preview](./Images/HELP_1.png)
+![CrickApp UI Preview](./Images/HELP_2.png)
+![CrickApp UI Preview](./Images/HELP_3.png)
+![CrickApp UI Preview](./Images/HELP_4.png)
 
 ## 🔮 Future Enhancements
 
