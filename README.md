@@ -148,6 +148,6 @@ SCORE-CARD
 ## 👨‍💻 Author
 
 **Ashutosh Birje**  
-📧 your.email@example.com  
-🔗 [LinkedIn](https://linkedin.com/in/your-profile)  
-🌐 [Portfolio](https://your-portfolio.com)
+📧 [Email](ashutoshbirje880@gmail.com) 
+🔗 [LinkedIn](https://www.linkedin.com/in/ashutosh-birje-246453263/)  
+🌐 [Portfolio](https://ashutoshbirje.netlify.app/)
