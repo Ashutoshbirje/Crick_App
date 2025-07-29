@@ -1,4 +1,4 @@
-# 🏏 CrickApp – Real-Time Cricket Scoring App 🏏
+# 🏏 Crick_App – Real-Time Cricket Scoring App 🏏
 
 ## 📚 Project Domain
 **Domain**: Sports Management & Live Scoring  
@@ -6,16 +6,17 @@
 
 ## 💡 Project Idea
 
-CrickApp is a dynamic and interactive cricket scoring application built for real-time match tracking. It allows authenticated admins to create matches, update live scores, and manage player statistics, while users can view live updates, detailed scorecards, and historical match data. The platform supports multiple matches simultaneously, ensuring seamless tracking across various tournaments and formats. With a user-friendly interface and instant data refresh, CrickApp delivers a responsive and engaging experience for both cricket fans and match administrators.
+CrickApp is a dynamic and interactive cricket scoring application built for real-time match tracking. It allows authenticated admins to create matches, update live scores, and manage player statistics, while users can view live updates, detailed scorecards, and historical match data. The platform supports user-friendly interface and instant data refresh, CrickApp delivers a responsive and engaging experience for both cricket fans and match administrators.
 
 ## ✨ Features
 
-### 👨‍💼 Admin Side
-- Secure login and admin dashboard
-- Create new matches with team and player inputs
+### 👨‍💼 Admin Side 
+- Secure login and admin dashboard 
+- Create new matches with team and other inputs
 - Toss and inning management
 - Ball-by-ball score entry with keyboard and UI support
 - Save match data and manage intervals
+- User ID : admin | Password : 12345
 
 ### 👤 User Side
 - Live score viewing
@@ -138,10 +139,9 @@ SCORE-CARD
 
 ## 🔮 Future Enhancements
 
-- Player statistics graphs  
+- Player statistics graphs and analysis 
 - Export match reports to PDF  
-- Authentication with OAuth or Firebase  
-- Progressive Web App (PWA) version  
+- Pointable for matches and tournament 
 
 ## 👨‍💻 Author
 
