@@ -114,8 +114,10 @@ NEW-MATCH
 ADMIN-VIEW
 ![CrickApp UI Preview](./Images/ADMIN_3.png)
 ![CrickApp UI Preview](./Images/ADMIN_4.png)
-![CrickApp UI Preview](./Images/KEYBORAD.png)
 ![CrickApp UI Preview](./Images/ADMIN_5.png)
+
+KEYBOARD
+![CrickApp UI Preview](./Images/KEYBORAD.png)
 
 USER-VIEW
 ![CrickApp UI Preview](./Images/NEW_MATCH.png)
