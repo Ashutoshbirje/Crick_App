@@ -5,7 +5,6 @@ npm start
 
 // NO + 1 RUN + WICKET (RUN OUT)
 // WICKET (RUN OUT) + 1 RUN
-// Non-Strick Runout UNDO WILL SHOW -ve ballcount of batsman account
 // Push half stack into recent overs
 
 // Feature acpects 
@@ -14,3 +13,8 @@ npm start
 // States (New Feature)
 // Team Runrate (New Feature)
 // Single admin (New Feature)
+// Form to fill data on website (New Feature)
+// Registration for match + Payment (New Feature)
+// Advertisement (New Feature)
+
+// Screen Orientation 

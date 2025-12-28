@@ -69,12 +69,10 @@ const Main = () => {
     <div
       id="main-scroll-container"
       style={{
-        height: "100vh",
+        minHeight: "100vh",
         overflowY: "auto",
         position: "relative",
         backgroundColor: "white"
-        // width: "100%",
-        // margin: "auto",
       }}
     >
       
@@ -147,6 +145,7 @@ const Main = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+
     </div>
   );
 };

@@ -15,10 +15,10 @@
 }
 
 .main-content {
-  margin-top: 64px; /* Height of AppBar */
+  margin-top: 64px; 
   overflow-y: auto;
   padding: 20px;
-  padding-bottom: 120px; /* ✅ Add space to avoid overlap with Footer */
+  padding-bottom: 120px; 
   background: #fff;
   text-align: center;
   flex-grow: 1;

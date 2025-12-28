@@ -1288,15 +1288,21 @@ const handleDelete = async (id) => {
       setTotalOvers(Math.round((totalOvers - 0.1) * 10) / 10);
     }
     setWicketCount(wicketCount - 1);
+
     const batter = batters[batters.length - 1];
 
-    // if(true){
-    // work on this
-    // } else {
-    batter.ball = batter.ball - 1;
-    // }
+    if(batter.onStrike){
+      batter.ball = batter.ball - 1;
+    } else {
+      if(batter1.name === undefined){
+         batter2.ball = batter2.ball - 1;
+      } else {
+         batter1.ball = batter1.ball - 1;
+      }
+    }
 
     const { id, name, run, ball, four, six, strikeRate, onStrike } = batter;
+
     if (batter1.name === undefined || batter1.onStrike) {
       const batter1NameElement = document.getElementById("batter1Name");
       batter1NameElement.value = batter.name;
@@ -1405,6 +1411,7 @@ const handleDelete = async (id) => {
        setCurrentRunStack(currentRunStack);
       }
     }
+
     if (batter1.onStrike) {
       if (run % 2 === 0) {
         setBatter1((state) => {
@@ -1510,6 +1517,7 @@ const handleDelete = async (id) => {
         });
       }
     }
+
   };
 
   const undoDelivery = () => {
@@ -2137,7 +2145,7 @@ const tossContent = (
   const welcomeContent = (
     <>
       <div></div>
-      <div>Welcome to TPL</div>
+      <div>Welcome to {process.env.REACT_APP_SERIES}</div>
       <div></div>
     </>
   );
@@ -2480,11 +2488,11 @@ const remainingRunsContent2 = (
             </tr>
             <tr>
               <td className="label">Series</td>
-              <td className="value">TPL</td>
+              <td className="value">{process.env.REACT_APP_SERIES}</td>
             </tr>
             <tr>
               <td className="label">Match Type</td>
-              <td className="value">Underarm turf cricket</td>
+              <td className="value">{process.env.REACT_APP_MATCH_TYPE}</td>
             </tr>
             <tr>
               <td className="label">Date</td>
@@ -2506,11 +2514,11 @@ const remainingRunsContent2 = (
             </tr>
             <tr>
               <td className="label">Stadium</td>
-              <td className="value">Mira Road, Mumbai</td>
+              <td className="value">{process.env.REACT_APP_STADIUM}</td>
             </tr>
             <tr>
-              <td className="label">City</td>
-              <td className="value">Mumbai</td>
+              <td className="label">Location</td>
+              <td className="value">{process.env.REACT_APP_LOCATION}</td>
             </tr>
             <tr>
               <td className="label">Country</td>
