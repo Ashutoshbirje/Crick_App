@@ -2189,8 +2189,8 @@ const remainingRunsContent1 = (
         <div>{liveData?.winningMessage}</div>
         <div>RRR: {isNaN(liveData?.rrr) ? 0 : liveData?.rrr >=0 ? liveData?.rrr  : 0}</div>
       </>
-);
-
+); 
+ 
 const remainingRunsContent2 = (
       <>
         <div>Target: {liveData?.target}</div>
