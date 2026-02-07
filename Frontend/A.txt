@@ -3,9 +3,11 @@
 set NODE_OPTIONS=--openssl-legacy-provider
 npm start
 
+// Show match win result on user side (Yellow line)
 // NO + 1 RUN + WICKET (RUN OUT)
 // WICKET (RUN OUT) + 1 RUN
 // Push half stack into recent overs
+// Wicket not selected and back add extra ball to batsman account 
 
 // Feature acpects 
 // Real-time batsman / bawler in scorecard (New Feature)
