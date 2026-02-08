@@ -4,7 +4,7 @@ const AutoRefresh = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       window.location.reload(); // 👈 full page refresh
-    }, 30 * 1000); // 30 sec
+    }, 10 * 1000); // 10 sec
 
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);

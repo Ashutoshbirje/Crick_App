@@ -3,20 +3,20 @@
 set NODE_OPTIONS=--openssl-legacy-provider
 npm start
 
-// Show match win result on user side (Yellow line)
 // NO + 1 RUN + WICKET (RUN OUT)
 // WICKET (RUN OUT) + 1 RUN
-// Push half stack into recent overs
 // Wicket not selected and back add extra ball to batsman account 
+// Push half stack into recent overs
 
 // Feature acpects 
-// Real-time batsman / bawler in scorecard (New Feature)
+// Real-time batsman / bawler in scorecard (New Feature) (ADD * Work on onstricke stateS)
 // Pointable (New Feature)
-// States (New Feature)
 // Team Runrate (New Feature)
+// States (New Feature)
 // Single admin (New Feature)
+
 // Form to fill data on website (New Feature)
 // Registration for match + Payment (New Feature)
-// Advertisement (New Feature)
 
+// Advertisement (New Feature)
 // Screen Orientation 
