@@ -3,12 +3,14 @@ const mongoose = require("mongoose");
 
 const batterSchema = new mongoose.Schema({
   name: String,
-  run: Number,
-  ball: Number,
-  four: Number,
-  six: Number,
-  strikeRate: Number
+  run: { type: Number, default: 0 },
+  ball: { type: Number, default: 0 },
+  four: { type: Number, default: 0 },
+  six: { type: Number, default: 0 },
+  strikeRate: { type: Number, default: 0 },
+  onStrike: { type: Boolean, default: false } // ✅ IMPORTANT
 });
+
 
 const bowlerSchema = new mongoose.Schema({
   name: String,

@@ -9,7 +9,7 @@ npm start
 // Push half stack into recent overs
 
 // Feature acpects 
-// Real-time batsman / bawler in scorecard (New Feature) (ADD * Work on onstricke stateS)
+// Real-time batsman / bawler in scorecard (New Feature) 
 // Pointable (New Feature)
 // Team Runrate (New Feature)
 // States (New Feature)
@@ -20,3 +20,73 @@ npm start
 
 // Advertisement (New Feature)
 // Screen Orientation 
+
+
+                    {/* bowling 2 */}
+                    <div className="sb-bowling">
+                      <table>
+                        <thead>
+                          <tr>
+                            <td className="score-types padding-left">
+                              <div className="sb">Bowler</div>
+                            </td>
+                            <td className="score-types text-center data">O</td>
+                            <td className="score-types text-center data">M</td>
+                            <td className="score-types text-center data">R</td>
+                            <td className="score-types text-center data">W</td>
+                            <td className="score-types text-center data">ECO</td>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {(() => {
+                            const isAdmin = props.Admin === true;
+
+                            const bowlersList = isAdmin
+                              ? bowlers
+                              : liveData?.inning2?.bowlers || [];
+
+                            const liveBowler = isAdmin
+                              ? bowler
+                              : bowlersList[bowlersList.length - 1]; // last updated bowler
+
+                            return bowlersList.map((blr, i) => {
+                              const isLiveBowler =
+                                blr?.name &&
+                                liveBowler?.name &&
+                                blr.name === liveBowler.name;
+
+                              return (
+                                <tr
+                                  key={`${blr.name}-${i}`}
+                                  style={{
+                                    fontWeight: isLiveBowler ? "700" : "400",
+                                    color: isLiveBowler ? "green" : "inherit",
+                                  }}
+                                >
+                                  <td className="score-types padding-left">
+                                    <div className="sb">{blr.name}</div>
+                                  </td>
+
+                                  <td className="score-types text-center data">
+                                    {blr.over}
+                                  </td>
+                                  <td className="score-types text-center data">
+                                    {blr.maiden}
+                                  </td>
+                                  <td className="score-types text-center data">
+                                    {blr.run}
+                                  </td>
+                                  <td className="score-types text-center data">
+                                    {blr.wicket}
+                                  </td>
+                                  <td className="score-types text-center data">
+                                    {blr.economy}
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>

@@ -166,6 +166,10 @@ const ScoreBoard = (props) => {
           `${process.env.REACT_APP_API_BASE_URL}/live/match/${count}`,
         );
         setLiveData(matchRes.data);
+        
+        console.log("Debugging is Started Now")
+        console.log(liveData);
+        
       } catch (err) {
         console.error("Failed to load match data:", err.message);
       }
@@ -488,6 +492,7 @@ const ScoreBoard = (props) => {
   useEffect(() => {
     if (props.newMatch) {
       updateLiveMatch();
+      handleLIVEscore();
     }
   }, [
     inningNo,
@@ -506,6 +511,7 @@ const ScoreBoard = (props) => {
     recentOvers,
     match,
   ]);
+
 
   const createLiveMatch = async ({
     inningNo,
@@ -1062,7 +1068,7 @@ const ScoreBoard = (props) => {
     }
   };
 
-const handleLIVEscore = (e) => {
+const handleLIVEscore = () => {
   const endInningButton = document.getElementById("end-inning") || "";
 
   if (endInningButton.textContent === "live") {
@@ -3312,7 +3318,7 @@ const liveBatters = Array.from(liveBattersMap.values());
                   <div
                     className="score-board-innings"
                     onClick={(e) => {
-                      handleLIVEscore(e);
+                      handleLIVEscore();
                       toggleSlide1();
                     }}
                   >
@@ -3348,73 +3354,98 @@ const liveBatters = Array.from(liveBattersMap.values());
                   {/* liveData.inningNo === 2 && */}
                   {isSlideOpen1 && (
                     <div className="sliding-panel">
-                      {/* batting 1 */}
+                      {/* ================= INNING 1 BATTING ================= */}
                       <div className="sb-batting">
                         <table>
                           <thead>
                             <tr>
-                              <td className="score-types padding-left">
-                                <div className="sb">Batter</div>
-                              </td>
-                              <td className="score-types text-center data">
-                                R
-                              </td>
-                              <td className="score-types text-center data">
-                                B
-                              </td>
-                              <td className="score-types text-center data">
-                                4s
-                              </td>
-                              <td className="score-types text-center data">
-                                6s
-                              </td>
-                              <td className="score-types text-center data">
-                                SR
-                              </td>
+                              <td className="score-types padding-left"><div className="sb">Batter</div></td>
+                              <td className="score-types text-center data">R</td>
+                              <td className="score-types text-center data">B</td>
+                              <td className="score-types text-center data">4s</td>
+                              <td className="score-types text-center data">6s</td>
+                              <td className="score-types text-center data">SR</td>
                             </tr>
                           </thead>
 
-<tbody>
-  {liveData?.inning1?.batters?.map((batter) => {
-    const isOnGround =
-      batter.name === liveData?.batter1?.name ||
-      batter.name === liveData?.batter2?.name;
+                          <tbody>
+                            {(() => {
+                              let battersList = [];
+                              let batterOne = null;
+                              let batterTwo = null;
 
-      // Work here 
-    const isStriker =
-      batter.name === liveData?.batter1?.name && batter1?.onStrike ||
-      batter.name === liveData?.batter2?.name && batter2?.onStrike;
-    
-    console.log(liveData?.batter1?.name);
-    console.log(liveData?.batter1?.onStrike);
-    console.log(liveData?.batter2?.name);
-    console.log(liveData?.batter2?.onStrike);
+                              /* ================= USER ================= */
+                              if (!props.Admin) {
+                                battersList = liveData?.inning1?.batters || [];
+                                batterOne = liveData?.batter1;
+                                batterTwo = liveData?.batter2;
+                              }
 
-    return (
-      <tr
-        key={`${batter.name}-${batter.ball}`}
-        style={{
-          fontWeight: isOnGround ? "700" : "400",
-          color: isOnGround ? "green" : "inherit",
-        }}
-      >
-        <td className="score-types padding-left">
-          <div className="sb">
-            {batter.name}
-            {isStriker && " *"}
-          </div>
-        </td>
+                              /* ================= ADMIN ================= */
+                              else {
+                                // Admin + Inning 1 → LOCAL
+                                if (inningNo === 1) {
+                                  const map = new Map();
 
-        <td className="score-types text-center data">{batter.run}</td>
-        <td className="score-types text-center data">{batter.ball}</td>
-        <td className="score-types text-center data">{batter.four}</td>
-        <td className="score-types text-center data">{batter.six}</td>
-        <td className="score-types text-center data">{batter.strikeRate}</td>
-      </tr>
-    );
-  })}
-</tbody>
+                                  (batters || []).forEach(b => b?.name && map.set(b.name, b));
+                                  if (batter1?.name) map.set(batter1.name, batter1);
+                                  if (batter2?.name) map.set(batter2.name, batter2);
 
+                                  battersList = Array.from(map.values());
+                                  batterOne = batter1;
+                                  batterTwo = batter2;
+                                }
+                                // Admin + Inning 2 → SHOW NOTHING
+                                else {
+                                  battersList = liveData?.inning1?.batters || [];
+                                  batterOne = liveData?.batter1;
+                                  batterTwo = liveData?.batter2;
+                                }
+                              }
+
+                              if (!battersList.length) {
+                                return (
+                                  <tr>
+                                    <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
+                                      No batters yet
+                                    </td>
+                                  </tr>
+                                );
+                              }
+
+                              return battersList.map((batter, index) => {
+                                const isOnGround =
+                                  batter?.name === batterOne?.name ||
+                                  batter?.name === batterTwo?.name;
+
+                                const isStriker =
+                                  (batter?.name === batterOne?.name && batterOne?.onStrike) ||
+                                  (batter?.name === batterTwo?.name && batterTwo?.onStrike);
+
+                                return (
+                                  <tr
+                                    key={`${batter.name}-${index}`}
+                                    style={{
+                                      fontWeight: isOnGround ? "700" : "400",
+                                      color: isOnGround ? "green" : "inherit",
+                                    }}
+                                  >
+                                    <td className="score-types padding-left">
+                                      <div className="sb">
+                                        {batter.name}
+                                        {isStriker && " *"}
+                                      </div>
+                                    </td>
+                                    <td className="score-types text-center data">{batter.run || 0}</td>
+                                    <td className="score-types text-center data">{batter.ball || 0}</td>
+                                    <td className="score-types text-center data">{batter.four || 0}</td>
+                                    <td className="score-types text-center data">{batter.six || 0}</td>
+                                    <td className="score-types text-center data">{batter.strikeRate || 0}</td>
+                                  </tr>
+                                );
+                              });
+                            })()}
+                          </tbody>
                         </table>
                       </div>
                       {/* bowling 1 */}
@@ -3606,7 +3637,7 @@ const liveBatters = Array.from(liveBattersMap.values());
                   <div
                     className="score-board-innings"
                     onClick={(e) => {
-                      handleLIVEscore(e);
+                      // handleLIVEscore();
                       toggleSlide2();
                     }}
                   >
@@ -3644,69 +3675,100 @@ const liveBatters = Array.from(liveBattersMap.values());
                   {/*  liveData.hasMatchEnded && */}
                   {isSlideOpen2 && (
                     <div className="sliding-panel">
-                      {/* batting 2 */}
-                      <div className="sb-batting">
-                        <table>
-                          <thead className="sb-bat">
-                            <tr>
-                              <td className="score-types padding-left">
-                                <div className="sb">Batter</div>
-                              </td>
-                              <td className="score-types text-center data">
-                                R
-                              </td>
-                              <td className="score-types text-center data">
-                                B
-                              </td>
-                              <td className="score-types text-center data">
-                                4s
-                              </td>
-                              <td className="score-types text-center data">
-                                6s
-                              </td>
-                              <td className="score-types text-center data">
-                                SR
-                              </td>
-                            </tr>
-                          </thead>
-
-<tbody>
-  {liveData?.inning2?.batters?.map((batter) => {
-    const isOnGround =
-      batter.name === liveData?.batter1?.name ||
-      batter.name === liveData?.batter2?.name;
-
-    const isStriker =
-      batter.name === liveData?.batter1?.name && batter1?.onStrike ||
-      batter.name === liveData?.batter2?.name && batter2?.onStrike;
-
-    return (
-      <tr
-        key={`${batter.name}-${batter.ball}`}
-        style={{
-          fontWeight: isOnGround ? "700" : "400",
-          color: isOnGround ? "green" : "inherit",
-        }}
-      >
-        <td className="score-types padding-left">
-          <div className="sb">
-            {batter.name}
-            {isStriker && " *"}
-          </div>
-        </td>
-
-        <td className="score-types text-center data">{batter.run}</td>
-        <td className="score-types text-center data">{batter.ball}</td>
-        <td className="score-types text-center data">{batter.four}</td>
-        <td className="score-types text-center data">{batter.six}</td>
-        <td className="score-types text-center data">{batter.strikeRate}</td>
+{/* ================= INNING 2 BATTING ================= */}
+<div className="sb-batting">
+  <table>
+    <thead>
+      <tr>
+        <td className="score-types padding-left"><div className="sb">Batter</div></td>
+        <td className="score-types text-center data">R</td>
+        <td className="score-types text-center data">B</td>
+        <td className="score-types text-center data">4s</td>
+        <td className="score-types text-center data">6s</td>
+        <td className="score-types text-center data">SR</td>
       </tr>
-    );
-  })}
-</tbody>
+    </thead>
 
-                        </table>
-                      </div>
+    <tbody>
+      {(() => {
+        let battersList = [];
+        let batterOne = null;
+        let batterTwo = null;
+
+        /* ================= USER ================= */
+        if (!props.Admin) {
+          battersList = liveData?.inning2?.batters || [];
+          batterOne = liveData?.batter1;
+          batterTwo = liveData?.batter2;
+        }
+
+        /* ================= ADMIN ================= */
+        else {
+          // Admin + Inning 2 → LOCAL
+          if (inningNo === 2) {
+            const map = new Map();
+
+            (batters || []).forEach(b => b?.name && map.set(b.name, b));
+            if (batter1?.name) map.set(batter1.name, batter1);
+            if (batter2?.name) map.set(batter2.name, batter2);
+
+            battersList = Array.from(map.values());
+            batterOne = batter1;
+            batterTwo = batter2;
+          }
+          // Admin + Inning 1 → DATABASE
+          else {
+            battersList = liveData?.inning2?.batters || [];
+            batterOne = liveData?.batter1;
+            batterTwo = liveData?.batter2;
+          }
+        }
+
+        if (!battersList.length) {
+          return (
+            <tr>
+              <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
+                No batters yet
+              </td>
+            </tr>
+          );
+        }
+
+        return battersList.map((batter, index) => {
+          const isOnGround =
+            batter?.name === batterOne?.name ||
+            batter?.name === batterTwo?.name;
+
+          const isStriker =
+            (batter?.name === batterOne?.name && batterOne?.onStrike) ||
+            (batter?.name === batterTwo?.name && batterTwo?.onStrike);
+
+          return (
+            <tr
+              key={`${batter.name}-${index}`}
+              style={{
+                fontWeight: isOnGround ? "700" : "400",
+                color: isOnGround ? "green" : "inherit",
+              }}
+            >
+              <td className="score-types padding-left">
+                <div className="sb">
+                  {batter.name}
+                  {isStriker && " *"}
+                </div>
+              </td>
+              <td className="score-types text-center data">{batter.run || 0}</td>
+              <td className="score-types text-center data">{batter.ball || 0}</td>
+              <td className="score-types text-center data">{batter.four || 0}</td>
+              <td className="score-types text-center data">{batter.six || 0}</td>
+              <td className="score-types text-center data">{batter.strikeRate || 0}</td>
+            </tr>
+          );
+        });
+      })()}
+    </tbody>
+  </table>
+</div>
                       {/* bowling 2 */}
                       <div className="sb-bowling">
                         <table>
