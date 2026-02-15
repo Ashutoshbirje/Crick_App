@@ -12,7 +12,7 @@ npm start
 // disable wicket table after click on w button (refresh is req - avoid)
 
 // Feature acpects 
-// Real-time batsman / bawler in scorecard (New Feature) | Clear Cache of old state (recentover both inning, batsman of inning2) | User side - Show current bowler in second inning2 with green| Update real time (recentover) 
+// Real-time batsman / bawler in scorecard (Done) | Clear Cache of old state (recentover both inning, batsman of inning2) | User side - Show current bowler in second inning2 with green | not out batsman name added twice in second inning (admin side)
 // Pointable (New Feature)
 // Team Runrate (New Feature)
 // States (New Feature)

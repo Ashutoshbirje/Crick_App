@@ -1001,6 +1001,24 @@ const getExtrasForTable = ({ tableInning }) => {
         // window.location.reload(); // Refresh the page
         // endInningButton.textContent = "Reset";
         // console.log("Press");
+          setRecentOvers([]);
+          setRecentOvers1([]);
+          setInningNo(1);
+          setCurrentRunStack([]);
+          setTotalRuns(0);
+          setExtras({ total: 0, wide: 0, noBall: 0, Lb: 0 });
+          setRunsByOver(0);
+          setWicketCount(0);
+          setTotalOvers(0);
+          setBallCount(0);
+          setOverCount(0);
+          setBatter1({});
+          setBatter2({});
+          setBatters([]);
+          setBowlers([]);
+          setBattingOrder(0);
+          setInputBowler("");
+          setBowler({});
       } else {
         // set data in Scorebord after press on end-inning and scorecard
         if (batter1.id !== undefined) {
@@ -2675,6 +2693,7 @@ setMatch((state) => ({
     </>
   );
 
+
   return (
     // main container
     <div className="container">
@@ -3743,7 +3762,7 @@ setMatch((state) => ({
                         </div>
                       </div>
                       {/* Recent Over */}
-                      <div className="recent-over-container">
+                      {/* <div className="recent-over-container">
                         <div className="recent-over-text">Recent Overs</div>
                         <div className="recent-over-details">
                           <table>
@@ -3756,7 +3775,7 @@ setMatch((state) => ({
                               </tr>
                             </thead>
                             <tbody className="Recent2">
-                              {liveData.inning1.recentOvers.map(
+                              {match.inning1.recentOvers.map(
                                 (recentOver1, i) => (
                                   <tr key={i}>
                                     <td className="text-center">
@@ -3781,7 +3800,48 @@ setMatch((state) => ({
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      </div> */}
+{/* ================= INNING 1 : RECENT OVERS ================= */}
+<div className="recent-over-container">
+  <div className="recent-over-text">Recent Overs (Inning 1)</div>
+
+  <div className="recent-over-details">
+    <table>
+      <thead className="Recent1">
+        <tr>
+          <th>Over</th>
+          <th>Bowler</th>
+          <th>Summary</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody className="Recent2">
+        {(props.isAdmin
+          ? inningNo === 1
+            ? recentOvers        // admin + inning 1 running
+            : recentOvers1       // admin + inning 2 running
+          : liveData?.inning1?.recentOvers || []
+        ).map((over, i) => (
+          <tr key={i}>
+            <td className="text-center">{over.overNo}</td>
+            <td className="text-center">{over.bowler}</td>
+            <td>
+              <div className="recent-over-runs">
+                {over.stack.map((run, index) => (
+                  <div key={index}>{run}</div>
+                ))}
+              </div>
+            </td>
+            <td className="recent-over-total-run">
+              <div>{over.runs}</div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
                     </div>
                   )}
                 </div>
@@ -3992,7 +4052,6 @@ setMatch((state) => ({
     </div>
   </div>
 </div>
-
                       {/* Total */}
                       <div className="extras-container">
                         <div>Total</div>
@@ -4032,7 +4091,7 @@ setMatch((state) => ({
                         </div>
                       </div>
                       {/* Recent Over */}
-                      <div className="recent-over-container">
+                      {/* <div className="recent-over-container">
                         <div className="recent-over-text">Recent Overs</div>
                         <div className="recent-over-details">
                           <table>
@@ -4045,7 +4104,7 @@ setMatch((state) => ({
                               </tr>
                             </thead>
                             <tbody className="Recent2">
-                              {liveData.inning2.recentOvers.map(
+                              {match.inning2.recentOvers.map(
                                 (recentOver, i) => (
                                   <tr key={i}>
                                     <td className="text-center">
@@ -4070,7 +4129,50 @@ setMatch((state) => ({
                             </tbody>
                           </table>
                         </div>
-                      </div>
+                      </div> */}
+{/* ================= INNING 2 : RECENT OVERS ================= */}
+<div className="recent-over-container">
+  <div className="recent-over-text">Recent Overs (Inning 2)</div>
+
+  <div className="recent-over-details">
+    <table>
+      <thead className="Recent1">
+        <tr>
+          <th>Over</th>
+          <th>Bowler</th>
+          <th>Summary</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody className="Recent2">
+        {(props.isAdmin
+          ? inningNo === 2
+            ? recentOvers        // admin + inning 2 running
+            : recentOvers1       // admin + inning 1 running
+          : liveData?.inning2?.recentOvers || []
+        ).map((over, i) => (
+          <tr key={i}>
+            <td className="text-center">{over.overNo}</td>
+            <td className="text-center">{over.bowler}</td>
+            <td>
+              <div className="recent-over-runs">
+                {over.stack.map((run, index) => (
+                  <div key={index}>{run}</div>
+                ))}
+              </div>
+            </td>
+            <td className="recent-over-total-run">
+              <div>{over.runs}</div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
                     </div>
                   )}
                 </div>
