@@ -42,28 +42,42 @@ const ScoreBoard = (props) => {
 
   const [totalOvers, setTotalOvers] = useState(getStoredData("totalOvers", 0));
   const [ballCount, setBallCount] = useState(getStoredData("ballCount", 0));
-  const [match, setMatch] = useState(
-    getStoredData("match", {
-      inning1: {
-        runs: 0,
-        wickets: 0,
-        overs: 0,
-        batters: [],
-        bowlers: [],
-        extras: {},
-        recentOvers: [],
-      },
-      inning2: {
-        runs: 0,
-        wickets: 0,
-        overs: 0,
-        batters: [],
-        bowlers: [],
-        extras: {},
-        recentOvers: [],
-      },
-    }),
-  );
+const [match, setMatch] = useState(
+  getStoredData("match", {
+    inning1: {
+      runs: 0,
+      wickets: 0,
+      overs: 0,
+      batters: [],
+      bowlers: [],
+      extras: {},
+      recentOvers: [],
+    },
+    inning2: {
+      runs: 0,
+      wickets: 0,
+      overs: 0,
+      batters: [],
+      bowlers: [],
+      extras: {},
+      recentOvers: [],
+    },
+
+    // ✅ ROOT-LEVEL CURRENT BOWLER
+    bowler: {
+      id: "",
+      name: "",
+      over: 0,
+      maiden: 0,
+      run: 0,
+      wicket: 0,
+      economy: 0,
+    },
+
+    // ✅ ROOT-LEVEL ALL BOWLERS
+    bowlers: [],
+  })
+);
   const [isBatter1Edited, setBatter1Edited] = useState(
     getStoredData("isBatter1Edited", false),
   );
@@ -110,6 +124,7 @@ const ScoreBoard = (props) => {
   const [battingOrder, setBattingOrder] = useState(
     getStoredData("battingOrder", 0),
   );
+  const [runrate, setRunrate] = useState(getStoredData("runrate",0));
   const [isModalOpen, setModalOpen] = useState(
     getStoredData("isModalOpen", false),
   );
@@ -177,6 +192,7 @@ const ScoreBoard = (props) => {
 
     fetchMatchData();
   }, []);
+  
   /// calcualtion
   useEffect(() => {
     const fetchMatchData = async () => {
@@ -250,7 +266,7 @@ const ScoreBoard = (props) => {
             winningMessage = "Match Tied";
           }
         }
-
+        setRunrate(crr);
         setLiveData({
           ...match,
           rrr,
@@ -265,6 +281,7 @@ const ScoreBoard = (props) => {
 
     fetchMatchData();
   }, []);
+
   // View Result
   useEffect(() => {
     const fetchScores = async () => {
@@ -282,7 +299,6 @@ const ScoreBoard = (props) => {
     };
     fetchScores();
   }, []);
-
   // Local Storage
   useEffect(() => {
     // localStorage.setItem("Admin", JSON.stringify(Admin));
@@ -322,6 +338,7 @@ const ScoreBoard = (props) => {
     localStorage.setItem("outType", JSON.stringify(outType));
     localStorage.setItem("buttonstate", JSON.stringify(buttonstate));
     localStorage.setItem("reset", JSON.stringify(reset));
+    localStorage.setItem("runrate",JSON.stringify(runrate))
   }, [
     match,
     inningNo,
@@ -359,6 +376,7 @@ const ScoreBoard = (props) => {
     outType,
     buttonstate,
     reset,
+    runrate
   ]);
   // New Match
   useEffect(() => {
@@ -489,6 +507,27 @@ const ScoreBoard = (props) => {
   }, []);
 
   // Real Time Update
+
+
+//   useEffect(() => {
+//   if (!props.newMatch) return;
+//   const interval = setInterval(() => {
+//     updateLiveMatch();
+//     handleLIVEscore();
+//   }, 3000); // every 3 seconds
+
+//   return () => clearInterval(interval);
+// }, [props.newMatch]);
+
+//  useEffect(() => {
+//     if (props.newMatch) {
+//       updateLiveMatch();
+//       handleLIVEscore();
+//     }
+//   }, [
+//     match
+//   ]);
+
   useEffect(() => {
     if (props.newMatch) {
       updateLiveMatch();
@@ -506,6 +545,7 @@ const ScoreBoard = (props) => {
     remainingBalls,
     batter1,
     batter2,
+    bowler,
     bowlers,
     extras,
     recentOvers,
@@ -526,6 +566,7 @@ const ScoreBoard = (props) => {
     match,
     batter1,
     batter2,
+    bowler,
     bowlers,
     extras,
     recentOvers,
@@ -554,6 +595,7 @@ const ScoreBoard = (props) => {
         inning2: match.inning2,
         batter1,
         batter2,
+        bowler,
         bowlers,
         extras,
         recentOvers,
@@ -616,6 +658,7 @@ const ScoreBoard = (props) => {
         remainingBalls,
         batter1,
         batter2,
+        bowler,
         bowlers,
         extras,
         recentOvers,
@@ -695,6 +738,7 @@ const ScoreBoard = (props) => {
             match,
             batter1,
             batter2,
+            bowler,
             bowlers,
             extras,
             recentOvers,
@@ -721,6 +765,96 @@ const ScoreBoard = (props) => {
       console.error("Error updating newmatch value:", error);
     }
   };
+
+  const getBowlersForTable = ({ tableInning }) => {
+  // ================= USER SIDE =================
+  if (!props.Admin) {
+    if (tableInning === 1) {
+      return liveData?.inning1?.bowlers || [];
+    }
+    if (tableInning === 2) {
+      return liveData?.inning2?.bowlers || [];
+    }
+  }
+
+  // ================= ADMIN SIDE =================
+  if (props.Admin) {
+    // -------- INNING 1 TABLE --------
+    if (tableInning === 1) {
+      if (inningNo === 1) {
+        // ADMIN + INNING 1 → LOCAL
+        const map = new Map();
+
+        (match?.inning1?.bowlers || []).forEach(b =>
+          b?.name && map.set(b.name, b)
+        );
+
+        if (match?.bowler?.name) {
+          map.set(match.bowler.name, match.bowler);
+        }
+
+        return Array.from(map.values());
+      } else {
+        // ADMIN + INNING 2 → DATABASE
+        return liveData?.inning1?.bowlers || [];
+      }
+    }
+
+    // -------- INNING 2 TABLE --------
+    if (tableInning === 2) {
+      if (inningNo === 2) {
+        // ADMIN + INNING 2 → LOCAL
+        const map = new Map();
+
+        (match?.inning2?.bowlers || []).forEach(b =>
+          b?.name && map.set(b.name, b)
+        );
+
+        if (match?.bowler?.name) {
+          map.set(match.bowler.name, match.bowler);
+        }
+
+        return Array.from(map.values());
+      } else {
+        // ADMIN + INNING 1 → NO DATA
+        return [];
+      }
+    }
+  }
+
+  return [];
+};
+
+const EMPTY_EXTRAS = { total: 0, wide: 0, noBall: 0, Lb: 0 };
+
+const getExtrasForTable = ({ tableInning }) => {
+  // ========== USER ==========
+  if (!props.Admin) {
+    if (tableInning === 1) return liveData?.inning1?.extras || EMPTY_EXTRAS;
+    if (tableInning === 2) return liveData?.inning2?.extras || EMPTY_EXTRAS;
+  }
+
+  // ========== ADMIN ==========
+  if (props.Admin) {
+    // INNING 1
+    if (tableInning === 1) {
+      return inningNo === 1
+        ? match?.inning1?.extras || EMPTY_EXTRAS
+        : liveData?.inning1?.extras || EMPTY_EXTRAS;
+    }
+
+    // INNING 2
+    if (tableInning === 2) {
+      return inningNo === 2
+        ? match?.inning2?.extras || EMPTY_EXTRAS
+        : liveData?.inning2?.extras || EMPTY_EXTRAS;
+    }
+  }
+
+  return EMPTY_EXTRAS;
+};
+
+
 
   // Edit Match
   // const handleEndInning1 = async (e) => {
@@ -855,6 +989,7 @@ const ScoreBoard = (props) => {
     }
   };
 
+  
   // Live Score and scoreboard
   const handleEndInning = (e) => {
     const endInningButton = document.getElementById("end-inning");
@@ -868,7 +1003,6 @@ const ScoreBoard = (props) => {
         // console.log("Press");
       } else {
         // set data in Scorebord after press on end-inning and scorecard
-        // real - time add kar sakte heai
         if (batter1.id !== undefined) {
           batters.push({
             id: batter1.id,
@@ -897,6 +1031,7 @@ const ScoreBoard = (props) => {
             battingStatus: BATTING,
           });
         }
+
         if (bowler.id !== undefined) {
           const currentDisplayOver =
             Math.round((ballCount === 6 ? 1 : ballCount * 0.1) * 10) / 10;
@@ -942,7 +1077,7 @@ const ScoreBoard = (props) => {
             setBowlers(bowlers);
           } else {
             if (ballCount !== 6) {
-              bowlers.push({
+              const newentry = {
                 id: bowler.id,
                 name: bowler.name,
                 over: currentDisplayOver,
@@ -952,7 +1087,8 @@ const ScoreBoard = (props) => {
                 noBall: countNoBall,
                 wide: countWide,
                 economy: Math.round((runsByOver / (ballCount / 6)) * 100) / 100,
-              });
+              }
+              bowlers.push(newentry);
               setBowlers(bowlers);
             }
           }
@@ -968,6 +1104,16 @@ const ScoreBoard = (props) => {
               .reduce((prev, next) => prev + next);
             return {
               ...state,
+              bowler: {
+                id: "",
+                name: "",
+                over: 0,
+                maiden: 0,
+                run: 0,
+                wicket: 0,
+                economy: 0,
+              },
+              bowlers: [],
               inning1: {
                 runs: totalRuns,
                 wickets: wicketCount,
@@ -1045,6 +1191,16 @@ const ScoreBoard = (props) => {
               .reduce((prev, next) => prev + next);
             return {
               ...state,
+              bowler: {
+                id: "",
+                name: "",
+                over: 0,
+                maiden: 0,
+                run: 0,
+                wicket: 0,
+                economy: 0,
+              },
+              bowlers: [],
               inning2: {
                 runs: totalRuns,
                 wickets: wicketCount,
@@ -1145,11 +1301,19 @@ const liveBatters = Array.from(liveBattersMap.values());
     const totalOversDecimal =
       (existingBowler?.over || 0) + currentOverDecimal;
 
-    const totalRuns =
+    const totalRuns_over =
       (existingBowler?.run || 0) + runsByOver;
 
     const totalWickets =
       (existingBowler?.wicket || 0) + wicketCount;
+
+      
+        // CRR
+        const overs = overCount + ballCount / 6;
+        let crr = (totalRuns / overs).toFixed(2);
+        crr = isFinite(crr) ? crr : 0;
+
+        setRunrate(crr);
 
     const liveBowler = bowler?.id
       ? {
@@ -1157,7 +1321,7 @@ const liveBatters = Array.from(liveBattersMap.values());
           name: bowler.name,
           maiden: existingBowler?.maiden || 0,
           over: (existingBowler?.over || 0) + currentOverOvers,
-          run: totalRuns,
+          run: totalRuns_over,
           wicket: totalWickets,
           economy:
             totalOversDecimal > 0
@@ -1166,31 +1330,40 @@ const liveBatters = Array.from(liveBattersMap.values());
         }
       : null;
 
-    const updatedBowlers = liveBowler
+    const updatedBowlers = liveBowler 
       ? [
           ...bowlers.filter((b) => b.id !== liveBowler.id),
           liveBowler,
         ]
       : bowlers;
-
+    
     // ===============================
     // UPDATE MATCH STATE
     // ===============================
-    setMatch((state) => ({
-      ...state,
-      [`inning${inningNo}`]: {
-        ...state[`inning${inningNo}`],
-        runs: totalRuns,
-        wickets: wicketCount,
-        overs: totalOvers,
-        runRate: crr,
-        extras,
-        batters: liveBatters,
-        bowlers: updatedBowlers,
-        recentOvers,
-      },
-    }));
+    
+setMatch((state) => ({
+  ...state,
 
+  // ✅ current bowler live data
+  bowler: liveBowler || state.bowler,
+
+  // ✅ all bowlers live data
+  bowlers: updatedBowlers,
+
+  [`inning${inningNo}`]: {
+    ...state[`inning${inningNo}`],
+    runs: totalRuns_over,
+    wickets: wicketCount,
+    overs: totalOvers,
+    runRate: crr,
+    extras,
+    batters: liveBatters,
+    bowlers: updatedBowlers,
+    recentOvers,
+  },
+}));
+
+    console.log(match);
     console.log("✅ Live scorecard updated");
   } 
 };
@@ -1291,6 +1464,11 @@ const liveBatters = Array.from(liveBattersMap.values());
           setBowler({
             id,
             name,
+            over: 0,
+            maiden: 0,
+            run: 0,
+            wicket: 0,
+            economy: 0,
           });
         }
       }
@@ -1312,6 +1490,11 @@ const liveBatters = Array.from(liveBattersMap.values());
     setBowler({
       id: suggestion.id,
       name: suggestion.name,
+      over: suggestion.over,
+      maiden: suggestion.maiden,
+      run: suggestion.run,
+      wicket: suggestion.wicket,
+      economy: suggestion.economy,
     });
     setNameSuggested(true);
     return suggestion.name;
@@ -1387,11 +1570,10 @@ const liveBatters = Array.from(liveBattersMap.values());
       existingBowler.economy =
         Math.round((existingBowler.run / existingBowler.over) * 100) / 100;
       bowlers[index] = existingBowler;
+      setBowler(existingBowler);
       setBowlers(bowlers);
     } else {
-      setBowlers((state) => [
-        ...state,
-        {
+      const newentry =  {
           id: bowler.id,
           name: bowler.name,
           over: 1,
@@ -1401,7 +1583,11 @@ const liveBatters = Array.from(liveBattersMap.values());
           noBall: countNoBall,
           wide: countWide,
           economy: runsByOverParam,
-        },
+        }
+      setBowler(newentry);
+      setBowlers((state) => [
+        ...state,
+        newentry,
       ]);
     }
   };
@@ -2063,6 +2249,7 @@ const liveBatters = Array.from(liveBattersMap.values());
         switchBatterStrike();
       }
     }
+    
   };
 
   const handleNoBall = () => {
@@ -2142,6 +2329,7 @@ const liveBatters = Array.from(liveBattersMap.values());
     enableScoreButtons(".ACTIVE1"); ////
     setwideBall(false);
   };
+
 
   //////
   const handleLb = () => {
@@ -3403,15 +3591,15 @@ const liveBatters = Array.from(liveBattersMap.values());
                                 }
                               }
 
-                              if (!battersList.length) {
-                                return (
-                                  <tr>
-                                    <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
-                                      No batters yet
-                                    </td>
-                                  </tr>
-                                );
-                              }
+                              // if (!battersList.length) {
+                              //   return (
+                              //     <tr>
+                              //       <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
+                              //         No batters yet
+                              //       </td>
+                              //     </tr>
+                              //   );
+                              // }
 
                               return battersList.map((batter, index) => {
                                 const isOnGround =
@@ -3448,7 +3636,7 @@ const liveBatters = Array.from(liveBattersMap.values());
                           </tbody>
                         </table>
                       </div>
-                      {/* bowling 1 */}
+                      {/* ================= BOWLING 1 ================= */}
                       <div className="sb-bowling">
                         <table>
                           <thead>
@@ -3456,106 +3644,71 @@ const liveBatters = Array.from(liveBattersMap.values());
                               <td className="score-types padding-left">
                                 <div className="sb">Bowler</div>
                               </td>
-                              <td className="score-types text-center data">
-                                O
-                              </td>
-                              <td className="score-types text-center data">
-                                M
-                              </td>
-                              <td className="score-types text-center data">
-                                R
-                              </td>
-                              <td className="score-types text-center data">
-                                W
-                              </td>
-                              {/* <td className='score-types text-center'>NB</td>
-                    <td className='score-types text-center'>WD</td> */}
-                              <td className="score-types text-center data">
-                                ECO
-                              </td>
+                              <td className="score-types text-center data">O</td>
+                              <td className="score-types text-center data">M</td>
+                              <td className="score-types text-center data">R</td>
+                              <td className="score-types text-center data">W</td>
+                              <td className="score-types text-center data">ECO</td>
                             </tr>
                           </thead>
-                          <tbody>
-                            {liveData.inning1.bowlers.map((blr, i) => {
-                              // noBall, wide,
-                              const {
-                                name,
-                                over,
-                                maiden,
-                                run,
-                                wicket,
-                                economy,
-                              } = blr;
-                              return (
-                                <tr key={i}>
-                                  <td className="score-types padding-left">
-                                    <div className="sb">{name}</div>
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {over}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {maiden}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {run}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {wicket}
-                                  </td>
-                                  {/* <td className='score-types text-center'>{noBall}</td>
-                        <td className='score-types text-center'>{wide}</td> */}
-                                  <td className="score-types text-center data">
-                                    {economy}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                          
+<tbody>
+  {getBowlersForTable({ tableInning: 1 }).map((blr, index) => {
+    const isCurrentBowler =
+      inningNo === 1 &&
+      (props.Admin ? match?.bowler?.name === blr?.name : liveData?.bowler?.name === blr?.name);
+
+    return (
+      <tr
+        key={`inning1-${blr.name}-${index}`}
+        style={{
+          fontWeight: isCurrentBowler ? "700" : "400",
+          color: isCurrentBowler ? "green" : "inherit",
+        }}
+      >
+        <td className="score-types padding-left">{blr.name}</td>
+        <td className="score-types text-center">{blr.over || 0}</td>
+        <td className="score-types text-center">{blr.maiden || 0}</td>
+        <td className="score-types text-center">{blr.run || 0}</td>
+        <td className="score-types text-center">{blr.wicket || 0}</td>
+        <td className="score-types text-center">{blr.economy || 0}</td>
+      </tr>
+    );
+  })}
+</tbody>
+
                         </table>
                       </div>
                       {/* Extra */}
-                      <div className="extras-container">
-                        <div>Extras</div>
-                        <div className="extra">
-                          <div>
-                            Total:{" "}
-                            {liveData.inningNo === 1
-                              ? liveData.extras.total
-                              : liveData.inning1.extras.total}
+                      {(() => {
+                        const extras = getExtrasForTable({ tableInning: 1 });
+
+                        return (
+                          <div className="extras-container">
+                            <div>Extras</div>
+                            <div className="extra">
+                              <div>Total: {extras.total}</div>
+                              <div>Wd: {extras.wide}</div>
+                              <div>Nb: {extras.noBall}</div>
+                              <div>Lb: {extras.Lb}</div>
+                            </div>
                           </div>
-                          <div>
-                            Wd:{" "}
-                            {liveData.inningNo === 1
-                              ? liveData.extras.wide
-                              : liveData.inning1.extras.wide}
-                          </div>
-                          <div>
-                            Nb:
-                            {liveData.inningNo === 1
-                              ? liveData.extras.noBall
-                              : liveData.inning1.extras.noBall}
-                          </div>
-                          <div>
-                            Lb:
-                            {liveData.inningNo === 1
-                              ? liveData.extras.Lb
-                              : liveData.inning1.extras.Lb}
-                          </div>
-                        </div>
-                      </div>
-                      {/* Run Rate */}
-                      <div className="extras-container">
-                        <div>Run Rate</div>
-                        <div className="extra">
-                          <div>
-                            {liveData.inningNo === 1
-                              ? liveData.crr
-                              : liveData.inning1.runRate}
-                          </div>
-                        </div>
-                      </div>
+                        );
+                      })()}
+{/* Run Rate – Inning 1 */}
+<div className="extras-container">
+  <div>Run Rate</div>
+  <div className="extra">
+    <div>
+      {props.Admin
+        ? inningNo === 1
+          ? runrate
+          : liveData.inning1.runRate
+        : liveData.inningNo === 1
+          ? liveData.crr
+          : liveData.inning1.runRate}
+    </div>
+  </div>
+</div>
                       {/* Total */}
                       <div className="extras-container">
                         <div>Total</div>
@@ -3675,208 +3828,171 @@ const liveBatters = Array.from(liveBattersMap.values());
                   {/*  liveData.hasMatchEnded && */}
                   {isSlideOpen2 && (
                     <div className="sliding-panel">
-{/* ================= INNING 2 BATTING ================= */}
-<div className="sb-batting">
-  <table>
-    <thead>
-      <tr>
-        <td className="score-types padding-left"><div className="sb">Batter</div></td>
-        <td className="score-types text-center data">R</td>
-        <td className="score-types text-center data">B</td>
-        <td className="score-types text-center data">4s</td>
-        <td className="score-types text-center data">6s</td>
-        <td className="score-types text-center data">SR</td>
-      </tr>
-    </thead>
+                      {/* ================= INNING 2 BATTING ================= */}
+                      <div className="sb-batting">
+                        <table>
+                          <thead>
+                            <tr>
+                              <td className="score-types padding-left"><div className="sb">Batter</div></td>
+                              <td className="score-types text-center data">R</td>
+                              <td className="score-types text-center data">B</td>
+                              <td className="score-types text-center data">4s</td>
+                              <td className="score-types text-center data">6s</td>
+                              <td className="score-types text-center data">SR</td>
+                            </tr>
+                          </thead>
 
-    <tbody>
-      {(() => {
-        let battersList = [];
-        let batterOne = null;
-        let batterTwo = null;
+                          <tbody>
+                            {(() => {
+                              let battersList = [];
+                              let batterOne = null;
+                              let batterTwo = null;
 
-        /* ================= USER ================= */
-        if (!props.Admin) {
-          battersList = liveData?.inning2?.batters || [];
-          batterOne = liveData?.batter1;
-          batterTwo = liveData?.batter2;
-        }
+                              /* ================= USER ================= */
+                              if (!props.Admin) {
+                                battersList = liveData?.inning2?.batters || [];
+                                batterOne = liveData?.batter1;
+                                batterTwo = liveData?.batter2;
+                              }
 
-        /* ================= ADMIN ================= */
-        else {
-          // Admin + Inning 2 → LOCAL
-          if (inningNo === 2) {
-            const map = new Map();
+                              /* ================= ADMIN ================= */
+                              else {
+                                // Admin + Inning 2 → LOCAL
+                                if (inningNo === 2) {
+                                  const map = new Map();
 
-            (batters || []).forEach(b => b?.name && map.set(b.name, b));
-            if (batter1?.name) map.set(batter1.name, batter1);
-            if (batter2?.name) map.set(batter2.name, batter2);
+                                  (batters || []).forEach(b => b?.name && map.set(b.name, b));
+                                  if (batter1?.name) map.set(batter1.name, batter1);
+                                  if (batter2?.name) map.set(batter2.name, batter2);
 
-            battersList = Array.from(map.values());
-            batterOne = batter1;
-            batterTwo = batter2;
-          }
-          // Admin + Inning 1 → DATABASE
-          else {
-            battersList = liveData?.inning2?.batters || [];
-            batterOne = liveData?.batter1;
-            batterTwo = liveData?.batter2;
-          }
-        }
+                                  battersList = Array.from(map.values());
+                                  batterOne = batter1;
+                                  batterTwo = batter2;
+                                }
+                                // Admin + Inning 1 → DATABASE
+                                else {
+                                  battersList = liveData?.inning2?.batters || [];
+                                  batterOne = liveData?.batter1;
+                                  batterTwo = liveData?.batter2;
+                                }
+                              }
 
-        if (!battersList.length) {
-          return (
-            <tr>
-              <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
-                No batters yet
-              </td>
-            </tr>
-          );
-        }
+                              // if (!battersList.length) {
+                              //   return (
+                              //     <tr>
+                              //       <td colSpan="6" style={{ textAlign: "center", opacity: 0.6 }}>
+                              //         No batters yet
+                              //       </td>
+                              //     </tr>
+                              //   );
+                              // }
 
-        return battersList.map((batter, index) => {
-          const isOnGround =
-            batter?.name === batterOne?.name ||
-            batter?.name === batterTwo?.name;
+                              return battersList.map((batter, index) => {
+                                const isOnGround =
+                                  batter?.name === batterOne?.name ||
+                                  batter?.name === batterTwo?.name;
 
-          const isStriker =
-            (batter?.name === batterOne?.name && batterOne?.onStrike) ||
-            (batter?.name === batterTwo?.name && batterTwo?.onStrike);
+                                const isStriker =
+                                  (batter?.name === batterOne?.name && batterOne?.onStrike) ||
+                                  (batter?.name === batterTwo?.name && batterTwo?.onStrike);
 
-          return (
-            <tr
-              key={`${batter.name}-${index}`}
-              style={{
-                fontWeight: isOnGround ? "700" : "400",
-                color: isOnGround ? "green" : "inherit",
-              }}
-            >
-              <td className="score-types padding-left">
-                <div className="sb">
-                  {batter.name}
-                  {isStriker && " *"}
-                </div>
-              </td>
-              <td className="score-types text-center data">{batter.run || 0}</td>
-              <td className="score-types text-center data">{batter.ball || 0}</td>
-              <td className="score-types text-center data">{batter.four || 0}</td>
-              <td className="score-types text-center data">{batter.six || 0}</td>
-              <td className="score-types text-center data">{batter.strikeRate || 0}</td>
-            </tr>
-          );
-        });
-      })()}
-    </tbody>
-  </table>
-</div>
-                      {/* bowling 2 */}
+                                return (
+                                  <tr
+                                    key={`${batter.name}-${index}`}
+                                    style={{
+                                      fontWeight: isOnGround ? "700" : "400",
+                                      color: isOnGround ? "green" : "inherit",
+                                    }}
+                                  >
+                                    <td className="score-types padding-left">
+                                      <div className="sb">
+                                        {batter.name}
+                                        {isStriker && " *"}
+                                      </div>
+                                    </td>
+                                    <td className="score-types text-center data">{batter.run || 0}</td>
+                                    <td className="score-types text-center data">{batter.ball || 0}</td>
+                                    <td className="score-types text-center data">{batter.four || 0}</td>
+                                    <td className="score-types text-center data">{batter.six || 0}</td>
+                                    <td className="score-types text-center data">{batter.strikeRate || 0}</td>
+                                  </tr>
+                                );
+                              });
+                            })()}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* ================= BOWLING 2 ================= */}
                       <div className="sb-bowling">
                         <table>
                           <thead>
                             <tr>
-                              <td className="score-types padding-left">
-                                <div className="sb">Bowler</div>
-                              </td>
-                              <td className="score-types text-center data">
-                                O
-                              </td>
-                              <td className="score-types text-center data">
-                                M
-                              </td>
-                              <td className="score-types text-center data">
-                                R
-                              </td>
-                              <td className="score-types text-center data">
-                                W
-                              </td>
-                              {/* <td className='score-types text-center'>NB</td>
-                      <td className='score-types text-center'>WD</td> */}
-                              <td className="score-types text-center data">
-                                ECO
-                              </td>
+                              <td className="score-types padding-left"><div className="sb">Bowler</div></td>
+                              <td className="score-types text-center data">O</td>
+                              <td className="score-types text-center data">M</td>
+                              <td className="score-types text-center data">R</td>
+                              <td className="score-types text-center data">W</td>
+                              <td className="score-types text-center data">ECO</td>
                             </tr>
                           </thead>
-                          <tbody>
-                            {liveData.inning2.bowlers.map((blr, i) => {
-                              // noBall, wide
-                              const {
-                                name,
-                                over,
-                                maiden,
-                                run,
-                                wicket,
-                                economy,
-                              } = blr;
-                              return (
-                                <tr key={i}>
-                                  <td className="score-types padding-left">
-                                    <div className="sb">{name}</div>
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {over}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {maiden}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {run}
-                                  </td>
-                                  <td className="score-types text-center data">
-                                    {wicket}
-                                  </td>
-                                  {/* <td className='score-types text-center'>{noBall}</td>
-                          <td className='score-types text-center'>{wide}</td> */}
-                                  <td className="score-types text-center data">
-                                    {economy}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
+<tbody>
+  {getBowlersForTable({ tableInning: 2 }).map((blr, index) => {
+    const isCurrentBowler =
+      inningNo === 2 &&
+      (props.Admin ? match?.bowler?.name === blr?.name : liveData?.bowler?.name === blr?.name);
+
+    return (
+      <tr
+        key={`inning2-${blr.name}-${index}`}
+        style={{
+          fontWeight: isCurrentBowler ? "700" : "400",
+          color: isCurrentBowler ? "green" : "inherit",
+        }}
+      >
+        <td className="score-types padding-left">{blr.name}</td>
+        <td className="score-types text-center">{blr.over || 0}</td>
+        <td className="score-types text-center">{blr.maiden || 0}</td>
+        <td className="score-types text-center">{blr.run || 0}</td>
+        <td className="score-types text-center">{blr.wicket || 0}</td>
+        <td className="score-types text-center">{blr.economy || 0}</td>
+      </tr>
+    );
+  })}
+</tbody>
                         </table>
                       </div>
                       {/* Extra */}
-                      <div className="extras-container">
-                        <div>Extras</div>
-                        <div className="extra">
-                          <div>
-                            Total:{" "}
-                            {liveData.hasMatchEnded
-                              ? liveData.inning2.extras.total
-                              : 0}
+                      {(() => {
+                        const extras = getExtrasForTable({ tableInning: 2 });
+
+                        return (
+                          <div className="extras-container">
+                            <div>Extras</div>
+                            <div className="extra">
+                              <div>Total: {extras.total}</div>
+                              <div>Wd: {extras.wide}</div>
+                              <div>Nb: {extras.noBall}</div>
+                              <div>Lb: {extras.Lb}</div>
+                            </div>
                           </div>
-                          <div>
-                            Wd:{" "}
-                            {liveData.hasMatchEnded
-                              ? liveData.inning2.extras.wide
-                              : 0}
-                          </div>
-                          <div>
-                            Nb:
-                            {liveData.hasMatchEnded
-                              ? liveData.inning2.extras.noBall
-                              : 0}
-                          </div>
-                          <div>
-                            Lb:
-                            {liveData.hasMatchEnded
-                              ? liveData.inning2.extras.Lb
-                              : 0}
-                          </div>
-                        </div>
-                      </div>
-                      {/* Run Rate */}
-                      <div className="extras-container">
-                        <div>Run Rate</div>
-                        <div className="extra">
-                          <div>
-                            {" "}
-                            {liveData.inningNo === 1
-                              ? "0"
-                              : liveData.inning2.runRate}
-                          </div>
-                        </div>
-                      </div>
+                        );
+                      })()}
+{/* Run Rate – Inning 2 */}
+<div className="extras-container">
+  <div>Run Rate</div>
+  <div className="extra">
+    <div>
+      {props.Admin
+        ? inningNo === 2
+          ? runrate
+          : "0.00"
+        : liveData.inningNo === 2
+          ? liveData.crr
+          : "0.00"}
+    </div>
+  </div>
+</div>
+
                       {/* Total */}
                       <div className="extras-container">
                         <div>Total</div>

@@ -18,7 +18,7 @@ import {
 import { IconButton, Box } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -126,12 +126,6 @@ const useStyles = makeStyles((theme) => ({
   "@media (max-width: 480px)": {
     mainContainer2: {
       padding: "0.2rem",
-    },
-  },
-
-  "@media (max-width: 480px)": {
-    mainContainer2: {
-      padding: "0rem",
     },
   },
 

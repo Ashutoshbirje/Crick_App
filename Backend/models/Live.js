@@ -70,6 +70,7 @@ const liveSchema = new mongoose.Schema({
   admin: { type: Boolean, default: false },
   batter1: batterSchema,
   batter2: batterSchema,
+  bowler: bowlerSchema,
   bowlers: [bowlerSchema],
   extras: extrasSchema,
   recentOvers: [recentOverSchema]
