@@ -3169,9 +3169,9 @@ setMatch((state) => ({
                           ? winnerCard2
                           : tossContent}
                   </div>
-                </div>
+                </div>``
                 {/* Admin panel */}
-                {props.Admin && (
+                {props.Admin && !hasMatchEnded && (
                   <div>
                     {/*Score Line*/}
                     <div className="score">

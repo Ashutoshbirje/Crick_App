@@ -15,8 +15,11 @@ npm start
 // Real-time batsman / bawler in scorecard (Done) 
 // Pointable (New Feature)
 // Team Runrate (New Feature)
+
 // States (New Feature)
+
 // Single admin (New Feature)
+
 // Registration for match + Payment (New Feature)
 // Advertisement (New Feature)
 
