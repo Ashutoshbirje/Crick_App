@@ -1021,33 +1021,43 @@ const getExtrasForTable = ({ tableInning }) => {
           setBowler({});
       } else {
         // set data in Scorebord after press on end-inning and scorecard
+
         if (batter1.id !== undefined) {
-          batters.push({
-            id: batter1.id,
-            name: batter1.name + " *",
-            run: batter1.run,
-            ball: batter1.ball,
-            four: batter1.four,
-            six: batter1.six,
-            strikeRate: batter1.strikeRate,
-            onStrike: batter1.onStrike,
-            battingOrder: batter1.battingOrder,
-            battingStatus: BATTING,
-          });
+          const exists = batters.some(b => b.id === batter1.id);
+
+          if (!exists) {
+            batters.push({
+              id: batter1.id,
+              name: batter1.name + " *",
+              run: batter1.run,
+              ball: batter1.ball,
+              four: batter1.four,
+              six: batter1.six,
+              strikeRate: batter1.strikeRate,
+              onStrike: batter1.onStrike,
+              battingOrder: batter1.battingOrder,
+              battingStatus: BATTING,
+            });
+          }
         }
+
         if (batter2.id !== undefined) {
-          batters.push({
-            id: batter2.id,
-            name: batter2.name + " *",
-            run: batter2.run,
-            ball: batter2.ball,
-            four: batter2.four,
-            six: batter2.six,
-            strikeRate: batter2.strikeRate,
-            onStrike: batter2.onStrike,
-            battingOrder: batter2.battingOrder,
-            battingStatus: BATTING,
-          });
+          const exists = batters.some(b => b.id === batter2.id);
+
+          if (!exists) {
+            batters.push({
+              id: batter2.id,
+              name: batter2.name + " *",
+              run: batter2.run,
+              ball: batter2.ball,
+              four: batter2.four,
+              six: batter2.six,
+              strikeRate: batter2.strikeRate,
+              onStrike: batter2.onStrike,
+              battingOrder: batter2.battingOrder,
+              battingStatus: BATTING,
+            });
+          }
         }
 
         if (bowler.id !== undefined) {
@@ -1199,6 +1209,7 @@ const getExtrasForTable = ({ tableInning }) => {
           ////
           // endInningButton.disabled = true;
           ////
+
         } else {
           setMatch((state) => {
             const totalFours = batters
@@ -1247,7 +1258,7 @@ const handleLIVEscore = () => {
 
   if (endInningButton.textContent === "live") {
    
-    // ===============================
+// ===============================
 // LIVE BATTERS (INCLUDE OUT BATTERS)
 // ===============================
 const liveBattersMap = new Map();
@@ -1302,7 +1313,6 @@ mergeBatter(batter2);
 
 // 3️⃣ Final live batters list (ALL batters)
 const liveBatters = Array.from(liveBattersMap.values());
-
 
     // ===============================
     // LIVE BOWLER (CUMULATIVE)
@@ -2347,7 +2357,6 @@ setMatch((state) => ({
     enableScoreButtons(".ACTIVE1"); ////
     setwideBall(false);
   };
-
 
   //////
   const handleLb = () => {
@@ -3713,21 +3722,21 @@ setMatch((state) => ({
                           </div>
                         );
                       })()}
-{/* Run Rate – Inning 1 */}
-<div className="extras-container">
-  <div>Run Rate</div>
-  <div className="extra">
-    <div>
-      {props.Admin
-        ? inningNo === 1
-          ? runrate
-          : liveData.inning1.runRate
-        : liveData.inningNo === 1
-          ? liveData.crr
-          : liveData.inning1.runRate}
-    </div>
-  </div>
-</div>
+                      {/* Run Rate – Inning 1 */}
+                      <div className="extras-container">
+                        <div>Run Rate</div>
+                        <div className="extra">
+                          <div>
+                            {props.Admin
+                              ? inningNo === 1
+                                ? runrate
+                                : liveData.inning1.runRate
+                              : liveData.inningNo === 1
+                                ? liveData.crr
+                                : liveData.inning1.runRate}
+                          </div>
+                        </div>
+                      </div>
                       {/* Total */}
                       <div className="extras-container">
                         <div>Total</div>
@@ -3801,47 +3810,47 @@ setMatch((state) => ({
                           </table>
                         </div>
                       </div> */}
-{/* ================= INNING 1 : RECENT OVERS ================= */}
-<div className="recent-over-container">
-  <div className="recent-over-text">Recent Overs (Inning 1)</div>
+                      {/* ================= INNING 1 : RECENT OVERS ================= */}
+                      <div className="recent-over-container">
+                        <div className="recent-over-text">Recent Overs (Inning 1)</div>
 
-  <div className="recent-over-details">
-    <table>
-      <thead className="Recent1">
-        <tr>
-          <th>Over</th>
-          <th>Bowler</th>
-          <th>Summary</th>
-          <th>Total</th>
-        </tr>
-      </thead>
+                        <div className="recent-over-details">
+                          <table>
+                            <thead className="Recent1">
+                              <tr>
+                                <th>Over</th>
+                                <th>Bowler</th>
+                                <th>Summary</th>
+                                <th>Total</th>
+                              </tr>
+                            </thead>
 
-      <tbody className="Recent2">
-        {(props.isAdmin
-          ? inningNo === 1
-            ? recentOvers        // admin + inning 1 running
-            : recentOvers1       // admin + inning 2 running
-          : liveData?.inning1?.recentOvers || []
-        ).map((over, i) => (
-          <tr key={i}>
-            <td className="text-center">{over.overNo}</td>
-            <td className="text-center">{over.bowler}</td>
-            <td>
-              <div className="recent-over-runs">
-                {over.stack.map((run, index) => (
-                  <div key={index}>{run}</div>
-                ))}
-              </div>
-            </td>
-            <td className="recent-over-total-run">
-              <div>{over.runs}</div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+                            <tbody className="Recent2">
+                              {(props.isAdmin
+                                ? inningNo === 1
+                                  ? recentOvers        // admin + inning 1 running
+                                  : recentOvers1       // admin + inning 2 running
+                                : liveData?.inning1?.recentOvers || []
+                              ).map((over, i) => (
+                                <tr key={i}>
+                                  <td className="text-center">{over.overNo}</td>
+                                  <td className="text-center">{over.bowler}</td>
+                                  <td>
+                                    <div className="recent-over-runs">
+                                      {over.stack.map((run, index) => (
+                                        <div key={index}>{run}</div>
+                                      ))}
+                                    </div>
+                                  </td>
+                                  <td className="recent-over-total-run">
+                                    <div>{over.runs}</div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -3918,12 +3927,22 @@ setMatch((state) => ({
                               /* ================= ADMIN ================= */
                               else {
                                 // Admin + Inning 2 → LOCAL
-                                if (inningNo === 2) {
+                                if (inningNo === 2 && !hasMatchEnded) {
                                   const map = new Map();
 
-                                  (batters || []).forEach(b => b?.name && map.set(b.name, b));
-                                  if (batter1?.name) map.set(batter1.name, batter1);
-                                  if (batter2?.name) map.set(batter2.name, batter2);
+                                  (batters || []).forEach(b => {
+                                    if (b?.name && !map.has(b.name)) {
+                                      map.set(b.name, b);
+                                    }
+                                  });
+
+                                  if (batter1?.name && !map.has(batter1.id)) {
+                                    map.set(batter1.name, batter1);
+                                  }
+
+                                  if (batter2?.name && !map.has(batter2.id)) {
+                                    map.set(batter2.name, batter2);
+                                  }
 
                                   battersList = Array.from(map.values());
                                   batterOne = batter1;
@@ -3982,6 +4001,7 @@ setMatch((state) => ({
                           </tbody>
                         </table>
                       </div>
+
                       {/* ================= BOWLING 2 ================= */}
                       <div className="sb-bowling">
                         <table>
@@ -4037,21 +4057,21 @@ setMatch((state) => ({
                           </div>
                         );
                       })()}
-{/* Run Rate – Inning 2 */}
-<div className="extras-container">
-  <div>Run Rate</div>
-  <div className="extra">
-    <div>
-      {props.Admin
-        ? inningNo === 2
-          ? runrate
-          : "0.00"
-        : liveData.inningNo === 2
-          ? liveData.crr
-          : "0.00"}
-    </div>
-  </div>
-</div>
+                      {/* Run Rate – Inning 2 */}
+                      <div className="extras-container">
+                        <div>Run Rate</div>
+                        <div className="extra">
+                          <div>
+                            {props.Admin
+                              ? inningNo === 2
+                                ? runrate
+                                : "0.00"
+                              : liveData.inningNo === 2
+                                ? liveData.crr
+                                : "0.00"}
+                          </div>
+                        </div>
+                      </div>
                       {/* Total */}
                       <div className="extras-container">
                         <div>Total</div>
@@ -4130,49 +4150,47 @@ setMatch((state) => ({
                           </table>
                         </div>
                       </div> */}
-{/* ================= INNING 2 : RECENT OVERS ================= */}
-<div className="recent-over-container">
-  <div className="recent-over-text">Recent Overs (Inning 2)</div>
+                      {/* ================= INNING 2 : RECENT OVERS ================= */}
+                      <div className="recent-over-container">
+                        <div className="recent-over-text">Recent Overs (Inning 2)</div>
 
-  <div className="recent-over-details">
-    <table>
-      <thead className="Recent1">
-        <tr>
-          <th>Over</th>
-          <th>Bowler</th>
-          <th>Summary</th>
-          <th>Total</th>
-        </tr>
-      </thead>
+                        <div className="recent-over-details">
+                          <table>
+                            <thead className="Recent1">
+                              <tr>
+                                <th>Over</th>
+                                <th>Bowler</th>
+                                <th>Summary</th>
+                                <th>Total</th>
+                              </tr>
+                            </thead>
 
-      <tbody className="Recent2">
-        {(props.isAdmin
-          ? inningNo === 2
-            ? recentOvers        // admin + inning 2 running
-            : recentOvers1       // admin + inning 1 running
-          : liveData?.inning2?.recentOvers || []
-        ).map((over, i) => (
-          <tr key={i}>
-            <td className="text-center">{over.overNo}</td>
-            <td className="text-center">{over.bowler}</td>
-            <td>
-              <div className="recent-over-runs">
-                {over.stack.map((run, index) => (
-                  <div key={index}>{run}</div>
-                ))}
-              </div>
-            </td>
-            <td className="recent-over-total-run">
-              <div>{over.runs}</div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
+                            <tbody className="Recent2">
+                              {(props.isAdmin
+                                ? inningNo === 2
+                                  ? recentOvers        // admin + inning 2 running
+                                  : recentOvers1       // admin + inning 1 running
+                                : liveData?.inning2?.recentOvers || []
+                              ).map((over, i) => (
+                                <tr key={i}>
+                                  <td className="text-center">{over.overNo}</td>
+                                  <td className="text-center">{over.bowler}</td>
+                                  <td>
+                                    <div className="recent-over-runs">
+                                      {over.stack.map((run, index) => (
+                                        <div key={index}>{run}</div>
+                                      ))}
+                                    </div>
+                                  </td>
+                                  <td className="recent-over-total-run">
+                                    <div>{over.runs}</div>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
