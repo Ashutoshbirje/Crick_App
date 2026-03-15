@@ -537,8 +537,6 @@ useEffect(() => {
   }
 }, [
   newMatch,
-  updateLiveMatch,
-  handleLIVEscore,
   inningNo,
   totalRuns,
   wicketCount,
