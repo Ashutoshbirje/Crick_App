@@ -13,13 +13,14 @@ npm start
 
 // Feature acpects 
 
-// States (New Feature)
-
-// Single admin (New Feature)
+// Form to fill data on website (New Feature)
 
 // Registration for match + Payment (New Feature)
-// Advertisement (New Feature)
 
-// final / semifinal / live tag on the live scorecard (New Feature)
-// Form to fill data on website (New Feature)
+// Advertisement + Custom photo (New Feature)
+
+// final / semifinal / Noraml (Default) / super over tag on the live scorecard (New Feature)
+
+// States (New Feature)
+
 // Screen Orientation 

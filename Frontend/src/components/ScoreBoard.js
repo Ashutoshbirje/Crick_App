@@ -749,6 +749,9 @@ const [match, setMatch] = useState(
         case "edit":
           // navigate("/EditPassward");
           break;
+        case "add":
+          // navigate("/EditPassward");
+          break;
         case "help":
           navigate("/help");
           break;
@@ -4409,7 +4412,7 @@ setMatch((state) => ({
                 className="score-board-settings"
                 onClick={() => handleClick("new")}
               >
-                NEW MATCH
+                NEW Match
               </div>
               {props.newMatch && (
                 <div
@@ -4424,7 +4427,14 @@ setMatch((state) => ({
                 onClick={() => handleClick("edit")}
               >
                 {/* edit */}
-                EDIT PASSWORD
+                EDIT Passward
+              </div>
+              <div
+                className="score-board-settings"
+                onClick={() => handleClick("edit")}
+              >
+                {/* add */}
+                ADD League
               </div>
               <div
                 className="score-board-settings"
