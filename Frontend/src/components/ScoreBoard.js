@@ -528,32 +528,20 @@ useEffect(() => {
 //     match
 //   ]);
 
+// useEffect(() => { if (props.newMatch) { updateLiveMatch(); handleLIVEscore(); } }, [ inningNo, totalRuns, wicketCount, totalOvers, overCount, ballCount, hasMatchEnded, remainingRuns, remainingBalls, batter1, batter2, bowler, bowlers, extras, recentOvers, match, ]);
+
 const { newMatch } = props;
 
 useEffect(() => {
-  if (newMatch) {
+  if (!newMatch) return;
+
+  const interval = setInterval(() => {
     updateLiveMatch();
     handleLIVEscore();
-  }
-}, [
-  newMatch,
-  inningNo,
-  totalRuns,
-  wicketCount,
-  totalOvers,
-  overCount,
-  ballCount,
-  hasMatchEnded,
-  remainingRuns,
-  remainingBalls,
-  batter1,
-  batter2,
-  bowler,
-  bowlers,
-  extras,
-  recentOvers,
-  match,
-]);
+  }, 3000);
+
+  return () => clearInterval(interval);
+}, [newMatch, updateLiveMatch, handleLIVEscore]);
 
 
   const createLiveMatch = async ({
