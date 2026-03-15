@@ -183,7 +183,7 @@ const [match, setMatch] = useState(
         setLiveData(matchRes.data);
         
         console.log("Debugging is Started Now")
-        console.log(liveData);
+        // console.log(liveData);
         
       } catch (err) {
         console.error("Failed to load match data:", err.message);
@@ -475,7 +475,7 @@ const [match, setMatch] = useState(
         setButtonstate(false);
       }
     }
-  }, [inningNo, overCount, maxOver, wicketCount, remainingRuns]);
+  }, [inningNo, overCount, maxOver, wicketCount, TotalWicket, remainingRuns]);
 
   // Useless
   // useEffect(() => {
