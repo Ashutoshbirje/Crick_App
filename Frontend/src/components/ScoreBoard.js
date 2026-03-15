@@ -530,18 +530,18 @@ useEffect(() => {
 
 // useEffect(() => { if (props.newMatch) { updateLiveMatch(); handleLIVEscore(); } }, [ inningNo, totalRuns, wicketCount, totalOvers, overCount, ballCount, hasMatchEnded, remainingRuns, remainingBalls, batter1, batter2, bowler, bowlers, extras, recentOvers, match, ]);
 
-const { newMatch } = props;
+// const { newMatch } = props;
 
-useEffect(() => {
-  if (!newMatch) return;
+// useEffect(() => {
+//   if (!newMatch) return;
 
-  const interval = setInterval(() => {
-    updateLiveMatch();
-    handleLIVEscore();
-  }, 3000);
+//   const interval = setInterval(() => {
+//     updateLiveMatch();
+//     handleLIVEscore();
+//   }, 3000);
 
-  return () => clearInterval(interval);
-}, [newMatch, updateLiveMatch, handleLIVEscore]);
+//   return () => clearInterval(interval);
+// }, [newMatch, updateLiveMatch, handleLIVEscore]);
 
 
   const createLiveMatch = async ({
@@ -2786,6 +2786,35 @@ setMatch((state) => ({
       .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
 
   }, [scores]);
+
+const { newMatch } = props;
+
+  useEffect(() => {
+  if (newMatch) {
+    updateLiveMatch();
+    handleLIVEscore();
+  }
+}, [
+  newMatch,
+  updateLiveMatch,
+  handleLIVEscore,
+  inningNo,
+  totalRuns,
+  wicketCount,
+  totalOvers,
+  overCount,
+  ballCount,
+  hasMatchEnded,
+  remainingRuns,
+  remainingBalls,
+  batter1,
+  batter2,
+  bowler,
+  bowlers,
+  extras,
+  recentOvers,
+  match,
+]);
 
   return (
     // main container
