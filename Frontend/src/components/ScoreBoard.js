@@ -2702,6 +2702,96 @@ setMatch((state) => ({
     </>
   );
 
+  const pointsTable = React.useMemo(() => {
+    const table = {};
+
+    (scores || []).forEach(match => {
+
+      const team1 = match.scoringTeam;
+      const team2 = match.chessingTeam;
+
+      const runs1 = match.inning1?.runs || 0;
+      const runs2 = match.inning2?.runs || 0;
+
+      const overs1 = parseFloat(match.inning1?.overs || 0);
+      const overs2 = parseFloat(match.inning2?.overs || 0);
+
+      const winner = match.winnerCard3?.includes("won")
+        ? match.winnerCard3.split(" won")[0]
+        : null;
+
+      if (!table[team1]) {
+        table[team1] = {
+          team: team1,
+          played: 0,
+          win: 0,
+          loss: 0,
+          tie: 0,
+          points: 0,
+          runsScored: 0,
+          runsConceded: 0,
+          oversFaced: 0,
+          oversBowled: 0,
+        };
+      }
+
+      if (!table[team2]) {
+        table[team2] = {
+          team: team2,
+          played: 0,
+          win: 0,
+          loss: 0,
+          tie: 0,
+          points: 0,
+          runsScored: 0,
+          runsConceded: 0,
+          oversFaced: 0,
+          oversBowled: 0,
+        };
+      }
+
+      table[team1].played++;
+      table[team2].played++;
+
+      table[team1].runsScored += runs1;
+      table[team1].runsConceded += runs2;
+      table[team1].oversFaced += overs1;
+      table[team1].oversBowled += overs2;
+
+      table[team2].runsScored += runs2;
+      table[team2].runsConceded += runs1;
+      table[team2].oversFaced += overs2;
+      table[team2].oversBowled += overs1;
+
+      if (runs1 === runs2) {
+        table[team1].tie++;
+        table[team2].tie++;
+        table[team1].points += 1;
+        table[team2].points += 1;
+      }
+      else if (winner === team1) {
+        table[team1].win++;
+        table[team1].points += 2;
+        table[team2].loss++;
+      }
+      else if (winner === team2) {
+        table[team2].win++;
+        table[team2].points += 2;
+        table[team1].loss++;
+      }
+    });
+
+    return Object.values(table)
+      .map(t => ({
+        ...t,
+        nrr: (
+          (t.runsScored / (t.oversFaced || 1)) -
+          (t.runsConceded / (t.oversBowled || 1))
+        ).toFixed(2)
+      }))
+      .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
+
+  }, [scores]);
 
   return (
     // main container
@@ -2927,7 +3017,7 @@ setMatch((state) => ({
             }`}
             onClick={() => setActiveSection("liveScore")}
           >
-            Live Score
+            Live
           </button>
           <button
             className={`tab ${
@@ -2935,13 +3025,19 @@ setMatch((state) => ({
             }`}
             onClick={() => setActiveSection("scoreCard")}
           >
-            Scorecard
+            Score
           </button>
           <button
             className={`tab ${activeSection === "result" ? "active-tab" : ""}`}
             onClick={() => setActiveSection("result")}
           >
             Results
+          </button>
+          <button
+            className={`tab ${activeSection === "pointtable" ? "active-tab" : ""}`}
+            onClick={() => setActiveSection("pointtable")}
+          >
+            Points
           </button>
           {props.Admin && (
             <button
@@ -2961,6 +3057,7 @@ setMatch((state) => ({
             activeSection === "scoreCard") &&
             activeSection !== "result" &&
             activeSection !== "setting" &&
+            activeSection !== "pointtable" &&
             !props.newMatch && (
               <div className="Imgdiv">
                 <img
@@ -4266,6 +4363,44 @@ setMatch((state) => ({
                 <div className="result">{score.winnerCard3}</div>
               </div>
             ))}
+
+          {/*Section 5 : Pointtable */}
+          {activeSection == "pointtable" && pointsTable && (
+            <div className="sb-batting">
+              <table>
+                <thead>
+                  <tr>
+                    <td className="score-types padding-left">
+                      <div className="sb">Team</div>
+                    </td>
+                    <td className="score-types text-center data">M</td>
+                    <td className="score-types text-center data">W</td>
+                    <td className="score-types text-center data">L</td>
+                    <td className="score-types text-center data">T</td>
+                    <td className="score-types text-center data">Pts</td>
+                    <td className="score-types text-center data">NRR</td>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {pointsTable.map((team, index) => (
+                    <tr key={index}>
+                      <td className="score-types padding-left">
+                        <div className="sb">{team.team}</div>
+                      </td>
+
+                      <td className="score-types text-center data">{team.played}</td>
+                      <td className="score-types text-center data">{team.win}</td>
+                      <td className="score-types text-center data">{team.loss}</td>
+                      <td className="score-types text-center data">{team.tie}</td>
+                      <td className="score-types text-center data">{team.points}</td>
+                      <td className="score-types text-center data">{team.nrr}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/*Section 5 :  settings */}
           {activeSection === "setting" && props.Admin && (

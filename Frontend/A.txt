@@ -12,9 +12,6 @@ npm start
 // disable wicket table after click on w button (refresh is req - avoid)
 
 // Feature acpects 
-// Real-time batsman / bawler in scorecard (Done) 
-// Pointable (New Feature)
-// Team Runrate (New Feature)
 
 // States (New Feature)
 
