@@ -280,7 +280,7 @@ const [match, setMatch] = useState(
     };
 
     fetchMatchData();
-  }, []);
+  }, [TotalWicket]);
 
   // View Result
   useEffect(() => {
@@ -378,54 +378,54 @@ const [match, setMatch] = useState(
     reset,
     runrate
   ]);
+
   // New Match
-  useEffect(() => {
-    const fetchMatch = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/matches`,
-        );
-        const data = await response.json();
+const { setNewMatch } = props;
 
-        // Check if there is at least one match
-        if (data.length === 0) {
-          // console.warn("No match data available.");
-          return;
-        }
+useEffect(() => {
+  const fetchMatch = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/matches`
+      );
+      const data = await response.json();
 
-        const latestMatch = data[data.length - 1];
-        setMatchData(latestMatch);
-        console.log(`Total number of wicket ${latestMatch.players}`);
-        setTotalWicket(latestMatch.players);
+      if (data.length === 0) return;
 
-        // Check if latestMatch.newmatch exists before calling props.setNewMatch
-        if (latestMatch.newmatch !== undefined) {
-          props.setNewMatch(latestMatch.newmatch);
-        }
+      const latestMatch = data[data.length - 1];
 
-        const battingTeam =
-          latestMatch.decision === "bat"
-            ? latestMatch.tossWinner
-            : latestMatch.tossWinner === latestMatch.team1
-              ? latestMatch.team2
-              : latestMatch.team1;
+      setMatchData(latestMatch);
+      console.log(`Total number of wicket ${latestMatch.players}`);
 
-        localStorage.setItem(
-          "data",
-          JSON.stringify({
-            maxOver: latestMatch.maxOver || 20,
-            team1: latestMatch.team1 || "Team A",
-            team2: latestMatch.team2 || "Team B",
-            batting: battingTeam || "Team A",
-          }),
-        );
-      } catch (error) {
-        console.error("Error fetching match data:", error);
+      setTotalWicket(latestMatch.players);
+
+      if (latestMatch.newmatch !== undefined) {
+        setNewMatch(latestMatch.newmatch);
       }
-    };
 
-    fetchMatch();
-  }, []);
+      const battingTeam =
+        latestMatch.decision === "bat"
+          ? latestMatch.tossWinner
+          : latestMatch.tossWinner === latestMatch.team1
+          ? latestMatch.team2
+          : latestMatch.team1;
+
+      localStorage.setItem(
+        "data",
+        JSON.stringify({
+          maxOver: latestMatch.maxOver || 20,
+          team1: latestMatch.team1 || "Team A",
+          team2: latestMatch.team2 || "Team B",
+          batting: battingTeam || "Team A",
+        })
+      );
+    } catch (error) {
+      console.error("Error fetching match data:", error);
+    }
+  };
+
+  fetchMatch();
+}, [setNewMatch]);
 
   const data = JSON.parse(localStorage.getItem("data")) || {};
   const { batting = "", team1 = "", team2 = "" } = data;
@@ -528,29 +528,34 @@ const [match, setMatch] = useState(
 //     match
 //   ]);
 
-  useEffect(() => {
-    if (props.newMatch) {
-      updateLiveMatch();
-      handleLIVEscore();
-    }
-  }, [
-    inningNo,
-    totalRuns,
-    wicketCount,
-    totalOvers,
-    overCount,
-    ballCount,
-    hasMatchEnded,
-    remainingRuns,
-    remainingBalls,
-    batter1,
-    batter2,
-    bowler,
-    bowlers,
-    extras,
-    recentOvers,
-    match,
-  ]);
+const { newMatch } = props;
+
+useEffect(() => {
+  if (newMatch) {
+    updateLiveMatch();
+    handleLIVEscore();
+  }
+}, [
+  newMatch,
+  updateLiveMatch,
+  handleLIVEscore,
+  inningNo,
+  totalRuns,
+  wicketCount,
+  totalOvers,
+  overCount,
+  ballCount,
+  hasMatchEnded,
+  remainingRuns,
+  remainingBalls,
+  batter1,
+  batter2,
+  bowler,
+  bowlers,
+  extras,
+  recentOvers,
+  match,
+]);
 
 
   const createLiveMatch = async ({
@@ -4368,7 +4373,7 @@ setMatch((state) => ({
             ))}
 
           {/*Section 5 : Pointtable */}
-          {activeSection == "pointtable" && pointsTable && (
+          {activeSection === "pointtable" && pointsTable && (
             <div className="sb-batting">
               <table>
                 <thead>
