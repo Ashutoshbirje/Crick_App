@@ -10,7 +10,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Modal from "@mui/material/Modal";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
 import { BATTING, OUT } from "../constants/BattingStatus";
@@ -605,82 +605,84 @@ useEffect(() => {
 
   ////////////
 
-  const updateLiveMatch = async () => {
-    try {
-      // Step 1: Get the current count of live matches
-      const countRes = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/live/count`,
-      );
+  // const updateLiveMatch = async () => {
+  //   try {
+  //     // Step 1: Get the current count of live matches
+  //     const countRes = await fetch(
+  //       `${process.env.REACT_APP_API_BASE_URL}/live/count`,
+  //     );
 
-      if (!countRes.ok) {
-        console.error(
-          `Failed to fetch match count: ${countRes.status} ${countRes.statusText}`,
-        );
-        return;
-      }
+  //     if (!countRes.ok) {
+  //       console.error(
+  //         `Failed to fetch match count: ${countRes.status} ${countRes.statusText}`,
+  //       );
+  //       return;
+  //     }
 
-      const countData = await countRes.json();
-      const count = countData.count || 0;
+  //     const countData = await countRes.json();
+  //     const count = countData.count || 0;
 
-      if (count === 0) {
-        console.warn("No live match entries found. Skipping update.");
-        return;
-      }
+  //     if (count === 0) {
+  //       console.warn("No live match entries found. Skipping update.");
+  //       return;
+  //     }
 
-      // Use count as the matchId
-      const matchId = parseInt(count, 10);
+  //     // Use count as the matchId
+  //     const matchId = parseInt(count, 10);
 
-      if (isNaN(matchId)) {
-        console.warn("Invalid match ID derived from count:", count);
-        return;
-      }
+  //     if (isNaN(matchId)) {
+  //       console.warn("Invalid match ID derived from count:", count);
+  //       return;
+  //     }
 
-      const updatePayload = {
-        inningNo,
-        totalRuns,
-        wicketCount,
-        totalOvers,
-        scoringTeam: scoringTeam,
-        chessingTeam: chessingTeam,
-        overCount,
-        ballCount,
-        hasMatchEnded,
-        remainingRuns,
-        remainingBalls,
-        batter1,
-        batter2,
-        bowler,
-        bowlers,
-        extras,
-        recentOvers,
-        inning1: match.inning1,
-        inning2: match.inning2,
-      };
+  //     const updatePayload = {
+  //       inningNo,
+  //       totalRuns,
+  //       wicketCount,
+  //       totalOvers,
+  //       scoringTeam: scoringTeam,
+  //       chessingTeam: chessingTeam,
+  //       overCount,
+  //       ballCount,
+  //       hasMatchEnded,
+  //       remainingRuns,
+  //       remainingBalls,
+  //       batter1,
+  //       batter2,
+  //       bowler,
+  //       bowlers,
+  //       extras,
+  //       recentOvers,
+  //       inning1: match.inning1,
+  //       inning2: match.inning2,
+  //     };
 
-      console.log("Updating match with ID (from count):", matchId);
+  //     console.log("Updating match with ID (from count):", matchId);
 
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/live/match/${matchId}/update`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatePayload),
-        },
-      );
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_API_BASE_URL}/live/match/${matchId}/update`,
+  //       {
+  //         method: "PATCH",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(updatePayload),
+  //       },
+  //     );
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      if (!response.ok) {
-        console.error("Error updating match:", result.message || result);
-      } else {
-        console.log("Match updated successfully:", result);
-      }
-    } catch (err) {
-      console.error("Error in updateLiveMatch:", err.message || err);
-    }
-  };
+  //     if (!response.ok) {
+  //       console.error("Error updating match:", result.message || result);
+  //     } else {
+  //       console.log("Match updated successfully:", result);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error in updateLiveMatch:", err.message || err);
+  //   }
+  // };
+
+ 
 
   /////////////
 
@@ -1247,70 +1249,196 @@ const getExtrasForTable = ({ tableInning }) => {
     }
   };
 
-const handleLIVEscore = () => {
+// const handleLIVEscore = () => {
+//   const endInningButton = document.getElementById("end-inning") || "";
+
+//   if (endInningButton.textContent === "live") {
+   
+// // ===============================
+// // LIVE BATTERS (INCLUDE OUT BATTERS)
+// // ===============================
+// const liveBattersMap = new Map();
+
+// // 1️⃣ Add all existing batters (includes OUT batters)
+// batters?.forEach((b) => {
+//   liveBattersMap.set(b.id, {
+//     ...b,
+//     onStrike: false, // default
+//   });
+// });
+
+// // helper to merge current batter with existing
+// const mergeBatter = (currentBatter) => {
+//   if (!currentBatter?.id) return;
+
+//   const existing = liveBattersMap.get(currentBatter.id);
+
+//   const totalRuns =
+//     (existing?.run || 0) + (currentBatter.run || 0);
+
+//   const totalBalls =
+//     (existing?.ball || 0) + (currentBatter.ball || 0);
+
+//   const totalFours =
+//     (existing?.four || 0) + (currentBatter.four || 0);
+
+//   const totalSixes =
+//     (existing?.six || 0) + (currentBatter.six || 0);
+
+//   const strikeRate =
+//     totalBalls > 0
+//       ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
+//       : 0;
+
+//   liveBattersMap.set(currentBatter.id, {
+//     id: currentBatter.id,
+//     name: currentBatter.name,
+//     run: totalRuns,
+//     ball: totalBalls,
+//     four: totalFours,
+//     six: totalSixes,
+//     strikeRate,
+//     onStrike: currentBatter.onStrike,
+//     battingStatus: BATTING,
+//   });
+// };
+
+// // 2️⃣ Merge current batters
+// mergeBatter(batter1);
+// mergeBatter(batter2);
+
+// // 3️⃣ Final live batters list (ALL batters)
+// const liveBatters = Array.from(liveBattersMap.values());
+
+//     // ===============================
+//     // LIVE BOWLER (CUMULATIVE)
+//     // ===============================
+//     const existingBowler = bowlers?.find(
+//       (b) => b.id === bowler?.id
+//     );
+
+//     const currentOverOvers =
+//       Math.floor(ballCount / 6) + (ballCount % 6) / 10;
+
+//     const currentOverDecimal = ballCount / 6;
+
+//     const totalOversDecimal =
+//       (existingBowler?.over || 0) + currentOverDecimal;
+
+//     const totalRuns_over =
+//       (existingBowler?.run || 0) + runsByOver;
+
+//     const totalWickets =
+//       (existingBowler?.wicket || 0) + wicketCount;
+
+      
+//         // CRR
+//         const overs = overCount + ballCount / 6;
+//         let crr = (totalRuns / overs).toFixed(2);
+//         crr = isFinite(crr) ? crr : 0;
+
+//         setRunrate(crr);
+
+//     const liveBowler = bowler?.id
+//       ? {
+//           id: bowler.id,
+//           name: bowler.name,
+//           maiden: existingBowler?.maiden || 0,
+//           over: (existingBowler?.over || 0) + currentOverOvers,
+//           run: totalRuns_over,
+//           wicket: totalWickets,
+//           economy:
+//             totalOversDecimal > 0
+//               ? Math.round((totalRuns / totalOversDecimal) * 100) / 100
+//               : 0,
+//         }
+//       : null;
+
+//     const updatedBowlers = liveBowler 
+//       ? [
+//           ...bowlers.filter((b) => b.id !== liveBowler.id),
+//           liveBowler,
+//         ]
+//       : bowlers;
+    
+//     // ===============================
+//     // UPDATE MATCH STATE
+//     // ===============================
+    
+// setMatch((state) => ({
+//   ...state,
+
+//   // ✅ current bowler live data
+//   bowler: liveBowler || state.bowler,
+
+//   // ✅ all bowlers live data
+//   bowlers: updatedBowlers,
+
+//   [`inning${inningNo}`]: {
+//     ...state[`inning${inningNo}`],
+//     runs: totalRuns_over,
+//     wickets: wicketCount,
+//     overs: totalOvers,
+//     runRate: crr,
+//     extras,
+//     batters: liveBatters,
+//     bowlers: updatedBowlers,
+//     recentOvers,
+//   },
+// }));
+
+//     console.log(match);
+//     console.log("✅ Live scorecard updated");
+//   } 
+// };
+
+const handleLIVEscore = useCallback(() => {
   const endInningButton = document.getElementById("end-inning") || "";
 
   if (endInningButton.textContent === "live") {
-   
-// ===============================
-// LIVE BATTERS (INCLUDE OUT BATTERS)
-// ===============================
-const liveBattersMap = new Map();
 
-// 1️⃣ Add all existing batters (includes OUT batters)
-batters?.forEach((b) => {
-  liveBattersMap.set(b.id, {
-    ...b,
-    onStrike: false, // default
-  });
-});
+    const liveBattersMap = new Map();
 
-// helper to merge current batter with existing
-const mergeBatter = (currentBatter) => {
-  if (!currentBatter?.id) return;
+    batters?.forEach((b) => {
+      liveBattersMap.set(b.id, {
+        ...b,
+        onStrike: false,
+      });
+    });
 
-  const existing = liveBattersMap.get(currentBatter.id);
+    const mergeBatter = (currentBatter) => {
+      if (!currentBatter?.id) return;
 
-  const totalRuns =
-    (existing?.run || 0) + (currentBatter.run || 0);
+      const existing = liveBattersMap.get(currentBatter.id);
 
-  const totalBalls =
-    (existing?.ball || 0) + (currentBatter.ball || 0);
+      const totalRuns = (existing?.run || 0) + (currentBatter.run || 0);
+      const totalBalls = (existing?.ball || 0) + (currentBatter.ball || 0);
+      const totalFours = (existing?.four || 0) + (currentBatter.four || 0);
+      const totalSixes = (existing?.six || 0) + (currentBatter.six || 0);
 
-  const totalFours =
-    (existing?.four || 0) + (currentBatter.four || 0);
+      const strikeRate =
+        totalBalls > 0
+          ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
+          : 0;
 
-  const totalSixes =
-    (existing?.six || 0) + (currentBatter.six || 0);
+      liveBattersMap.set(currentBatter.id, {
+        id: currentBatter.id,
+        name: currentBatter.name,
+        run: totalRuns,
+        ball: totalBalls,
+        four: totalFours,
+        six: totalSixes,
+        strikeRate,
+        onStrike: currentBatter.onStrike,
+        battingStatus: BATTING,
+      });
+    };
 
-  const strikeRate =
-    totalBalls > 0
-      ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
-      : 0;
+    mergeBatter(batter1);
+    mergeBatter(batter2);
 
-  liveBattersMap.set(currentBatter.id, {
-    id: currentBatter.id,
-    name: currentBatter.name,
-    run: totalRuns,
-    ball: totalBalls,
-    four: totalFours,
-    six: totalSixes,
-    strikeRate,
-    onStrike: currentBatter.onStrike,
-    battingStatus: BATTING,
-  });
-};
+    const liveBatters = Array.from(liveBattersMap.values());
 
-// 2️⃣ Merge current batters
-mergeBatter(batter1);
-mergeBatter(batter2);
-
-// 3️⃣ Final live batters list (ALL batters)
-const liveBatters = Array.from(liveBattersMap.values());
-
-    // ===============================
-    // LIVE BOWLER (CUMULATIVE)
-    // ===============================
     const existingBowler = bowlers?.find(
       (b) => b.id === bowler?.id
     );
@@ -1329,13 +1457,11 @@ const liveBatters = Array.from(liveBattersMap.values());
     const totalWickets =
       (existingBowler?.wicket || 0) + wicketCount;
 
-      
-        // CRR
-        const overs = overCount + ballCount / 6;
-        let crr = (totalRuns / overs).toFixed(2);
-        crr = isFinite(crr) ? crr : 0;
+    const overs = overCount + ballCount / 6;
+    let crr = (totalRuns / overs).toFixed(2);
+    crr = isFinite(crr) ? crr : 0;
 
-        setRunrate(crr);
+    setRunrate(crr);
 
     const liveBowler = bowler?.id
       ? {
@@ -1358,37 +1484,46 @@ const liveBatters = Array.from(liveBattersMap.values());
           liveBowler,
         ]
       : bowlers;
-    
-    // ===============================
-    // UPDATE MATCH STATE
-    // ===============================
-    
-setMatch((state) => ({
-  ...state,
 
-  // ✅ current bowler live data
-  bowler: liveBowler || state.bowler,
-
-  // ✅ all bowlers live data
-  bowlers: updatedBowlers,
-
-  [`inning${inningNo}`]: {
-    ...state[`inning${inningNo}`],
-    runs: totalRuns_over,
-    wickets: wicketCount,
-    overs: totalOvers,
-    runRate: crr,
-    extras,
-    batters: liveBatters,
-    bowlers: updatedBowlers,
-    recentOvers,
-  },
-}));
+    setMatch((state) => ({
+      ...state,
+      bowler: liveBowler || state.bowler,
+      bowlers: updatedBowlers,
+      [`inning${inningNo}`]: {
+        ...state[`inning${inningNo}`],
+        runs: totalRuns_over,
+        wickets: wicketCount,
+        overs: totalOvers,
+        runRate: crr,
+        extras,
+        batters: liveBatters,
+        bowlers: updatedBowlers,
+        recentOvers,
+      },
+    }));
 
     console.log(match);
     console.log("✅ Live scorecard updated");
-  } 
-};
+  }
+}, [
+  batters,
+  batter1,
+  batter2,
+  bowlers,
+  bowler,
+  ballCount,
+  runsByOver,
+  wicketCount,
+  overCount,
+  totalRuns,
+  totalOvers,
+  inningNo,
+  extras,
+  recentOvers,
+  setMatch,
+  setRunrate,
+  match,
+]);
 
   const endMatch = () => {
     disableAllScoreButtons(); // Assuming this is defined elsewhere
@@ -2589,6 +2724,99 @@ setMatch((state) => ({
     }
   }
 
+   const updateLiveMatch = useCallback(async () => {
+  try {
+    const countRes = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/live/count`,
+    );
+
+    if (!countRes.ok) {
+      console.error(
+        `Failed to fetch match count: ${countRes.status} ${countRes.statusText}`,
+      );
+      return;
+    }
+
+    const countData = await countRes.json();
+    const count = countData.count || 0;
+
+    if (count === 0) {
+      console.warn("No live match entries found. Skipping update.");
+      return;
+    }
+
+    const matchId = parseInt(count, 10);
+
+    if (isNaN(matchId)) {
+      console.warn("Invalid match ID derived from count:", count);
+      return;
+    }
+
+    const updatePayload = {
+      inningNo,
+      totalRuns,
+      wicketCount,
+      totalOvers,
+      scoringTeam: scoringTeam,
+      chessingTeam: chessingTeam,
+      overCount,
+      ballCount,
+      hasMatchEnded,
+      remainingRuns,
+      remainingBalls,
+      batter1,
+      batter2,
+      bowler,
+      bowlers,
+      extras,
+      recentOvers,
+      inning1: match.inning1,
+      inning2: match.inning2,
+    };
+
+    const response = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/live/match/${matchId}/update`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatePayload),
+      },
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error("Error updating match:", result.message || result);
+    } else {
+      console.log("Match updated successfully:", result);
+    }
+  } catch (err) {
+    console.error("Error in updateLiveMatch:", err.message || err);
+  }
+}, [
+  inningNo,
+  totalRuns,
+  wicketCount,
+  totalOvers,
+  scoringTeam,
+  chessingTeam,
+  overCount,
+  ballCount,
+  hasMatchEnded,
+  remainingRuns,
+  remainingBalls,
+  batter1,
+  batter2,
+  bowler,
+  bowlers,
+  extras,
+  recentOvers,
+  match.inning1,
+  match.inning2,
+]);
+
   const tossContent = (
     <>
       {matchData && (
@@ -2789,32 +3017,39 @@ setMatch((state) => ({
 
 const { newMatch } = props;
 
-  useEffect(() => {
+//   useEffect(() => {
+//   if (newMatch) {
+//     updateLiveMatch();
+//     handleLIVEscore();
+//   }
+// }, [
+//   newMatch,
+//   updateLiveMatch,
+//   handleLIVEscore,
+//   inningNo,
+//   totalRuns,
+//   wicketCount,
+//   totalOvers,
+//   overCount,
+//   ballCount,
+//   hasMatchEnded,
+//   remainingRuns,
+//   remainingBalls,
+//   batter1,
+//   batter2,
+//   bowler,
+//   bowlers,
+//   extras,
+//   recentOvers,
+//   match,
+// ]);
+
+useEffect(() => {
   if (newMatch) {
     updateLiveMatch();
     handleLIVEscore();
   }
-}, [
-  newMatch,
-  updateLiveMatch,
-  handleLIVEscore,
-  inningNo,
-  totalRuns,
-  wicketCount,
-  totalOvers,
-  overCount,
-  ballCount,
-  hasMatchEnded,
-  remainingRuns,
-  remainingBalls,
-  batter1,
-  batter2,
-  bowler,
-  bowlers,
-  extras,
-  recentOvers,
-  match,
-]);
+}, [newMatch, updateLiveMatch, handleLIVEscore]);
 
   return (
     // main container
