@@ -14,7 +14,6 @@ exports.saveScore = async (req, res) => {
 };
 
 // Delete score by ID
-
 exports.deleteScore = async (req, res) => {
   try {
     const { id } = req.params;

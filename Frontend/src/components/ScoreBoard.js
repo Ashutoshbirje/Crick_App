@@ -42,42 +42,42 @@ const ScoreBoard = (props) => {
 
   const [totalOvers, setTotalOvers] = useState(getStoredData("totalOvers", 0));
   const [ballCount, setBallCount] = useState(getStoredData("ballCount", 0));
-const [match, setMatch] = useState(
-  getStoredData("match", {
-    inning1: {
-      runs: 0,
-      wickets: 0,
-      overs: 0,
-      batters: [],
-      bowlers: [],
-      extras: {},
-      recentOvers: [],
-    },
-    inning2: {
-      runs: 0,
-      wickets: 0,
-      overs: 0,
-      batters: [],
-      bowlers: [],
-      extras: {},
-      recentOvers: [],
-    },
+  const [match, setMatch] = useState(
+    getStoredData("match", {
+      inning1: {
+        runs: 0,
+        wickets: 0,
+        overs: 0,
+        batters: [],
+        bowlers: [],
+        extras: {},
+        recentOvers: [],
+      },
+      inning2: {
+        runs: 0,
+        wickets: 0,
+        overs: 0,
+        batters: [],
+        bowlers: [],
+        extras: {},
+        recentOvers: [],
+      },
 
-    // ✅ ROOT-LEVEL CURRENT BOWLER
-    bowler: {
-      id: "",
-      name: "",
-      over: 0,
-      maiden: 0,
-      run: 0,
-      wicket: 0,
-      economy: 0,
-    },
+      // ✅ ROOT-LEVEL CURRENT BOWLER
+      bowler: {
+        id: "",
+        name: "",
+        over: 0,
+        maiden: 0,
+        run: 0,
+        wicket: 0,
+        economy: 0,
+      },
 
-    // ✅ ROOT-LEVEL ALL BOWLERS
-    bowlers: [],
-  })
-);
+      // ✅ ROOT-LEVEL ALL BOWLERS
+      bowlers: [],
+    }),
+  );
   const [isBatter1Edited, setBatter1Edited] = useState(
     getStoredData("isBatter1Edited", false),
   );
@@ -124,7 +124,7 @@ const [match, setMatch] = useState(
   const [battingOrder, setBattingOrder] = useState(
     getStoredData("battingOrder", 0),
   );
-  const [runrate, setRunrate] = useState(getStoredData("runrate",0));
+  const [runrate, setRunrate] = useState(getStoredData("runrate", 0));
   const [isModalOpen, setModalOpen] = useState(
     getStoredData("isModalOpen", false),
   );
@@ -181,10 +181,9 @@ const [match, setMatch] = useState(
           `${process.env.REACT_APP_API_BASE_URL}/live/match/${count}`,
         );
         setLiveData(matchRes.data);
-        
-        console.log("Debugging is Started Now")
+
+        console.log("Debugging is Started Now");
         // console.log(liveData);
-        
       } catch (err) {
         console.error("Failed to load match data:", err.message);
       }
@@ -192,7 +191,7 @@ const [match, setMatch] = useState(
 
     fetchMatchData();
   }, []);
-  
+
   /// calcualtion
   useEffect(() => {
     const fetchMatchData = async () => {
@@ -338,7 +337,7 @@ const [match, setMatch] = useState(
     localStorage.setItem("outType", JSON.stringify(outType));
     localStorage.setItem("buttonstate", JSON.stringify(buttonstate));
     localStorage.setItem("reset", JSON.stringify(reset));
-    localStorage.setItem("runrate",JSON.stringify(runrate))
+    localStorage.setItem("runrate", JSON.stringify(runrate));
   }, [
     match,
     inningNo,
@@ -376,56 +375,56 @@ const [match, setMatch] = useState(
     outType,
     buttonstate,
     reset,
-    runrate
+    runrate,
   ]);
 
   // New Match
-const { setNewMatch } = props;
+  const { setNewMatch } = props;
 
-useEffect(() => {
-  const fetchMatch = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/matches`
-      );
-      const data = await response.json();
+  useEffect(() => {
+    const fetchMatch = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/matches`,
+        );
+        const data = await response.json();
 
-      if (data.length === 0) return;
+        if (data.length === 0) return;
 
-      const latestMatch = data[data.length - 1];
+        const latestMatch = data[data.length - 1];
 
-      setMatchData(latestMatch);
-      console.log(`Total number of wicket ${latestMatch.players}`);
+        setMatchData(latestMatch);
+        console.log(`Total number of wicket ${latestMatch.players}`);
 
-      setTotalWicket(latestMatch.players);
+        setTotalWicket(latestMatch.players);
 
-      if (latestMatch.newmatch !== undefined) {
-        setNewMatch(latestMatch.newmatch);
+        if (latestMatch.newmatch !== undefined) {
+          setNewMatch(latestMatch.newmatch);
+        }
+
+        const battingTeam =
+          latestMatch.decision === "bat"
+            ? latestMatch.tossWinner
+            : latestMatch.tossWinner === latestMatch.team1
+              ? latestMatch.team2
+              : latestMatch.team1;
+
+        localStorage.setItem(
+          "data",
+          JSON.stringify({
+            maxOver: latestMatch.maxOver || 20,
+            team1: latestMatch.team1 || "Team A",
+            team2: latestMatch.team2 || "Team B",
+            batting: battingTeam || "Team A",
+          }),
+        );
+      } catch (error) {
+        console.error("Error fetching match data:", error);
       }
+    };
 
-      const battingTeam =
-        latestMatch.decision === "bat"
-          ? latestMatch.tossWinner
-          : latestMatch.tossWinner === latestMatch.team1
-          ? latestMatch.team2
-          : latestMatch.team1;
-
-      localStorage.setItem(
-        "data",
-        JSON.stringify({
-          maxOver: latestMatch.maxOver || 20,
-          team1: latestMatch.team1 || "Team A",
-          team2: latestMatch.team2 || "Team B",
-          batting: battingTeam || "Team A",
-        })
-      );
-    } catch (error) {
-      console.error("Error fetching match data:", error);
-    }
-  };
-
-  fetchMatch();
-}, [setNewMatch]);
+    fetchMatch();
+  }, [setNewMatch]);
 
   const data = JSON.parse(localStorage.getItem("data")) || {};
   const { batting = "", team1 = "", team2 = "" } = data;
@@ -456,7 +455,6 @@ useEffect(() => {
   };
 
   useEffect(() => {
-
     // maintain state
     if (inningNo === 2) {
       if (
@@ -508,41 +506,39 @@ useEffect(() => {
 
   // Real Time Update
 
+  //   useEffect(() => {
+  //   if (!props.newMatch) return;
+  //   const interval = setInterval(() => {
+  //     updateLiveMatch();
+  //     handleLIVEscore();
+  //   }, 3000); // every 3 seconds
 
-//   useEffect(() => {
-//   if (!props.newMatch) return;
-//   const interval = setInterval(() => {
-//     updateLiveMatch();
-//     handleLIVEscore();
-//   }, 3000); // every 3 seconds
+  //   return () => clearInterval(interval);
+  // }, [props.newMatch]);
 
-//   return () => clearInterval(interval);
-// }, [props.newMatch]);
+  //  useEffect(() => {
+  //     if (props.newMatch) {
+  //       updateLiveMatch();
+  //       handleLIVEscore();
+  //     }
+  //   }, [
+  //     match
+  //   ]);
 
-//  useEffect(() => {
-//     if (props.newMatch) {
-//       updateLiveMatch();
-//       handleLIVEscore();
-//     }
-//   }, [
-//     match
-//   ]);
+  // useEffect(() => { if (props.newMatch) { updateLiveMatch(); handleLIVEscore(); } }, [ inningNo, totalRuns, wicketCount, totalOvers, overCount, ballCount, hasMatchEnded, remainingRuns, remainingBalls, batter1, batter2, bowler, bowlers, extras, recentOvers, match, ]);
 
-// useEffect(() => { if (props.newMatch) { updateLiveMatch(); handleLIVEscore(); } }, [ inningNo, totalRuns, wicketCount, totalOvers, overCount, ballCount, hasMatchEnded, remainingRuns, remainingBalls, batter1, batter2, bowler, bowlers, extras, recentOvers, match, ]);
+  // const { newMatch } = props;
 
-// const { newMatch } = props;
+  // useEffect(() => {
+  //   if (!newMatch) return;
 
-// useEffect(() => {
-//   if (!newMatch) return;
+  //   const interval = setInterval(() => {
+  //     updateLiveMatch();
+  //     handleLIVEscore();
+  //   }, 3000);
 
-//   const interval = setInterval(() => {
-//     updateLiveMatch();
-//     handleLIVEscore();
-//   }, 3000);
-
-//   return () => clearInterval(interval);
-// }, [newMatch, updateLiveMatch, handleLIVEscore]);
-
+  //   return () => clearInterval(interval);
+  // }, [newMatch, updateLiveMatch, handleLIVEscore]);
 
   const createLiveMatch = async ({
     inningNo,
@@ -682,8 +678,6 @@ useEffect(() => {
   //   }
   // };
 
- 
-
   /////////////
 
   // Settings
@@ -695,13 +689,12 @@ useEffect(() => {
         case "new":
           newMatchValue = false;
           break;
-        // case "logout":
-        //   newMatchValue = true;
-        //   break;
+
         default:
           break;
       }
 
+      // 🔹 Update newmatch
       if (newMatchValue !== null && matchData?._id) {
         await fetch(
           `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
@@ -715,9 +708,9 @@ useEffect(() => {
         props.setNewMatch(newMatchValue);
       }
 
+      // 🔹 Existing actions
       switch (type) {
         case "new":
-          // props.setNewMatch(true);
           await createLiveMatch({
             inningNo,
             totalRuns,
@@ -739,118 +732,112 @@ useEffect(() => {
 
           navigate("/form", { state: { newMatch: true } });
           break;
-        case "edit":
-          // navigate("/EditPassward");
-          break;
-        case "add":
-          // navigate("/EditPassward");
-          break;
+
         case "help":
           navigate("/help");
           break;
+
         case "logout":
           localStorage.removeItem("token");
-          // props.setNewMatch(false);
           props.setAdmin(false);
           navigate("/");
           break;
+
         default:
           break;
       }
     } catch (error) {
-      console.error("Error updating newmatch value:", error);
+      console.error("Error updating values:", error);
     }
   };
 
   const getBowlersForTable = ({ tableInning }) => {
-  // ================= USER SIDE =================
-  if (!props.Admin) {
-    if (tableInning === 1) {
-      return liveData?.inning1?.bowlers || [];
-    }
-    if (tableInning === 2) {
-      return liveData?.inning2?.bowlers || [];
-    }
-  }
-
-  // ================= ADMIN SIDE =================
-  if (props.Admin) {
-    // -------- INNING 1 TABLE --------
-    if (tableInning === 1) {
-      if (inningNo === 1) {
-        // ADMIN + INNING 1 → LOCAL
-        const map = new Map();
-
-        (match?.inning1?.bowlers || []).forEach(b =>
-          b?.name && map.set(b.name, b)
-        );
-
-        if (match?.bowler?.name) {
-          map.set(match.bowler.name, match.bowler);
-        }
-
-        return Array.from(map.values());
-      } else {
-        // ADMIN + INNING 2 → DATABASE
+    // ================= USER SIDE =================
+    if (!props.Admin) {
+      if (tableInning === 1) {
         return liveData?.inning1?.bowlers || [];
       }
-    }
-
-    // -------- INNING 2 TABLE --------
-    if (tableInning === 2) {
-      if (inningNo === 2) {
-        // ADMIN + INNING 2 → LOCAL
-        const map = new Map();
-
-        (match?.inning2?.bowlers || []).forEach(b =>
-          b?.name && map.set(b.name, b)
-        );
-
-        if (match?.bowler?.name) {
-          map.set(match.bowler.name, match.bowler);
-        }
-
-        return Array.from(map.values());
-      } else {
-        // ADMIN + INNING 1 → NO DATA
-        return [];
+      if (tableInning === 2) {
+        return liveData?.inning2?.bowlers || [];
       }
     }
-  }
 
-  return [];
-};
+    // ================= ADMIN SIDE =================
+    if (props.Admin) {
+      // -------- INNING 1 TABLE --------
+      if (tableInning === 1) {
+        if (inningNo === 1) {
+          // ADMIN + INNING 1 → LOCAL
+          const map = new Map();
 
-const EMPTY_EXTRAS = { total: 0, wide: 0, noBall: 0, Lb: 0 };
+          (match?.inning1?.bowlers || []).forEach(
+            (b) => b?.name && map.set(b.name, b),
+          );
 
-const getExtrasForTable = ({ tableInning }) => {
-  // ========== USER ==========
-  if (!props.Admin) {
-    if (tableInning === 1) return liveData?.inning1?.extras || EMPTY_EXTRAS;
-    if (tableInning === 2) return liveData?.inning2?.extras || EMPTY_EXTRAS;
-  }
+          if (match?.bowler?.name) {
+            map.set(match.bowler.name, match.bowler);
+          }
 
-  // ========== ADMIN ==========
-  if (props.Admin) {
-    // INNING 1
-    if (tableInning === 1) {
-      return inningNo === 1
-        ? match?.inning1?.extras || EMPTY_EXTRAS
-        : liveData?.inning1?.extras || EMPTY_EXTRAS;
+          return Array.from(map.values());
+        } else {
+          // ADMIN + INNING 2 → DATABASE
+          return liveData?.inning1?.bowlers || [];
+        }
+      }
+
+      // -------- INNING 2 TABLE --------
+      if (tableInning === 2) {
+        if (inningNo === 2) {
+          // ADMIN + INNING 2 → LOCAL
+          const map = new Map();
+
+          (match?.inning2?.bowlers || []).forEach(
+            (b) => b?.name && map.set(b.name, b),
+          );
+
+          if (match?.bowler?.name) {
+            map.set(match.bowler.name, match.bowler);
+          }
+
+          return Array.from(map.values());
+        } else {
+          // ADMIN + INNING 1 → NO DATA
+          return [];
+        }
+      }
     }
 
-    // INNING 2
-    if (tableInning === 2) {
-      return inningNo === 2
-        ? match?.inning2?.extras || EMPTY_EXTRAS
-        : liveData?.inning2?.extras || EMPTY_EXTRAS;
+    return [];
+  };
+
+  const EMPTY_EXTRAS = { total: 0, wide: 0, noBall: 0, Lb: 0 };
+
+  const getExtrasForTable = ({ tableInning }) => {
+    // ========== USER ==========
+    if (!props.Admin) {
+      if (tableInning === 1) return liveData?.inning1?.extras || EMPTY_EXTRAS;
+      if (tableInning === 2) return liveData?.inning2?.extras || EMPTY_EXTRAS;
     }
-  }
 
-  return EMPTY_EXTRAS;
-};
+    // ========== ADMIN ==========
+    if (props.Admin) {
+      // INNING 1
+      if (tableInning === 1) {
+        return inningNo === 1
+          ? match?.inning1?.extras || EMPTY_EXTRAS
+          : liveData?.inning1?.extras || EMPTY_EXTRAS;
+      }
 
+      // INNING 2
+      if (tableInning === 2) {
+        return inningNo === 2
+          ? match?.inning2?.extras || EMPTY_EXTRAS
+          : liveData?.inning2?.extras || EMPTY_EXTRAS;
+      }
+    }
 
+    return EMPTY_EXTRAS;
+  };
 
   // Edit Match
   // const handleEndInning1 = async (e) => {
@@ -927,6 +914,7 @@ const getExtrasForTable = ({ tableInning }) => {
     };
 
     const scoreData = {
+      matchType: matchData.matchType,
       scoringTeam,
       chessingTeam,
       inning1: plainInning1,
@@ -985,7 +973,6 @@ const getExtrasForTable = ({ tableInning }) => {
     }
   };
 
-  
   // Live Score and scoreboard
   const handleEndInning = (e) => {
     const endInningButton = document.getElementById("end-inning");
@@ -997,29 +984,29 @@ const getExtrasForTable = ({ tableInning }) => {
         // window.location.reload(); // Refresh the page
         // endInningButton.textContent = "Reset";
         // console.log("Press");
-          setRecentOvers([]);
-          setRecentOvers1([]);
-          setInningNo(1);
-          setCurrentRunStack([]);
-          setTotalRuns(0);
-          setExtras({ total: 0, wide: 0, noBall: 0, Lb: 0 });
-          setRunsByOver(0);
-          setWicketCount(0);
-          setTotalOvers(0);
-          setBallCount(0);
-          setOverCount(0);
-          setBatter1({});
-          setBatter2({});
-          setBatters([]);
-          setBowlers([]);
-          setBattingOrder(0);
-          setInputBowler("");
-          setBowler({});
+        setRecentOvers([]);
+        setRecentOvers1([]);
+        setInningNo(1);
+        setCurrentRunStack([]);
+        setTotalRuns(0);
+        setExtras({ total: 0, wide: 0, noBall: 0, Lb: 0 });
+        setRunsByOver(0);
+        setWicketCount(0);
+        setTotalOvers(0);
+        setBallCount(0);
+        setOverCount(0);
+        setBatter1({});
+        setBatter2({});
+        setBatters([]);
+        setBowlers([]);
+        setBattingOrder(0);
+        setInputBowler("");
+        setBowler({});
       } else {
         // set data in Scorebord after press on end-inning and scorecard
 
         if (batter1.id !== undefined) {
-          const exists = batters.some(b => b.id === batter1.id);
+          const exists = batters.some((b) => b.id === batter1.id);
 
           if (!exists) {
             batters.push({
@@ -1038,7 +1025,7 @@ const getExtrasForTable = ({ tableInning }) => {
         }
 
         if (batter2.id !== undefined) {
-          const exists = batters.some(b => b.id === batter2.id);
+          const exists = batters.some((b) => b.id === batter2.id);
 
           if (!exists) {
             batters.push({
@@ -1111,7 +1098,7 @@ const getExtrasForTable = ({ tableInning }) => {
                 noBall: countNoBall,
                 wide: countWide,
                 economy: Math.round((runsByOver / (ballCount / 6)) * 100) / 100,
-              }
+              };
               bowlers.push(newentry);
               setBowlers(bowlers);
             }
@@ -1205,7 +1192,6 @@ const getExtrasForTable = ({ tableInning }) => {
           ////
           // endInningButton.disabled = true;
           ////
-
         } else {
           setMatch((state) => {
             const totalFours = batters
@@ -1249,281 +1235,271 @@ const getExtrasForTable = ({ tableInning }) => {
     }
   };
 
-// const handleLIVEscore = () => {
-//   const endInningButton = document.getElementById("end-inning") || "";
+  // const handleLIVEscore = () => {
+  //   const endInningButton = document.getElementById("end-inning") || "";
 
-//   if (endInningButton.textContent === "live") {
-   
-// // ===============================
-// // LIVE BATTERS (INCLUDE OUT BATTERS)
-// // ===============================
-// const liveBattersMap = new Map();
+  //   if (endInningButton.textContent === "live") {
 
-// // 1️⃣ Add all existing batters (includes OUT batters)
-// batters?.forEach((b) => {
-//   liveBattersMap.set(b.id, {
-//     ...b,
-//     onStrike: false, // default
-//   });
-// });
+  // // ===============================
+  // // LIVE BATTERS (INCLUDE OUT BATTERS)
+  // // ===============================
+  // const liveBattersMap = new Map();
 
-// // helper to merge current batter with existing
-// const mergeBatter = (currentBatter) => {
-//   if (!currentBatter?.id) return;
+  // // 1️⃣ Add all existing batters (includes OUT batters)
+  // batters?.forEach((b) => {
+  //   liveBattersMap.set(b.id, {
+  //     ...b,
+  //     onStrike: false, // default
+  //   });
+  // });
 
-//   const existing = liveBattersMap.get(currentBatter.id);
+  // // helper to merge current batter with existing
+  // const mergeBatter = (currentBatter) => {
+  //   if (!currentBatter?.id) return;
 
-//   const totalRuns =
-//     (existing?.run || 0) + (currentBatter.run || 0);
+  //   const existing = liveBattersMap.get(currentBatter.id);
 
-//   const totalBalls =
-//     (existing?.ball || 0) + (currentBatter.ball || 0);
+  //   const totalRuns =
+  //     (existing?.run || 0) + (currentBatter.run || 0);
 
-//   const totalFours =
-//     (existing?.four || 0) + (currentBatter.four || 0);
+  //   const totalBalls =
+  //     (existing?.ball || 0) + (currentBatter.ball || 0);
 
-//   const totalSixes =
-//     (existing?.six || 0) + (currentBatter.six || 0);
+  //   const totalFours =
+  //     (existing?.four || 0) + (currentBatter.four || 0);
 
-//   const strikeRate =
-//     totalBalls > 0
-//       ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
-//       : 0;
+  //   const totalSixes =
+  //     (existing?.six || 0) + (currentBatter.six || 0);
 
-//   liveBattersMap.set(currentBatter.id, {
-//     id: currentBatter.id,
-//     name: currentBatter.name,
-//     run: totalRuns,
-//     ball: totalBalls,
-//     four: totalFours,
-//     six: totalSixes,
-//     strikeRate,
-//     onStrike: currentBatter.onStrike,
-//     battingStatus: BATTING,
-//   });
-// };
+  //   const strikeRate =
+  //     totalBalls > 0
+  //       ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
+  //       : 0;
 
-// // 2️⃣ Merge current batters
-// mergeBatter(batter1);
-// mergeBatter(batter2);
+  //   liveBattersMap.set(currentBatter.id, {
+  //     id: currentBatter.id,
+  //     name: currentBatter.name,
+  //     run: totalRuns,
+  //     ball: totalBalls,
+  //     four: totalFours,
+  //     six: totalSixes,
+  //     strikeRate,
+  //     onStrike: currentBatter.onStrike,
+  //     battingStatus: BATTING,
+  //   });
+  // };
 
-// // 3️⃣ Final live batters list (ALL batters)
-// const liveBatters = Array.from(liveBattersMap.values());
+  // // 2️⃣ Merge current batters
+  // mergeBatter(batter1);
+  // mergeBatter(batter2);
 
-//     // ===============================
-//     // LIVE BOWLER (CUMULATIVE)
-//     // ===============================
-//     const existingBowler = bowlers?.find(
-//       (b) => b.id === bowler?.id
-//     );
+  // // 3️⃣ Final live batters list (ALL batters)
+  // const liveBatters = Array.from(liveBattersMap.values());
 
-//     const currentOverOvers =
-//       Math.floor(ballCount / 6) + (ballCount % 6) / 10;
+  //     // ===============================
+  //     // LIVE BOWLER (CUMULATIVE)
+  //     // ===============================
+  //     const existingBowler = bowlers?.find(
+  //       (b) => b.id === bowler?.id
+  //     );
 
-//     const currentOverDecimal = ballCount / 6;
+  //     const currentOverOvers =
+  //       Math.floor(ballCount / 6) + (ballCount % 6) / 10;
 
-//     const totalOversDecimal =
-//       (existingBowler?.over || 0) + currentOverDecimal;
+  //     const currentOverDecimal = ballCount / 6;
 
-//     const totalRuns_over =
-//       (existingBowler?.run || 0) + runsByOver;
+  //     const totalOversDecimal =
+  //       (existingBowler?.over || 0) + currentOverDecimal;
 
-//     const totalWickets =
-//       (existingBowler?.wicket || 0) + wicketCount;
+  //     const totalRuns_over =
+  //       (existingBowler?.run || 0) + runsByOver;
 
-      
-//         // CRR
-//         const overs = overCount + ballCount / 6;
-//         let crr = (totalRuns / overs).toFixed(2);
-//         crr = isFinite(crr) ? crr : 0;
+  //     const totalWickets =
+  //       (existingBowler?.wicket || 0) + wicketCount;
 
-//         setRunrate(crr);
+  //         // CRR
+  //         const overs = overCount + ballCount / 6;
+  //         let crr = (totalRuns / overs).toFixed(2);
+  //         crr = isFinite(crr) ? crr : 0;
 
-//     const liveBowler = bowler?.id
-//       ? {
-//           id: bowler.id,
-//           name: bowler.name,
-//           maiden: existingBowler?.maiden || 0,
-//           over: (existingBowler?.over || 0) + currentOverOvers,
-//           run: totalRuns_over,
-//           wicket: totalWickets,
-//           economy:
-//             totalOversDecimal > 0
-//               ? Math.round((totalRuns / totalOversDecimal) * 100) / 100
-//               : 0,
-//         }
-//       : null;
+  //         setRunrate(crr);
 
-//     const updatedBowlers = liveBowler 
-//       ? [
-//           ...bowlers.filter((b) => b.id !== liveBowler.id),
-//           liveBowler,
-//         ]
-//       : bowlers;
-    
-//     // ===============================
-//     // UPDATE MATCH STATE
-//     // ===============================
-    
-// setMatch((state) => ({
-//   ...state,
+  //     const liveBowler = bowler?.id
+  //       ? {
+  //           id: bowler.id,
+  //           name: bowler.name,
+  //           maiden: existingBowler?.maiden || 0,
+  //           over: (existingBowler?.over || 0) + currentOverOvers,
+  //           run: totalRuns_over,
+  //           wicket: totalWickets,
+  //           economy:
+  //             totalOversDecimal > 0
+  //               ? Math.round((totalRuns / totalOversDecimal) * 100) / 100
+  //               : 0,
+  //         }
+  //       : null;
 
-//   // ✅ current bowler live data
-//   bowler: liveBowler || state.bowler,
+  //     const updatedBowlers = liveBowler
+  //       ? [
+  //           ...bowlers.filter((b) => b.id !== liveBowler.id),
+  //           liveBowler,
+  //         ]
+  //       : bowlers;
 
-//   // ✅ all bowlers live data
-//   bowlers: updatedBowlers,
+  //     // ===============================
+  //     // UPDATE MATCH STATE
+  //     // ===============================
 
-//   [`inning${inningNo}`]: {
-//     ...state[`inning${inningNo}`],
-//     runs: totalRuns_over,
-//     wickets: wicketCount,
-//     overs: totalOvers,
-//     runRate: crr,
-//     extras,
-//     batters: liveBatters,
-//     bowlers: updatedBowlers,
-//     recentOvers,
-//   },
-// }));
+  // setMatch((state) => ({
+  //   ...state,
 
-//     console.log(match);
-//     console.log("✅ Live scorecard updated");
-//   } 
-// };
+  //   // ✅ current bowler live data
+  //   bowler: liveBowler || state.bowler,
 
-const handleLIVEscore = useCallback(() => {
-  const endInningButton = document.getElementById("end-inning") || "";
+  //   // ✅ all bowlers live data
+  //   bowlers: updatedBowlers,
 
-  if (endInningButton.textContent === "live") {
+  //   [`inning${inningNo}`]: {
+  //     ...state[`inning${inningNo}`],
+  //     runs: totalRuns_over,
+  //     wickets: wicketCount,
+  //     overs: totalOvers,
+  //     runRate: crr,
+  //     extras,
+  //     batters: liveBatters,
+  //     bowlers: updatedBowlers,
+  //     recentOvers,
+  //   },
+  // }));
 
-    const liveBattersMap = new Map();
+  //     console.log(match);
+  //     console.log("✅ Live scorecard updated");
+  //   }
+  // };
 
-    batters?.forEach((b) => {
-      liveBattersMap.set(b.id, {
-        ...b,
-        onStrike: false,
+  const handleLIVEscore = useCallback(() => {
+    const endInningButton = document.getElementById("end-inning") || "";
+
+    if (endInningButton.textContent === "live") {
+      const liveBattersMap = new Map();
+
+      batters?.forEach((b) => {
+        liveBattersMap.set(b.id, {
+          ...b,
+          onStrike: false,
+        });
       });
-    });
 
-    const mergeBatter = (currentBatter) => {
-      if (!currentBatter?.id) return;
+      const mergeBatter = (currentBatter) => {
+        if (!currentBatter?.id) return;
 
-      const existing = liveBattersMap.get(currentBatter.id);
+        const existing = liveBattersMap.get(currentBatter.id);
 
-      const totalRuns = (existing?.run || 0) + (currentBatter.run || 0);
-      const totalBalls = (existing?.ball || 0) + (currentBatter.ball || 0);
-      const totalFours = (existing?.four || 0) + (currentBatter.four || 0);
-      const totalSixes = (existing?.six || 0) + (currentBatter.six || 0);
+        const totalRuns = (existing?.run || 0) + (currentBatter.run || 0);
+        const totalBalls = (existing?.ball || 0) + (currentBatter.ball || 0);
+        const totalFours = (existing?.four || 0) + (currentBatter.four || 0);
+        const totalSixes = (existing?.six || 0) + (currentBatter.six || 0);
 
-      const strikeRate =
-        totalBalls > 0
-          ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
-          : 0;
+        const strikeRate =
+          totalBalls > 0
+            ? Math.round((totalRuns / totalBalls) * 100 * 100) / 100
+            : 0;
 
-      liveBattersMap.set(currentBatter.id, {
-        id: currentBatter.id,
-        name: currentBatter.name,
-        run: totalRuns,
-        ball: totalBalls,
-        four: totalFours,
-        six: totalSixes,
-        strikeRate,
-        onStrike: currentBatter.onStrike,
-        battingStatus: BATTING,
-      });
-    };
+        liveBattersMap.set(currentBatter.id, {
+          id: currentBatter.id,
+          name: currentBatter.name,
+          run: totalRuns,
+          ball: totalBalls,
+          four: totalFours,
+          six: totalSixes,
+          strikeRate,
+          onStrike: currentBatter.onStrike,
+          battingStatus: BATTING,
+        });
+      };
 
-    mergeBatter(batter1);
-    mergeBatter(batter2);
+      mergeBatter(batter1);
+      mergeBatter(batter2);
 
-    const liveBatters = Array.from(liveBattersMap.values());
+      const liveBatters = Array.from(liveBattersMap.values());
 
-    const existingBowler = bowlers?.find(
-      (b) => b.id === bowler?.id
-    );
+      const existingBowler = bowlers?.find((b) => b.id === bowler?.id);
 
-    const currentOverOvers =
-      Math.floor(ballCount / 6) + (ballCount % 6) / 10;
+      const currentOverOvers = Math.floor(ballCount / 6) + (ballCount % 6) / 10;
 
-    const currentOverDecimal = ballCount / 6;
+      const currentOverDecimal = ballCount / 6;
 
-    const totalOversDecimal =
-      (existingBowler?.over || 0) + currentOverDecimal;
+      const totalOversDecimal =
+        (existingBowler?.over || 0) + currentOverDecimal;
 
-    const totalRuns_over =
-      (existingBowler?.run || 0) + runsByOver;
+      const totalRuns_over = (existingBowler?.run || 0) + runsByOver;
 
-    const totalWickets =
-      (existingBowler?.wicket || 0) + wicketCount;
+      const totalWickets = (existingBowler?.wicket || 0) + wicketCount;
 
-    const overs = overCount + ballCount / 6;
-    let crr = (totalRuns / overs).toFixed(2);
-    crr = isFinite(crr) ? crr : 0;
+      const overs = overCount + ballCount / 6;
+      let crr = (totalRuns / overs).toFixed(2);
+      crr = isFinite(crr) ? crr : 0;
 
-    setRunrate(crr);
+      setRunrate(crr);
 
-    const liveBowler = bowler?.id
-      ? {
-          id: bowler.id,
-          name: bowler.name,
-          maiden: existingBowler?.maiden || 0,
-          over: (existingBowler?.over || 0) + currentOverOvers,
-          run: totalRuns_over,
-          wicket: totalWickets,
-          economy:
-            totalOversDecimal > 0
-              ? Math.round((totalRuns / totalOversDecimal) * 100) / 100
-              : 0,
-        }
-      : null;
+      const liveBowler = bowler?.id
+        ? {
+            id: bowler.id,
+            name: bowler.name,
+            maiden: existingBowler?.maiden || 0,
+            over: (existingBowler?.over || 0) + currentOverOvers,
+            run: totalRuns_over,
+            wicket: totalWickets,
+            economy:
+              totalOversDecimal > 0
+                ? Math.round((totalRuns / totalOversDecimal) * 100) / 100
+                : 0,
+          }
+        : null;
 
-    const updatedBowlers = liveBowler 
-      ? [
-          ...bowlers.filter((b) => b.id !== liveBowler.id),
-          liveBowler,
-        ]
-      : bowlers;
+      const updatedBowlers = liveBowler
+        ? [...bowlers.filter((b) => b.id !== liveBowler.id), liveBowler]
+        : bowlers;
 
-    setMatch((state) => ({
-      ...state,
-      bowler: liveBowler || state.bowler,
-      bowlers: updatedBowlers,
-      [`inning${inningNo}`]: {
-        ...state[`inning${inningNo}`],
-        runs: totalRuns_over,
-        wickets: wicketCount,
-        overs: totalOvers,
-        runRate: crr,
-        extras,
-        batters: liveBatters,
+      setMatch((state) => ({
+        ...state,
+        bowler: liveBowler || state.bowler,
         bowlers: updatedBowlers,
-        recentOvers,
-      },
-    }));
+        [`inning${inningNo}`]: {
+          ...state[`inning${inningNo}`],
+          runs: totalRuns_over,
+          wickets: wicketCount,
+          overs: totalOvers,
+          runRate: crr,
+          extras,
+          batters: liveBatters,
+          bowlers: updatedBowlers,
+          recentOvers,
+        },
+      }));
 
-    console.log(match);
-    console.log("✅ Live scorecard updated");
-  }
-}, [
-  batters,
-  batter1,
-  batter2,
-  bowlers,
-  bowler,
-  ballCount,
-  runsByOver,
-  wicketCount,
-  overCount,
-  totalRuns,
-  totalOvers,
-  inningNo,
-  extras,
-  recentOvers,
-  setMatch,
-  setRunrate,
-  match,
-]);
+      console.log(match);
+      console.log("✅ Live scorecard updated");
+    }
+  }, [
+    batters,
+    batter1,
+    batter2,
+    bowlers,
+    bowler,
+    ballCount,
+    runsByOver,
+    wicketCount,
+    overCount,
+    totalRuns,
+    totalOvers,
+    inningNo,
+    extras,
+    recentOvers,
+    setMatch,
+    setRunrate,
+    match,
+  ]);
 
   const endMatch = () => {
     disableAllScoreButtons(); // Assuming this is defined elsewhere
@@ -1730,22 +1706,19 @@ const handleLIVEscore = useCallback(() => {
       setBowler(existingBowler);
       setBowlers(bowlers);
     } else {
-      const newentry =  {
-          id: bowler.id,
-          name: bowler.name,
-          over: 1,
-          maiden: isMaidenOver ? 1 : 0,
-          run: runsByOverParam,
-          wicket: countWicket,
-          noBall: countNoBall,
-          wide: countWide,
-          economy: runsByOverParam,
-        }
+      const newentry = {
+        id: bowler.id,
+        name: bowler.name,
+        over: 1,
+        maiden: isMaidenOver ? 1 : 0,
+        run: runsByOverParam,
+        wicket: countWicket,
+        noBall: countNoBall,
+        wide: countWide,
+        economy: runsByOverParam,
+      };
       setBowler(newentry);
-      setBowlers((state) => [
-        ...state,
-        newentry,
-      ]);
+      setBowlers((state) => [...state, newentry]);
     }
   };
 
@@ -2406,7 +2379,6 @@ const handleLIVEscore = useCallback(() => {
         switchBatterStrike();
       }
     }
-    
   };
 
   const handleNoBall = () => {
@@ -2724,98 +2696,98 @@ const handleLIVEscore = useCallback(() => {
     }
   }
 
-   const updateLiveMatch = useCallback(async () => {
-  try {
-    const countRes = await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/live/count`,
-    );
-
-    if (!countRes.ok) {
-      console.error(
-        `Failed to fetch match count: ${countRes.status} ${countRes.statusText}`,
+  const updateLiveMatch = useCallback(async () => {
+    try {
+      const countRes = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/live/count`,
       );
-      return;
-    }
 
-    const countData = await countRes.json();
-    const count = countData.count || 0;
+      if (!countRes.ok) {
+        console.error(
+          `Failed to fetch match count: ${countRes.status} ${countRes.statusText}`,
+        );
+        return;
+      }
 
-    if (count === 0) {
-      console.warn("No live match entries found. Skipping update.");
-      return;
-    }
+      const countData = await countRes.json();
+      const count = countData.count || 0;
 
-    const matchId = parseInt(count, 10);
+      if (count === 0) {
+        console.warn("No live match entries found. Skipping update.");
+        return;
+      }
 
-    if (isNaN(matchId)) {
-      console.warn("Invalid match ID derived from count:", count);
-      return;
-    }
+      const matchId = parseInt(count, 10);
 
-    const updatePayload = {
-      inningNo,
-      totalRuns,
-      wicketCount,
-      totalOvers,
-      scoringTeam: scoringTeam,
-      chessingTeam: chessingTeam,
-      overCount,
-      ballCount,
-      hasMatchEnded,
-      remainingRuns,
-      remainingBalls,
-      batter1,
-      batter2,
-      bowler,
-      bowlers,
-      extras,
-      recentOvers,
-      inning1: match.inning1,
-      inning2: match.inning2,
-    };
+      if (isNaN(matchId)) {
+        console.warn("Invalid match ID derived from count:", count);
+        return;
+      }
 
-    const response = await fetch(
-      `${process.env.REACT_APP_API_BASE_URL}/live/match/${matchId}/update`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const updatePayload = {
+        inningNo,
+        totalRuns,
+        wicketCount,
+        totalOvers,
+        scoringTeam: scoringTeam,
+        chessingTeam: chessingTeam,
+        overCount,
+        ballCount,
+        hasMatchEnded,
+        remainingRuns,
+        remainingBalls,
+        batter1,
+        batter2,
+        bowler,
+        bowlers,
+        extras,
+        recentOvers,
+        inning1: match.inning1,
+        inning2: match.inning2,
+      };
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/live/match/${matchId}/update`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatePayload),
         },
-        body: JSON.stringify(updatePayload),
-      },
-    );
+      );
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (!response.ok) {
-      console.error("Error updating match:", result.message || result);
-    } else {
-      console.log("Match updated successfully:", result);
+      if (!response.ok) {
+        console.error("Error updating match:", result.message || result);
+      } else {
+        console.log("Match updated successfully:", result);
+      }
+    } catch (err) {
+      console.error("Error in updateLiveMatch:", err.message || err);
     }
-  } catch (err) {
-    console.error("Error in updateLiveMatch:", err.message || err);
-  }
-}, [
-  inningNo,
-  totalRuns,
-  wicketCount,
-  totalOvers,
-  scoringTeam,
-  chessingTeam,
-  overCount,
-  ballCount,
-  hasMatchEnded,
-  remainingRuns,
-  remainingBalls,
-  batter1,
-  batter2,
-  bowler,
-  bowlers,
-  extras,
-  recentOvers,
-  match.inning1,
-  match.inning2,
-]);
+  }, [
+    inningNo,
+    totalRuns,
+    wicketCount,
+    totalOvers,
+    scoringTeam,
+    chessingTeam,
+    overCount,
+    ballCount,
+    hasMatchEnded,
+    remainingRuns,
+    remainingBalls,
+    batter1,
+    batter2,
+    bowler,
+    bowlers,
+    extras,
+    recentOvers,
+    match.inning1,
+    match.inning2,
+  ]);
 
   const tossContent = (
     <>
@@ -2924,132 +2896,182 @@ const handleLIVEscore = useCallback(() => {
     </>
   );
 
-  const pointsTable = React.useMemo(() => {
-    const table = {};
+const pointsTable = React.useMemo(() => {
+  const table = {};
 
-    (scores || []).forEach(match => {
+  (scores || []).forEach((match) => {
+    // ❌ Skip Final & Semifinal
+    if (["Final", "Semifinal"].includes(match.matchType)) return;
 
-      const team1 = match.scoringTeam;
-      const team2 = match.chessingTeam;
+    const team1 = match.scoringTeam;
+    const team2 = match.chessingTeam;
 
-      const runs1 = match.inning1?.runs || 0;
-      const runs2 = match.inning2?.runs || 0;
+    if (!team1 || !team2) return;
 
-      const overs1 = parseFloat(match.inning1?.overs || 0);
-      const overs2 = parseFloat(match.inning2?.overs || 0);
+    const runs1 = match.inning1?.runs || 0;
+    const runs2 = match.inning2?.runs || 0;
 
-      const winner = match.winnerCard3?.includes("won")
-        ? match.winnerCard3.split(" won")[0]
-        : null;
+    const overs1 = parseFloat(match.inning1?.overs || 0);
+    const overs2 = parseFloat(match.inning2?.overs || 0);
 
-      if (!table[team1]) {
-        table[team1] = {
-          team: team1,
-          played: 0,
-          win: 0,
-          loss: 0,
-          tie: 0,
-          points: 0,
-          runsScored: 0,
-          runsConceded: 0,
-          oversFaced: 0,
-          oversBowled: 0,
-        };
+    const winner = match.winnerCard3?.includes("won")
+      ? match.winnerCard3.split(" won")[0]
+      : null;
+
+    // 🔹 Init teams
+    if (!table[team1]) {
+      table[team1] = {
+        team: team1,
+        played: 0,
+        win: 0,
+        loss: 0,
+        tie: 0,
+        points: 0,
+        runsScored: 0,
+        runsConceded: 0,
+        oversFaced: 0,
+        oversBowled: 0,
+      };
+    }
+
+    if (!table[team2]) {
+      table[team2] = {
+        team: team2,
+        played: 0,
+        win: 0,
+        loss: 0,
+        tie: 0,
+        points: 0,
+        runsScored: 0,
+        runsConceded: 0,
+        oversFaced: 0,
+        oversBowled: 0,
+      };
+    }
+
+    // ===============================
+    // 🔹 SUPER OVER HANDLING
+    // ===============================
+    if (match.matchType === "SuperOver") {
+      if (winner === team1 || winner === team2) {
+        const winTeam = winner;
+        const loseTeam = winner === team1 ? team2 : team1;
+
+        // 🔥 remove tie effect ONLY ONCE
+        if (table[team1].tie > 0 && table[team2].tie > 0) {
+          table[team1].points -= 1;
+          table[team2].points -= 1;
+
+          table[team1].tie = 0;
+          table[team2].tie = 0;
+        }
+
+        // apply final win/loss
+        table[winTeam].win++;
+        table[winTeam].points += 2;
+        table[loseTeam].loss++;
       }
 
-      if (!table[team2]) {
-        table[team2] = {
-          team: team2,
-          played: 0,
-          win: 0,
-          loss: 0,
-          tie: 0,
-          points: 0,
-          runsScored: 0,
-          runsConceded: 0,
-          oversFaced: 0,
-          oversBowled: 0,
-        };
-      }
+      return; // 🚫 no stats counted for super over
+    }
 
-      table[team1].played++;
-      table[team2].played++;
+    // ===============================
+    // 🔹 NORMAL MATCH STATS
+    // ===============================
+    table[team1].played++;
+    table[team2].played++;
 
-      table[team1].runsScored += runs1;
-      table[team1].runsConceded += runs2;
-      table[team1].oversFaced += overs1;
-      table[team1].oversBowled += overs2;
+    table[team1].runsScored += runs1;
+    table[team1].runsConceded += runs2;
+    table[team1].oversFaced += overs1;
+    table[team1].oversBowled += overs2;
 
-      table[team2].runsScored += runs2;
-      table[team2].runsConceded += runs1;
-      table[team2].oversFaced += overs2;
-      table[team2].oversBowled += overs1;
+    table[team2].runsScored += runs2;
+    table[team2].runsConceded += runs1;
+    table[team2].oversFaced += overs2;
+    table[team2].oversBowled += overs1;
 
-      if (runs1 === runs2) {
-        table[team1].tie++;
-        table[team2].tie++;
+    // ===============================
+    // 🔹 RESULT LOGIC
+    // ===============================
+    if (runs1 === runs2) {
+      // ✅ first tie → give points
+      if (table[team1].tie === 0 && table[team2].tie === 0) {
         table[team1].points += 1;
         table[team2].points += 1;
       }
-      else if (winner === team1) {
-        table[team1].win++;
-        table[team1].points += 2;
-        table[team2].loss++;
-      }
-      else if (winner === team2) {
-        table[team2].win++;
-        table[team2].points += 2;
-        table[team1].loss++;
-      }
-    });
 
-    return Object.values(table)
-      .map(t => ({
+      // track tie count (no extra points after first)
+      table[team1].tie++;
+      table[team2].tie++;
+    } else if (winner === team1) {
+      table[team1].win++;
+      table[team1].points += 2;
+      table[team2].loss++;
+    } else if (winner === team2) {
+      table[team2].win++;
+      table[team2].points += 2;
+      table[team1].loss++;
+    }
+  });
+
+  // ===============================
+  // 🔹 FINAL TABLE FORMAT
+  // ===============================
+  return Object.values(table)
+    .map((t) => {
+      const nrr =
+        t.oversFaced > 0 && t.oversBowled > 0
+          ? t.runsScored / t.oversFaced -
+            t.runsConceded / t.oversBowled
+          : 0;
+
+      return {
         ...t,
-        nrr: (
-          (t.runsScored / (t.oversFaced || 1)) -
-          (t.runsConceded / (t.oversBowled || 1))
-        ).toFixed(2)
-      }))
-      .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
+        nrr: nrr.toFixed(2),
+      };
+    })
+    .sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      return b.nrr - a.nrr;
+    });
+}, [scores]);
 
-  }, [scores]);
+  const { newMatch } = props;
 
-const { newMatch } = props;
+  //   useEffect(() => {
+  //   if (newMatch) {
+  //     updateLiveMatch();
+  //     handleLIVEscore();
+  //   }
+  // }, [
+  //   newMatch,
+  //   updateLiveMatch,
+  //   handleLIVEscore,
+  //   inningNo,
+  //   totalRuns,
+  //   wicketCount,
+  //   totalOvers,
+  //   overCount,
+  //   ballCount,
+  //   hasMatchEnded,
+  //   remainingRuns,
+  //   remainingBalls,
+  //   batter1,
+  //   batter2,
+  //   bowler,
+  //   bowlers,
+  //   extras,
+  //   recentOvers,
+  //   match,
+  // ]);
 
-//   useEffect(() => {
-//   if (newMatch) {
-//     updateLiveMatch();
-//     handleLIVEscore();
-//   }
-// }, [
-//   newMatch,
-//   updateLiveMatch,
-//   handleLIVEscore,
-//   inningNo,
-//   totalRuns,
-//   wicketCount,
-//   totalOvers,
-//   overCount,
-//   ballCount,
-//   hasMatchEnded,
-//   remainingRuns,
-//   remainingBalls,
-//   batter1,
-//   batter2,
-//   bowler,
-//   bowlers,
-//   extras,
-//   recentOvers,
-//   match,
-// ]);
-
-useEffect(() => {
-  if (newMatch) {
-    updateLiveMatch();
-    handleLIVEscore();
-  }
-}, [newMatch, updateLiveMatch, handleLIVEscore]);
+  useEffect(() => {
+    if (newMatch) {
+      updateLiveMatch();
+      handleLIVEscore();
+    }
+  }, [newMatch, updateLiveMatch, handleLIVEscore]);
 
   return (
     // main container
@@ -3310,21 +3332,57 @@ useEffect(() => {
         </div>
         {/* All section */}
         <div>
-          {(activeSection === "matchInfo" ||
-            activeSection === "liveScore" ||
-            activeSection === "scoreCard") &&
-            activeSection !== "result" &&
-            activeSection !== "setting" &&
-            activeSection !== "pointtable" &&
+          {activeSection === "matchInfo" &&
             !props.newMatch && (
               <div className="Imgdiv">
                 <img
                   className="NoMatchLive"
-                  src="/images/Photo7.jpg"
+                  src="/images/A1.png"
                   alt="No match available"
                 />
               </div>
             )}
+
+           { activeSection === "liveScore"  &&
+            !props.newMatch && (
+              <div className="Imgdiv">
+                <img
+                  className="NoMatchLive"
+                  src="/images/A2.png"
+                  alt="No match available"
+                />
+              </div>
+            )}
+
+             {activeSection === "scoreCard" &&
+            !props.newMatch && (
+              <div className="Imgdiv">
+                <img
+                  className="NoMatchLive"
+                  src="/images/A3.png"
+                  alt="No match available"
+                />
+              </div>
+            )}
+
+           {(activeSection === "result" &&
+            scores?.length <= 0) && (
+              <div className="Imgdiv">
+                <img
+                  className="NoMatchLive"
+                  src="/images/A4.png"
+                  alt="No match available"
+                />
+              </div>)}
+
+            {(activeSection === "pointtable" && pointsTable?.length <= 0 && (
+              <div className="Imgdiv">
+                <img
+                  className="NoMatchLive"
+                  src="/images/A5.png"
+                  alt="No match available"
+                />
+              </div>))}
 
           {/*Section 1 :  Match Info */}
           {activeSection === "matchInfo" &&
@@ -3417,13 +3475,17 @@ useEffect(() => {
                 <div className="score-container1">
                   <div className="Tag">
                     <div className="First">
-                      <div className="Data">
+                      <div className="Data" style={{ marginBottom: "5px" }}>
                         <div className="Circle"></div>
-                        <div className="upcoming">Live</div>{" "}
+                        <div className="upcoming">
+                          {matchData?.matchType &&
+                          matchData.matchType !== "Normal"
+                            ? matchData.matchType
+                            : "Live"}
+                        </div>
                       </div>
                     </div>
                   </div>
-
                   <div className="team-score1">
                     <div
                       style={{
@@ -3524,7 +3586,7 @@ useEffect(() => {
                           ? winnerCard2
                           : tossContent}
                   </div>
-                </div>``
+                </div>
                 {/* Admin panel */}
                 {props.Admin && !hasMatchEnded && (
                   <div>
@@ -3930,12 +3992,24 @@ useEffect(() => {
                         <table>
                           <thead>
                             <tr>
-                              <td className="score-types padding-left"><div className="sb">Batter</div></td>
-                              <td className="score-types text-center data">R</td>
-                              <td className="score-types text-center data">B</td>
-                              <td className="score-types text-center data">4s</td>
-                              <td className="score-types text-center data">6s</td>
-                              <td className="score-types text-center data">SR</td>
+                              <td className="score-types padding-left">
+                                <div className="sb">Batter</div>
+                              </td>
+                              <td className="score-types text-center data">
+                                R
+                              </td>
+                              <td className="score-types text-center data">
+                                B
+                              </td>
+                              <td className="score-types text-center data">
+                                4s
+                              </td>
+                              <td className="score-types text-center data">
+                                6s
+                              </td>
+                              <td className="score-types text-center data">
+                                SR
+                              </td>
                             </tr>
                           </thead>
 
@@ -3950,17 +4024,20 @@ useEffect(() => {
                                 battersList = liveData?.inning1?.batters || [];
                                 batterOne = liveData?.batter1;
                                 batterTwo = liveData?.batter2;
-                              }
+                              } else {
 
                               /* ================= ADMIN ================= */
-                              else {
                                 // Admin + Inning 1 → LOCAL
                                 if (inningNo === 1) {
                                   const map = new Map();
 
-                                  (batters || []).forEach(b => b?.name && map.set(b.name, b));
-                                  if (batter1?.name) map.set(batter1.name, batter1);
-                                  if (batter2?.name) map.set(batter2.name, batter2);
+                                  (batters || []).forEach(
+                                    (b) => b?.name && map.set(b.name, b),
+                                  );
+                                  if (batter1?.name)
+                                    map.set(batter1.name, batter1);
+                                  if (batter2?.name)
+                                    map.set(batter2.name, batter2);
 
                                   battersList = Array.from(map.values());
                                   batterOne = batter1;
@@ -3968,7 +4045,8 @@ useEffect(() => {
                                 }
                                 // Admin + Inning 2 → SHOW NOTHING
                                 else {
-                                  battersList = liveData?.inning1?.batters || [];
+                                  battersList =
+                                    liveData?.inning1?.batters || [];
                                   batterOne = liveData?.batter1;
                                   batterTwo = liveData?.batter2;
                                 }
@@ -3990,8 +4068,10 @@ useEffect(() => {
                                   batter?.name === batterTwo?.name;
 
                                 const isStriker =
-                                  (batter?.name === batterOne?.name && batterOne?.onStrike) ||
-                                  (batter?.name === batterTwo?.name && batterTwo?.onStrike);
+                                  (batter?.name === batterOne?.name &&
+                                    batterOne?.onStrike) ||
+                                  (batter?.name === batterTwo?.name &&
+                                    batterTwo?.onStrike);
 
                                 return (
                                   <tr
@@ -4007,11 +4087,21 @@ useEffect(() => {
                                         {isStriker && " *"}
                                       </div>
                                     </td>
-                                    <td className="score-types text-center data">{batter.run || 0}</td>
-                                    <td className="score-types text-center data">{batter.ball || 0}</td>
-                                    <td className="score-types text-center data">{batter.four || 0}</td>
-                                    <td className="score-types text-center data">{batter.six || 0}</td>
-                                    <td className="score-types text-center data">{batter.strikeRate || 0}</td>
+                                    <td className="score-types text-center data">
+                                      {batter.run || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.ball || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.four || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.six || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.strikeRate || 0}
+                                    </td>
                                   </tr>
                                 );
                               });
@@ -4027,38 +4117,67 @@ useEffect(() => {
                               <td className="score-types padding-left">
                                 <div className="sb">Bowler</div>
                               </td>
-                              <td className="score-types text-center data">O</td>
-                              <td className="score-types text-center data">M</td>
-                              <td className="score-types text-center data">R</td>
-                              <td className="score-types text-center data">W</td>
-                              <td className="score-types text-center data">ECO</td>
+                              <td className="score-types text-center data">
+                                O
+                              </td>
+                              <td className="score-types text-center data">
+                                M
+                              </td>
+                              <td className="score-types text-center data">
+                                R
+                              </td>
+                              <td className="score-types text-center data">
+                                W
+                              </td>
+                              <td className="score-types text-center data">
+                                ECO
+                              </td>
                             </tr>
                           </thead>
-<tbody>
-  {getBowlersForTable({ tableInning: 1 }).map((blr, index) => {
-    const isCurrentBowler =
-      inningNo === 1 &&
-      (props.Admin ? match?.bowler?.name === blr?.name : liveData?.bowler?.name === blr?.name);
+                          <tbody>
+                            {getBowlersForTable({ tableInning: 1 }).map(
+                              (blr, index) => {
+                                const isCurrentBowler =
+                                  inningNo === 1 &&
+                                  (props.Admin
+                                    ? match?.bowler?.name === blr?.name
+                                    : liveData?.bowler?.name === blr?.name);
 
-    return (
-      <tr
-        key={`inning1-${blr.name}-${index}`}
-        style={{
-          fontWeight: isCurrentBowler ? "700" : "400",
-          color: isCurrentBowler ? "green" : "inherit",
-        }}
-      >
-        <td className="score-types padding-left">{blr.name}</td>
-        <td className="score-types text-center">{blr.over || 0}</td>
-        <td className="score-types text-center">{blr.maiden || 0}</td>
-        <td className="score-types text-center">{blr.run || 0}</td>
-        <td className="score-types text-center">{blr.wicket || 0}</td>
-        <td className="score-types text-center">{blr.economy || 0}</td>
-      </tr>
-    );
-  })}
-</tbody>
-
+                                return (
+                                  <tr
+                                    key={`inning1-${blr.name}-${index}`}
+                                    style={{
+                                      fontWeight: isCurrentBowler
+                                        ? "700"
+                                        : "400",
+                                      color: isCurrentBowler
+                                        ? "green"
+                                        : "inherit",
+                                    }}
+                                  >
+                                    <td className="score-types padding-left">
+                                      {blr.name}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.over || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.maiden || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.run || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.wicket || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.economy || 0}
+                                    </td>
+                                  </tr>
+                                );
+                              },
+                            )}
+                          </tbody>
                         </table>
                       </div>
                       {/* Extra */}
@@ -4167,7 +4286,9 @@ useEffect(() => {
                       </div> */}
                       {/* ================= INNING 1 : RECENT OVERS ================= */}
                       <div className="recent-over-container">
-                        <div className="recent-over-text">Recent Overs (Inning 1)</div>
+                        <div className="recent-over-text">
+                          Recent Overs (Inning 1)
+                        </div>
 
                         <div className="recent-over-details">
                           <table>
@@ -4183,8 +4304,8 @@ useEffect(() => {
                             <tbody className="Recent2">
                               {(props.isAdmin
                                 ? inningNo === 1
-                                  ? recentOvers        // admin + inning 1 running
-                                  : recentOvers1       // admin + inning 2 running
+                                  ? recentOvers // admin + inning 1 running
+                                  : recentOvers1 // admin + inning 2 running
                                 : liveData?.inning1?.recentOvers || []
                               ).map((over, i) => (
                                 <tr key={i}>
@@ -4257,12 +4378,24 @@ useEffect(() => {
                         <table>
                           <thead>
                             <tr>
-                              <td className="score-types padding-left"><div className="sb">Batter</div></td>
-                              <td className="score-types text-center data">R</td>
-                              <td className="score-types text-center data">B</td>
-                              <td className="score-types text-center data">4s</td>
-                              <td className="score-types text-center data">6s</td>
-                              <td className="score-types text-center data">SR</td>
+                              <td className="score-types padding-left">
+                                <div className="sb">Batter</div>
+                              </td>
+                              <td className="score-types text-center data">
+                                R
+                              </td>
+                              <td className="score-types text-center data">
+                                B
+                              </td>
+                              <td className="score-types text-center data">
+                                4s
+                              </td>
+                              <td className="score-types text-center data">
+                                6s
+                              </td>
+                              <td className="score-types text-center data">
+                                SR
+                              </td>
                             </tr>
                           </thead>
 
@@ -4277,15 +4410,14 @@ useEffect(() => {
                                 battersList = liveData?.inning2?.batters || [];
                                 batterOne = liveData?.batter1;
                                 batterTwo = liveData?.batter2;
-                              }
+                              } else {
 
                               /* ================= ADMIN ================= */
-                              else {
                                 // Admin + Inning 2 → LOCAL
                                 if (inningNo === 2 && !hasMatchEnded) {
                                   const map = new Map();
 
-                                  (batters || []).forEach(b => {
+                                  (batters || []).forEach((b) => {
                                     if (b?.name && !map.has(b.name)) {
                                       map.set(b.name, b);
                                     }
@@ -4305,7 +4437,8 @@ useEffect(() => {
                                 }
                                 // Admin + Inning 1 → DATABASE
                                 else {
-                                  battersList = liveData?.inning2?.batters || [];
+                                  battersList =
+                                    liveData?.inning2?.batters || [];
                                   batterOne = liveData?.batter1;
                                   batterTwo = liveData?.batter2;
                                 }
@@ -4327,8 +4460,10 @@ useEffect(() => {
                                   batter?.name === batterTwo?.name;
 
                                 const isStriker =
-                                  (batter?.name === batterOne?.name && batterOne?.onStrike) ||
-                                  (batter?.name === batterTwo?.name && batterTwo?.onStrike);
+                                  (batter?.name === batterOne?.name &&
+                                    batterOne?.onStrike) ||
+                                  (batter?.name === batterTwo?.name &&
+                                    batterTwo?.onStrike);
 
                                 return (
                                   <tr
@@ -4344,11 +4479,21 @@ useEffect(() => {
                                         {isStriker && " *"}
                                       </div>
                                     </td>
-                                    <td className="score-types text-center data">{batter.run || 0}</td>
-                                    <td className="score-types text-center data">{batter.ball || 0}</td>
-                                    <td className="score-types text-center data">{batter.four || 0}</td>
-                                    <td className="score-types text-center data">{batter.six || 0}</td>
-                                    <td className="score-types text-center data">{batter.strikeRate || 0}</td>
+                                    <td className="score-types text-center data">
+                                      {batter.run || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.ball || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.four || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.six || 0}
+                                    </td>
+                                    <td className="score-types text-center data">
+                                      {batter.strikeRate || 0}
+                                    </td>
                                   </tr>
                                 );
                               });
@@ -4362,38 +4507,70 @@ useEffect(() => {
                         <table>
                           <thead>
                             <tr>
-                              <td className="score-types padding-left"><div className="sb">Bowler</div></td>
-                              <td className="score-types text-center data">O</td>
-                              <td className="score-types text-center data">M</td>
-                              <td className="score-types text-center data">R</td>
-                              <td className="score-types text-center data">W</td>
-                              <td className="score-types text-center data">ECO</td>
+                              <td className="score-types padding-left">
+                                <div className="sb">Bowler</div>
+                              </td>
+                              <td className="score-types text-center data">
+                                O
+                              </td>
+                              <td className="score-types text-center data">
+                                M
+                              </td>
+                              <td className="score-types text-center data">
+                                R
+                              </td>
+                              <td className="score-types text-center data">
+                                W
+                              </td>
+                              <td className="score-types text-center data">
+                                ECO
+                              </td>
                             </tr>
                           </thead>
-<tbody>
-  {getBowlersForTable({ tableInning: 2 }).map((blr, index) => {
-    const isCurrentBowler =
-      inningNo === 2 &&
-      (props.Admin ? match?.bowler?.name === blr?.name : liveData?.bowler?.name === blr?.name);
+                          <tbody>
+                            {getBowlersForTable({ tableInning: 2 }).map(
+                              (blr, index) => {
+                                const isCurrentBowler =
+                                  inningNo === 2 &&
+                                  (props.Admin
+                                    ? match?.bowler?.name === blr?.name
+                                    : liveData?.bowler?.name === blr?.name);
 
-    return (
-      <tr
-        key={`inning2-${blr.name}-${index}`}
-        style={{
-          fontWeight: isCurrentBowler ? "700" : "400",
-          color: isCurrentBowler ? "green" : "inherit",
-        }}
-      >
-        <td className="score-types padding-left">{blr.name}</td>
-        <td className="score-types text-center">{blr.over || 0}</td>
-        <td className="score-types text-center">{blr.maiden || 0}</td>
-        <td className="score-types text-center">{blr.run || 0}</td>
-        <td className="score-types text-center">{blr.wicket || 0}</td>
-        <td className="score-types text-center">{blr.economy || 0}</td>
-      </tr>
-    );
-  })}
-</tbody>
+                                return (
+                                  <tr
+                                    key={`inning2-${blr.name}-${index}`}
+                                    style={{
+                                      fontWeight: isCurrentBowler
+                                        ? "700"
+                                        : "400",
+                                      color: isCurrentBowler
+                                        ? "green"
+                                        : "inherit",
+                                    }}
+                                  >
+                                    <td className="score-types padding-left">
+                                      {blr.name}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.over || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.maiden || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.run || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.wicket || 0}
+                                    </td>
+                                    <td className="score-types text-center">
+                                      {blr.economy || 0}
+                                    </td>
+                                  </tr>
+                                );
+                              },
+                            )}
+                          </tbody>
                         </table>
                       </div>
                       {/* Extra */}
@@ -4507,7 +4684,9 @@ useEffect(() => {
                       </div> */}
                       {/* ================= INNING 2 : RECENT OVERS ================= */}
                       <div className="recent-over-container">
-                        <div className="recent-over-text">Recent Overs (Inning 2)</div>
+                        <div className="recent-over-text">
+                          Recent Overs (Inning 2)
+                        </div>
 
                         <div className="recent-over-details">
                           <table>
@@ -4523,8 +4702,8 @@ useEffect(() => {
                             <tbody className="Recent2">
                               {(props.isAdmin
                                 ? inningNo === 2
-                                  ? recentOvers        // admin + inning 2 running
-                                  : recentOvers1       // admin + inning 1 running
+                                  ? recentOvers // admin + inning 2 running
+                                  : recentOvers1 // admin + inning 1 running
                                 : liveData?.inning2?.recentOvers || []
                               ).map((over, i) => (
                                 <tr key={i}>
@@ -4575,6 +4754,9 @@ useEffect(() => {
                   <div className="First">
                     <div className="upcoming">
                       MATCH {scores.length - index}
+                      {score.matchType && score.matchType !== "Normal"
+                        ? ` - ${score.matchType}`
+                        : ""}
                     </div>
                     <div className="Date">{score.date}</div>
                   </div>
@@ -4623,7 +4805,7 @@ useEffect(() => {
             ))}
 
           {/*Section 5 : Pointtable */}
-          {activeSection === "pointtable" && pointsTable && (
+          {activeSection === "pointtable" && pointsTable?.length > 0 && (
             <div className="sb-batting">
               <table>
                 <thead>
@@ -4647,12 +4829,24 @@ useEffect(() => {
                         <div className="sb">{team.team}</div>
                       </td>
 
-                      <td className="score-types text-center data">{team.played}</td>
-                      <td className="score-types text-center data">{team.win}</td>
-                      <td className="score-types text-center data">{team.loss}</td>
-                      <td className="score-types text-center data">{team.tie}</td>
-                      <td className="score-types text-center data">{team.points}</td>
-                      <td className="score-types text-center data">{team.nrr}</td>
+                      <td className="score-types text-center data">
+                        {team.played}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.win}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.loss}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.tie}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.points}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.nrr}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -52,3 +52,32 @@ exports.toggleNewMatch = async (req, res) => {
   }
 };
 
+exports.updateMatchType = async (req, res) => {
+  try {
+    const { matchId } = req.params;
+    const { matchType } = req.body;
+
+    const allowedTypes = ['Normal', 'Final', 'Semifinal', 'SuperOver'];
+
+    if (!allowedTypes.includes(matchType)) {
+      return res.status(400).json({ message: "Invalid matchType" });
+    }
+
+    const updatedMatch = await Match.findByIdAndUpdate(
+      matchId,
+      { matchType },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedMatch) {
+      return res.status(404).json({ message: "Match not found" });
+    }
+
+    res.status(200).json({
+      message: "Match type updated successfully",
+      data: updatedMatch,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

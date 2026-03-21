@@ -58,6 +58,18 @@ const useStyles = makeStyles((theme) => ({
     boxSizing: "border-box",
   },
 
+  "@media (max-width: 630px)": {
+    mainContainerA1: {
+      "& .MuiStepLabel-label": {
+        display: "none", // ❌ hide text (Team, Squad...)
+      },
+      "& .MuiStep-root": {
+        paddingLeft: 6,
+        paddingRight: 6,
+      },
+    },
+  },
+
   "@media (max-width: 550px)": {
     mainContainerA1: {
       padding: "2px",
@@ -237,7 +249,7 @@ const HorizontalStepper = ({
     return saved ? parseInt(saved) : 11;
   });
 
-  const steps = ["Team", "Squad", "Over", "Toss", "Save"];
+  const steps = ["Team", "Squad", "Over", "Match", "Toss", "Save"];
 
 
   const initialValues = {
@@ -245,6 +257,7 @@ const HorizontalStepper = ({
   team2: localStorage.getItem("team2") || "",
   players: playersCount,
   maxOver: localStorage.getItem("maxOver") || "",
+  matchType: localStorage.getItem("matchType") || "Normal",
   tossWinner: localStorage.getItem("tossWinner") || "",
   decision: localStorage.getItem("decision") || "",
   newmatch: false,
@@ -276,6 +289,9 @@ const HorizontalStepper = ({
     }),
     Yup.object().shape({
       maxOver: Yup.string().required("Overs are required"),
+    }),
+    Yup.object().shape({
+    matchType: Yup.string().required("Match type is required"), // ✅ NEW
     }),
     Yup.object().shape({
       tossWinner: Yup.string().required("Toss winner is required"),
@@ -366,6 +382,7 @@ const HorizontalStepper = ({
                 localStorage.removeItem("team2");
                 localStorage.removeItem("playersCount");
                 localStorage.removeItem("maxOver");
+                localStorage.removeItem("matchType");
                 localStorage.removeItem("tossWinner");
                 localStorage.removeItem("decision");
 
@@ -519,6 +536,44 @@ const HorizontalStepper = ({
                     </div>
                   )}
                   {activeStep === 3 && (
+                    <FormControl
+                      component="fieldset"
+                      className={classes.formGroup}
+                      style={{ width: "100%" }}
+                    >
+                      {/* Centered Label */}
+                      <FormLabel
+                        component="legend"
+                        style={{ textAlign: "center", width: "100%", marginBottom: "12px" }}
+                      >
+                        Match Type
+                      </FormLabel>
+
+                      {/* Grid Layout */}
+                      <RadioGroup
+                        name="matchType"
+                        value={values.matchType}
+                        onChange={(e) => {
+                          setFieldValue("matchType", e.target.value);
+                          localStorage.setItem("matchType", e.target.value);
+                        }}
+                        className={classes.radioGroup}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr",
+                          gap: "10px 40px",
+                          justifyItems: "start",
+                          marginTop: "10px",
+                        }}
+                      >
+                        <FormControlLabel value="Normal" control={<Radio />} label="Normal" />
+                        <FormControlLabel value="SuperOver" control={<Radio />} label="Superover" />
+                        <FormControlLabel value="Final" control={<Radio />} label="Final" />
+                        <FormControlLabel value="Semifinal" control={<Radio />} label="SemiFinal" />
+                      </RadioGroup>
+                    </FormControl>
+                  )}
+                  {activeStep === 4 && (
                     // Toss
                     <FormControl
                       component="fieldset"
@@ -550,7 +605,7 @@ const HorizontalStepper = ({
                       </RadioGroup>
                     </FormControl>
                   )}
-                  {activeStep === 4 && (
+                  {activeStep === 5 && (
                     // Decision
                     <FormControl
                       component="fieldset"

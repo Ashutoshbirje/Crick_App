@@ -15,11 +15,9 @@ npm start
 
 // Form to fill data on website (New Feature)
 
-// Registration for match + Payment (New Feature)
-
 // Advertisement + Custom photo (New Feature)
 
-// final / semifinal / Noraml (Default) / super over tag on the live scorecard (New Feature)
+// Registration for match + Payment (New Feature)
 
 // States (New Feature)
 

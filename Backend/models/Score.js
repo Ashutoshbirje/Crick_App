@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const scoreSchema = new mongoose.Schema({
+  matchType: String,
   scoringTeam: String,
   chessingTeam: String,
   inning1: {

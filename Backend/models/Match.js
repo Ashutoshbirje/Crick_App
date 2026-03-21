@@ -26,6 +26,10 @@ const matchSchema = new mongoose.Schema({
     enum: ['bat', 'ball'],
     required: true,
   },
+  matchType: {
+    type: String,
+    enum: ['Normal', 'Final', 'Semi-Final', 'Super-Over'],
+  },
   newmatch: {
     type: Boolean,
     default: false, // Initially false
