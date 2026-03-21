@@ -1,5 +1,5 @@
 // Done
-import React from "react";
+import React  from "react";
 import {
   TextField,
   Button,
@@ -18,13 +18,12 @@ import {
 import { IconButton, Box } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import tennisBall from "../Images/tennis-ball.png";
-import squad from "../Images/s.png";
+
 const useStyles = makeStyles((theme) => ({
   main: {
     display: "flex",
@@ -303,6 +302,32 @@ const HorizontalStepper = ({
 
   const currentValidationSchema = validationSchema[activeStep];
 
+  const [info, setInfo] = useState(null);
+
+ useEffect(() => {
+    const fetchSetup = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/admin/setup`
+        );
+
+        if (!res.ok) throw new Error("API failed");
+
+        const data = await res.json();
+
+        if (data.success && data.data) {
+          setInfo(data.data.info || {});
+        } else {
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+      }
+    };
+
+    fetchSetup();
+  }, []);
+
   function isLastStep() {
     return activeStep === steps.length - 1;
   }
@@ -496,7 +521,7 @@ const HorizontalStepper = ({
                         </div>
                         <div className={classes.overcircle}>
                           <img
-                            src={squad}
+                            src="/images/Photo3.png"
                             alt="Tennis Ball"
                             style={{ width: "200px", height: "200px" }}
                           />
@@ -528,7 +553,7 @@ const HorizontalStepper = ({
                       />
                       <div className={classes.overcircle}>
                         <img
-                          src={tennisBall}
+                          src="/images/Photo2.png"
                           alt="Tennis Ball"
                           style={{ width: "130px", height: "130px" }}
                         />
@@ -662,7 +687,7 @@ const HorizontalStepper = ({
       </div>
       {/* Part C (About) */}
       <div className={classes.mainContainer3}>
-        <p>INDIAN PREMIER LEAGUE</p>
+        <p>{info?.names}</p>
       </div>
     </div>
   );

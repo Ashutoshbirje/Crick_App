@@ -153,6 +153,39 @@ const ScoreBoard = (props) => {
   const [currentTime, setCurrentTime] = useState("");
   const [matchData, setMatchData] = useState(null);
   const [liveData, setLiveData] = useState(null);
+  const [info, setInfo] = useState(null);
+  const [venue, setVenue] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState("");
+
+   useEffect(() => {
+    const fetchSetup = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/admin/setup`
+        );
+
+        if (!res.ok) throw new Error("API failed");
+
+        const data = await res.json();
+
+        if (data.success && data.data) {
+          setInfo(data.data.info || {});
+          setVenue(data.data.venue || {});
+        } else {
+          // setError("No data found");
+        }
+      } catch (err) {
+        console.error(err);
+        // setError("Failed to fetch data");
+      } finally {
+        // setLoading(false);
+      }
+    };
+
+    fetchSetup();
+  }, []);
+
 
   useEffect(() => {
     const fetchMatchData = async () => {
@@ -731,6 +764,14 @@ const ScoreBoard = (props) => {
           });
 
           navigate("/form", { state: { newMatch: true } });
+          break;
+        
+        case "edit": 
+          navigate("/EditPassward"); 
+          break; 
+        
+        case "add": 
+          navigate("/MatchData"); 
           break;
 
         case "help":
@@ -2806,7 +2847,7 @@ const ScoreBoard = (props) => {
   const welcomeContent = (
     <>
       <div></div>
-      <div>Welcome to {process.env.REACT_APP_SERIES}</div>
+      <div>Welcome to {info?.series}</div>
       <div></div>
     </>
   );
@@ -3414,13 +3455,13 @@ const pointsTable = React.useMemo(() => {
                         <tr>
                           <td className="label">Series</td>
                           <td className="value">
-                            {process.env.REACT_APP_SERIES}
+                            {info?.series}
                           </td>
                         </tr>
                         <tr>
-                          <td className="label">Match Type</td>
+                          <td className="label">Type</td>
                           <td className="value">
-                            {process.env.REACT_APP_MATCH_TYPE}
+                            {info?.types}
                           </td>
                         </tr>
                         <tr>
@@ -3439,24 +3480,26 @@ const pointsTable = React.useMemo(() => {
                           </td>
                         </tr>
                         <tr>
-                          <td className="label1">Venue Guide</td>
+                          <td className="label1">Venue</td>
                           <td className="label1"></td>
                         </tr>
                         <tr>
                           <td className="label">Stadium</td>
                           <td className="value">
-                            {process.env.REACT_APP_STADIUM}
+                            {venue?.stadium}
                           </td>
                         </tr>
                         <tr>
                           <td className="label">Location</td>
                           <td className="value">
-                            {process.env.REACT_APP_LOCATION}
+                            {venue?.location}
                           </td>
                         </tr>
                         <tr>
                           <td className="label">Country</td>
-                          <td className="value">India</td>
+                          <td className="value">
+                            {venue?.country}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -4880,7 +4923,7 @@ const pointsTable = React.useMemo(() => {
               </div>
               <div
                 className="score-board-settings"
-                onClick={() => handleClick("edit")}
+                onClick={() => handleClick("add")}
               >
                 {/* add */}
                 ADD League

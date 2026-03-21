@@ -1,8 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
-import Main from "../../Images/Main.png";
-import { profiles } from "../data";
 import Footer from "../Footer/Footer";
 import "./HomePage.css"; // Import the external CSS file
 
@@ -29,20 +27,47 @@ const LandingPage = ({ Admin, setIsAdmin, setNewMatch }) => {
     setNewMatch(false);
   }, [setNewMatch]);
 
+   const [info, setInfo] = useState(null);
+   const [photos, setPhotos] = useState([]);
+    
+    useEffect(() => {
+        const fetchSetup = async () => {
+          try {
+            const res = await fetch(
+              `${process.env.REACT_APP_API_BASE_URL}/admin/setup`
+            );
+    
+            if (!res.ok) throw new Error("API failed");
+    
+            const data = await res.json();
+    
+            if (data.success && data.data) {
+              setInfo(data.data.info || {});
+              setPhotos(data.data.photos || []);
+            } else {
+            }
+          } catch (err) {
+            console.error(err);
+          } finally {
+          }
+        };
+    
+        fetchSetup();
+      }, []);
+
   return (
     <div className="landing-container">
       {/* Fixed AppBar */}
       <AppBar position="fixed" className="appbar">
         <Toolbar>
-          <Typography variant="h6">{process.env.REACT_APP_TITLE}</Typography>
+          <Typography variant="h6">{info?.names}</Typography>
         </Toolbar>
       </AppBar>
 
       {/* Scrollable Content */}
       <div className="main-content">
         <div className="centered-image">
-          <img src={Main} alt="Cricket League" className="main-img" />
-        </div>
+<img src="/images/Photo4.png" alt="Cricket League" className="main-img" />        </div>
 
         <div className="button-container">
           <Button
@@ -80,18 +105,20 @@ const LandingPage = ({ Admin, setIsAdmin, setNewMatch }) => {
 
         {/* Circular Photos and Text */}
         <div className="profile-container">
-          {profiles.map((profile, index) => (
+          {photos.length > 0 ? (photos.map((profile, index) => (
             <div key={index}>
               <img
-                src={profile.img}
+                src={profile.url}
                 alt={profile.name}
                 className="circular-photo"
               />
               <Typography variant="h6" className="profile-name">
-                {profile.name}
+                {profile.name?.replace(/\.[^/.]+$/, "")}
               </Typography>
             </div>
-          ))}
+          ))) : (
+                <p></p>
+              )}
         </div>
         
       </div>

@@ -1,4 +1,10 @@
 const mongoose = require('mongoose');
+
+
+// 🔥 CLEAR ALL MODELS
+mongoose.models = {};
+mongoose.modelSchemas = {};
+
 require('dotenv').config();
 
 const connectDB = async () => {

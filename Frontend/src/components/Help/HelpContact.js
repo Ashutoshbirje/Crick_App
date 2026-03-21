@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -204,7 +204,7 @@ const HelpContact = () => {
     {
       icon: <LocationIcon />,
       title: "Office Address",
-      value: "Vijaydurg, Maharashtra",
+      value: "Baner, Pune",
       description: "Visit us for in-person support",
       action: "Get Directions",
     },
@@ -292,11 +292,37 @@ const HelpContact = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const [info, setInfo] = useState(null);
+  
+  useEffect(() => {
+      const fetchSetup = async () => {
+        try {
+          const res = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/admin/setup`
+          );
+  
+          if (!res.ok) throw new Error("API failed");
+  
+          const data = await res.json();
+  
+          if (data.success && data.data) {
+            setInfo(data.data.info || {});
+          } else {
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+        }
+      };
+  
+      fetchSetup();
+    }, []);
+
   return (
     <div className="help-contact-container">
       <AppBar position="fixed" className="appbar">
         <Toolbar>
-          <Typography variant="h6">Training Premier League</Typography>
+          <Typography variant="h6">{info?.names}</Typography>
         </Toolbar>
       </AppBar>
 
@@ -354,7 +380,7 @@ const HelpContact = () => {
           >
             <Tab label="FAQ" icon={<FAQIcon />} />
             <Tab label="Contact Us" icon={<SupportIcon />} />
-            <Tab label="Support Categories" icon={<SettingsIcon />} />
+            <Tab label="Support" icon={<SettingsIcon />} />
           </Tabs>
 
           {/* FAQ Tab */}

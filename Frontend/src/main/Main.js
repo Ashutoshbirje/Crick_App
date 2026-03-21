@@ -6,6 +6,7 @@ import ScoreBoard from "../components/ScoreBoard";
 import LandingPage from "../components/HomePage/HomePage";
 import LoginSignUp from "../components/LoginSignUp/LoginSignUp";
 import EditPass from "../components/Passward/EditPass";
+import Form from "../components/Form/Form";
 import TossFlip from "../components/TossFlip/TossFlip";
 import HelpContact from "../components/Help/HelpContact";
 import { Fab } from "@mui/material";
@@ -141,6 +142,7 @@ const Main = () => {
             element={<LoginSignUp Admin={isAdmin} setIsAdmin={setIsAdmin} />}
           />
           <Route path="/EditPassward" element={<EditPass />} />
+          <Route path="/MatchData" element={<Form />} />
           <Route path="/help" element={<HelpContact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
