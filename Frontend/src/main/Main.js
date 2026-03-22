@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+
 import NotFound from "../components/NotFound/NotFound";
 import StepperContainer from "../components/StepperContainer";
 import ScoreBoard from "../components/ScoreBoard";
@@ -9,7 +10,9 @@ import EditPass from "../components/Passward/EditPass";
 import Form from "../components/Form/Form";
 import TossFlip from "../components/TossFlip/TossFlip";
 import HelpContact from "../components/Help/HelpContact";
+
 import { Fab } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const Main = () => {
@@ -25,7 +28,9 @@ const Main = () => {
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // ✅ REF for scroll container
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const containerRef = useRef(null);
 
   // ✅ Persist admin
@@ -52,7 +57,7 @@ const Main = () => {
     if (win) localStorage.setItem("win", win);
   }, [toss, win]);
 
-  // ✅ Scroll listener (FIXED)
+  // ✅ Scroll detection
   useEffect(() => {
     const container = containerRef.current;
 
@@ -77,8 +82,31 @@ const Main = () => {
 
   // ✅ Scroll to top
   const scrollToTop = () => {
-    const container = containerRef.current;
-    container?.scrollTo({ top: 0, behavior: "smooth" });
+    containerRef.current?.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  // ✅ Back button logic
+  const handleBack = () => {
+    if (isAdmin) {
+      if (
+        ["/form", "/EditPassward", "/MatchData", "/help"].includes(
+          location.pathname
+        )
+      ) {
+        navigate("/score");
+      }
+    } else {
+      if (
+        ["/score", "/Toss", "/help", "/LoginSignUp"].includes(
+          location.pathname
+        )
+      ) {
+        navigate("/");
+      }
+    }
   };
 
   return (
@@ -86,86 +114,92 @@ const Main = () => {
       ref={containerRef}
       id="main-scroll-container"
       style={{
-        height: "100vh", // 🔥 IMPORTANT: ensures scrolling works
+        height: "100vh",
         overflowY: "auto",
         position: "relative",
         backgroundColor: "white"
       }}
     >
-      {/* ✅ Scroll-to-top button */}
-      {showScrollTop && (
+      {/* ✅ SMART BUTTON */}
+      {location.pathname !== "/" && (
         <Fab
           color="primary"
-          onClick={scrollToTop}
+          onClick={showScrollTop ? scrollToTop : handleBack}
           style={{
             position: "fixed",
             bottom: "40px",
             right: "30px",
             zIndex: 1000,
-            height: "40px",
-            width: "40px"
+            height: "45px",
+            width: "45px"
           }}
         >
-          <KeyboardArrowUpIcon />
+          {showScrollTop ? <KeyboardArrowUpIcon /> : <ArrowBackIcon />}
         </Fab>
       )}
 
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <LandingPage
-                Admin={isAdmin}
-                setIsAdmin={setIsAdmin}
-                setNewMatch={setNewMatch}
-              />
-            }
-          />
-          <Route path="/Toss" element={<TossFlip />} />
-          <Route
-            path="/form"
-            element={
-              <StepperContainer
-                toss={toss}
-                win={win}
-                setToss={setToss}
-                setWin={setWin}
-                Globalstate={Globalstate}
-                setGlobalstate={setGlobalstate}
-                newMatch={newMatch}
-                setNewMatch={setNewMatch}
-              />
-            }
-          />
-          <Route
-            path="/score"
-            element={
-              <ScoreBoard
-                toss={toss}
-                win={win}
-                Globalstate={Globalstate}
-                Admin={isAdmin}
-                setAdmin={setIsAdmin}
-                newMatch={newMatch}
-                setNewMatch={setNewMatch}
-              />
-            }
-          />
-          <Route
-            path="/LoginSignUp"
-            element={
-              <LoginSignUp Admin={isAdmin} setIsAdmin={setIsAdmin} />
-            }
-          />
-          <Route path="/EditPassward" element={<EditPass />} />
-          <Route path="/MatchData" element={<Form />} />
-          <Route path="/help" element={<HelpContact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <LandingPage
+              Admin={isAdmin}
+              setIsAdmin={setIsAdmin}
+              setNewMatch={setNewMatch}
+            />
+          }
+        />
+
+        <Route path="/Toss" element={<TossFlip />} />
+
+        <Route
+          path="/form"
+          element={
+            <StepperContainer
+              toss={toss}
+              win={win}
+              setToss={setToss}
+              setWin={setWin}
+              Globalstate={Globalstate}
+              setGlobalstate={setGlobalstate}
+              newMatch={newMatch}
+              setNewMatch={setNewMatch}
+            />
+          }
+        />
+
+        <Route
+          path="/score"
+          element={
+            <ScoreBoard
+              toss={toss}
+              win={win}
+              Globalstate={Globalstate}
+              Admin={isAdmin}
+              setAdmin={setIsAdmin}
+              newMatch={newMatch}
+              setNewMatch={setNewMatch}
+            />
+          }
+        />
+
+        <Route
+          path="/LoginSignUp"
+          element={
+            <LoginSignUp Admin={isAdmin} setIsAdmin={setIsAdmin} />
+          }
+        />
+
+        <Route path="/EditPassward" element={<EditPass />} />
+
+        <Route path="/MatchData" element={<Form />} />
+
+        <Route path="/help" element={<HelpContact />} />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </div>
   );
 };
 
-export default Main; 
+export default Main;
