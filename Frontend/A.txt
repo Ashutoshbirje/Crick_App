@@ -9,8 +9,7 @@ npm start
 // Wicket not selected and back add extra ball to batsman account 
 // Push half stack into recent overs
 // disable bowler name after every over (refresh is req - avoid)
-// disable wicket table after click on w button (refresh is req - avoid)
-// Back To Home button 
+// disable wicket table after click on w button (refresh is req - avoid) 
 // Screen Orientation 
 
 // Feature acpects 
