@@ -11,15 +11,11 @@ npm start
 // disable bowler name after every over (refresh is req - avoid)
 // disable wicket table after click on w button (refresh is req - avoid)
 // Back To Home button 
+// Screen Orientation 
 
 // Feature acpects 
-
 // Advertisement (New Feature)
-
-// Admin -> Name Owner: (Other Payment details) -> Payment -> Email -> Admin login page 
-
+// Prime Mode (New Feature : Admin -> Name Owner: (Other Payment details) -> Payment -> Email -> Admin login page eable)
 // Registration for match + Payment (New Feature)
-
 // States (New Feature)
-
-// Screen Orientation 
+// Past (New Feature : Show past matches scorecard)

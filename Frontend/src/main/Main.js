@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "../components/NotFound/NotFound";
 import StepperContainer from "../components/StepperContainer";
@@ -17,6 +17,7 @@ const Main = () => {
   const [win, setWin] = useState();
   const [Globalstate, setGlobalstate] = useState(true);
   const [newMatch, setNewMatch] = useState(false);
+
   const [isAdmin, setIsAdmin] = useState(() => {
     const stored = localStorage.getItem("isAdmin");
     return stored ? JSON.parse(stored) : false;
@@ -24,14 +25,20 @@ const Main = () => {
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  // ✅ REF for scroll container
+  const containerRef = useRef(null);
+
+  // ✅ Persist admin
   useEffect(() => {
     localStorage.setItem("isAdmin", JSON.stringify(isAdmin));
   }, [isAdmin]);
 
+  // ✅ Persist new match
   useEffect(() => {
     localStorage.setItem("newMatch", JSON.stringify(newMatch));
   }, [newMatch]);
 
+  // ✅ Load toss + winner
   useEffect(() => {
     const savedToss = localStorage.getItem("toss");
     const savedWinner = localStorage.getItem("win");
@@ -39,14 +46,15 @@ const Main = () => {
     if (savedWinner) setWin(savedWinner);
   }, []);
 
+  // ✅ Save toss + winner
   useEffect(() => {
-    localStorage.setItem("toss", toss);
-    localStorage.setItem("win", win);
+    if (toss) localStorage.setItem("toss", toss);
+    if (win) localStorage.setItem("win", win);
   }, [toss, win]);
 
-  // ✅ Scroll-to-top visibility logic
+  // ✅ Scroll listener (FIXED)
   useEffect(() => {
-    const container = document.getElementById("main-scroll-container");
+    const container = containerRef.current;
 
     const handleScroll = () => {
       if (container.scrollTop > 100) {
@@ -56,28 +64,35 @@ const Main = () => {
       }
     };
 
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
   }, []);
 
-  // ✅ Scroll to top handler
+  // ✅ Scroll to top
   const scrollToTop = () => {
-    const container = document.getElementById("main-scroll-container");
+    const container = containerRef.current;
     container?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div
+      ref={containerRef}
       id="main-scroll-container"
       style={{
-        minHeight: "100vh",
+        height: "100vh", // 🔥 IMPORTANT: ensures scrolling works
         overflowY: "auto",
         position: "relative",
         backgroundColor: "white"
       }}
     >
-      
-      {/* ✅ Inline-styled Floating Scroll-to-Top Button */}
+      {/* ✅ Scroll-to-top button */}
       {showScrollTop && (
         <Fab
           color="primary"
@@ -139,7 +154,9 @@ const Main = () => {
           />
           <Route
             path="/LoginSignUp"
-            element={<LoginSignUp Admin={isAdmin} setIsAdmin={setIsAdmin} />}
+            element={
+              <LoginSignUp Admin={isAdmin} setIsAdmin={setIsAdmin} />
+            }
           />
           <Route path="/EditPassward" element={<EditPass />} />
           <Route path="/MatchData" element={<Form />} />
@@ -147,7 +164,6 @@ const Main = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-
     </div>
   );
 };
