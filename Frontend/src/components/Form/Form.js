@@ -6,7 +6,7 @@ import "./Form.css";
 const Form = () => {
   const navigate = useNavigate();
 
-  // Admin
+  // ---------------- STATE ----------------
   const [admin, setAdmin] = useState({
     name: "",
     email: "",
@@ -14,30 +14,73 @@ const Form = () => {
     address: "",
   });
 
-  // ✅ UPDATED: info (not league)
   const [info, setInfo] = useState({
     names: "",
     series: "",
     types: "",
   });
 
-  // Venue
   const [venue, setVenue] = useState({
     stadium: "",
     location: "",
     country: "",
   });
 
-  // Photos
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState("");
+  const [setupSaved, setSetupSaved] = useState(false);
 
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`;
 
-  // ---------------- UPLOAD ----------------
+  // ---------------- VALIDATION ----------------
+  const validateSetup = () => {
+    if (
+      !admin.name ||
+      !admin.email ||
+      !admin.phone ||
+      !admin.address ||
+      !info.names ||
+      !info.series ||
+      !info.types ||
+      !venue.stadium ||
+      !venue.location ||
+      !venue.country
+    ) {
+      setError("All fields are mandatory");
+      return false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(admin.email)) {
+      setError("Invalid email format");
+      return false;
+    }
+
+    // Phone validation (India)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(admin.phone)) {
+      setError("Invalid phone number (must be 10 digits starting with 6-9)");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  // ---------------- PHOTO UPLOAD ----------------
   const handlePhotoUpload = async (files) => {
     try {
-      const uploads = Array.from(files).map((file) => {
+      const validFiles = Array.from(files).filter((file) => {
+        if (!file.type.startsWith("image/")) return false;
+        if (file.size > 5 * 1024 * 1024) {
+          alert("Max size 5MB");
+          return false;
+        }
+        return true;
+      });
+
+      const uploads = validFiles.map((file) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append(
@@ -53,24 +96,27 @@ const Form = () => {
 
       const results = await Promise.all(uploads);
 
-      const formatted = results.map((r, i) => ({
-        name: files[i].name,
-        url: r.secure_url,
-        public_id: r.public_id,
-      }));
+      const formatted = results
+        .filter((r) => r.secure_url)
+        .map((r, i) => ({
+          name: validFiles[i].name,
+          url: r.secure_url,
+          public_id: r.public_id,
+        }));
 
       setPhotos((prev) => [...prev, ...formatted]);
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError("Upload failed");
     }
   };
 
-  // ---------------- SAVE ----------------
-  const handleSaveAll = async () => {
-    try {
-      const payload = { admin, info, venue, photos };
+  // ---------------- SUBMIT INFO ----------------
+  const handleSubmitSetup = async () => {
+    if (!validateSetup()) return;
 
-      console.log("PAYLOAD:", payload);
+    try {
+      const payload = { admin, info, venue };
 
       const res = await fetch(
         `${process.env.REACT_APP_API_BASE_URL}/admin/setup`,
@@ -83,13 +129,45 @@ const Form = () => {
 
       if (!res.ok) throw new Error();
 
-      alert("Saved successfully");
-      navigate("/score");
+      setSetupSaved(true);
+      alert("Info saved successfully");
     } catch {
-      setError("Save failed");
+      setError("Info save failed");
     }
   };
 
+  // ---------------- SUBMIT PHOTOS ----------------
+  const handleSavePhotos = async () => {
+    if (!setupSaved) {
+      setError("Please submit info first");
+      return;
+    }
+
+    if (photos.length === 0) {
+      setError("Upload at least one photo");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/admin/photos`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ photos }),
+        }
+      );
+
+      if (!res.ok) throw new Error();
+
+      alert("Photos saved successfully");
+      navigate("/score");
+    } catch {
+      setError("Photo save failed");
+    }
+  };
+
+  // ---------------- UI ----------------
   return (
     <div>
       <AppBar position="fixed">
@@ -116,15 +194,19 @@ const Form = () => {
               placeholder="Email"
               value={admin.email}
               onChange={(e) =>
-                setAdmin({ ...admin, email: e.target.value })
+                setAdmin({
+                  ...admin,
+                  email: e.target.value.trim(),
+                })
               }
             />
             <input
               placeholder="Phone"
               value={admin.phone}
-              onChange={(e) =>
-                setAdmin({ ...admin, phone: e.target.value })
-              }
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setAdmin({ ...admin, phone: value });
+              }}
             />
             <input
               placeholder="Address"
@@ -134,7 +216,7 @@ const Form = () => {
               }
             />
 
-            {/* INFO (LEAGUE) */}
+            {/* LEAGUE */}
             <h4 className="heading">League</h4>
             <input
               placeholder="League Name"
@@ -182,14 +264,30 @@ const Form = () => {
               }
             />
 
+            {/* ERROR */}
+            {error && <p className="error-msg">{error}</p>}
+
+            {/* SUBMIT INFO */}
+            <div style={{ margin: "20px 0" }}>
+              <button
+                className="login-btn"
+                onClick={handleSubmitSetup}
+                style={{ width: "100%" }}
+              >
+                Submit
+              </button>
+            </div>
+
             {/* PHOTOS */}
             <h4 className="heading">Photos</h4>
             <input
               type="file"
               multiple
+              accept="image/png, image/jpeg, image/jpg"
               onChange={(e) => handlePhotoUpload(e.target.files)}
             />
 
+            {/* PREVIEW */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {photos.map((p, i) => (
                 <div key={i} style={{ textAlign: "center" }}>
@@ -204,11 +302,17 @@ const Form = () => {
               ))}
             </div>
 
-            {error && <p className="error-msg">{error}</p>}
-
-            <button className="login-btn" onClick={handleSaveAll}>
-              Save All
-            </button>
+            {/* SUBMIT PHOTOS */}
+            <div style={{ marginTop: "20px" }}>
+              <button
+                className="login-btn"
+                onClick={handleSavePhotos}
+                disabled={!setupSaved}
+                style={{ width: "100%" }}
+              >
+                Upload
+              </button>
+            </div>
           </div>
         </div>
       </div>
