@@ -10,6 +10,7 @@ import EditPass from "../components/Passward/EditPass";
 import Form from "../components/Form/Form";
 import TossFlip from "../components/TossFlip/TossFlip";
 import HelpContact from "../components/Help/HelpContact";
+import Photo from "../components/Photos/Photo";
 
 import { Fab } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -92,7 +93,7 @@ const Main = () => {
   const handleBack = () => {
     if (isAdmin) {
       if (
-        ["/form", "/EditPassward", "/MatchData", "/help"].includes(
+        ["/form", "/EditPassward", "/MatchData", "/help", "/Photos"].includes(
           location.pathname
         )
       ) {
@@ -196,6 +197,8 @@ const Main = () => {
 
         <Route path="/help" element={<HelpContact />} />
 
+        <Route path="/Photos" element={<Photo />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

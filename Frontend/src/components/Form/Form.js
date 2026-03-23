@@ -28,7 +28,6 @@ const Form = () => {
 
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState("");
-  const [setupSaved, setSetupSaved] = useState(false);
 
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`;
 
@@ -50,17 +49,15 @@ const Form = () => {
       return false;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(admin.email)) {
       setError("Invalid email format");
       return false;
     }
 
-    // Phone validation (India)
     const phoneRegex = /^[6-9]\d{9}$/;
     if (!phoneRegex.test(admin.phone)) {
-      setError("Invalid phone number (must be 10 digits starting with 6-9)");
+      setError("Invalid phone number (10 digits, start 6-9)");
       return false;
     }
 
@@ -71,16 +68,26 @@ const Form = () => {
   // ---------------- PHOTO UPLOAD ----------------
   const handlePhotoUpload = async (files) => {
     try {
+      if (!files || files.length === 0) return;
+
       const validFiles = Array.from(files).filter((file) => {
-        if (!file.type.startsWith("image/")) return false;
-        if (file.size > 5 * 1024 * 1024) {
-          alert("Max size 5MB");
+        // 🔥 handle mobile formats (including HEIC fallback)
+        if (!file.type.startsWith("image/")) {
+          console.warn("Skipping non-image:", file.name);
           return false;
         }
+
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`${file.name} > 5MB`);
+          return false;
+        }
+
         return true;
       });
 
-      const uploads = validFiles.map((file) => {
+      if (validFiles.length === 0) return;
+
+      const uploads = validFiles.map(async (file) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append(
@@ -88,23 +95,30 @@ const Form = () => {
           process.env.REACT_APP_UPLOAD_PRESET
         );
 
-        return fetch(CLOUDINARY_URL, {
+        const res = await fetch(CLOUDINARY_URL, {
           method: "POST",
           body: formData,
-        }).then((res) => res.json());
+        });
+
+        const data = await res.json();
+
+        if (!data.secure_url) {
+          console.error("Cloudinary error:", data);
+          return null;
+        }
+
+        return {
+          name: file.name,
+          url: data.secure_url,
+          public_id: data.public_id,
+        };
       });
 
       const results = await Promise.all(uploads);
 
-      const formatted = results
-        .filter((r) => r.secure_url)
-        .map((r, i) => ({
-          name: validFiles[i].name,
-          url: r.secure_url,
-          public_id: r.public_id,
-        }));
+      const filtered = results.filter(Boolean);
 
-      setPhotos((prev) => [...prev, ...formatted]);
+      setPhotos((prev) => [...prev, ...filtered]);
     } catch (err) {
       console.error(err);
       setError("Upload failed");
@@ -129,20 +143,14 @@ const Form = () => {
 
       if (!res.ok) throw new Error();
 
-      setSetupSaved(true);
       alert("Info saved successfully");
     } catch {
       setError("Info save failed");
     }
   };
 
-  // ---------------- SUBMIT PHOTOS ----------------
+  // ---------------- SUBMIT PHOTOS (INDEPENDENT) ----------------
   const handleSavePhotos = async () => {
-    if (!setupSaved) {
-      setError("Please submit info first");
-      return;
-    }
-
     if (photos.length === 0) {
       setError("Upload at least one photo");
       return;
@@ -150,7 +158,7 @@ const Form = () => {
 
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/admin/photos`,
+        `${process.env.REACT_APP_API_BASE_URL}/admin/photo`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -284,6 +292,7 @@ const Form = () => {
               type="file"
               multiple
               accept="image/png, image/jpeg, image/jpg"
+              capture="environment" 
               onChange={(e) => handlePhotoUpload(e.target.files)}
             />
 
@@ -307,7 +316,6 @@ const Form = () => {
               <button
                 className="login-btn"
                 onClick={handleSavePhotos}
-                disabled={!setupSaved}
                 style={{ width: "100%" }}
               >
                 Upload

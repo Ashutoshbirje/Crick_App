@@ -29,7 +29,4 @@ const setupSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔥 prevent model caching issue
-delete mongoose.models.Setup;
-
 module.exports = mongoose.model("Setup", setupSchema);

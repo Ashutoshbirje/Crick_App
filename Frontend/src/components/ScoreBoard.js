@@ -770,6 +770,10 @@ const ScoreBoard = (props) => {
           navigate("/EditPassward"); 
           break; 
         
+        case "photo": 
+          navigate("/Photos"); 
+          break; 
+
         case "add": 
           navigate("/MatchData"); 
           break;
@@ -4921,12 +4925,19 @@ const pointsTable = React.useMemo(() => {
                 {/* edit */}
                 EDIT Passward
               </div>
+               <div
+                className="score-board-settings"
+                onClick={() => handleClick("photo")}
+              >
+                {/* edit */}
+                VIEW Photos
+              </div>
               <div
                 className="score-board-settings"
                 onClick={() => handleClick("add")}
               >
                 {/* add */}
-                ADD League
+                SETUP
               </div>
               <div
                 className="score-board-settings"
