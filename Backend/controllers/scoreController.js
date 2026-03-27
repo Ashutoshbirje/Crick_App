@@ -13,6 +13,38 @@ exports.saveScore = async (req, res) => {
   }
 };
 
+// Get score 
+exports.getScore = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await Score.findById(id).lean();
+
+    if (!result) {
+      return res.status(404).json({ message: 'Score not found' });
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid score ID format' });
+    }
+
+    console.error('Server error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Get scores 
+exports.getScores = async (req, res) => {
+  try {
+    const scores = await Score.find().sort({ _id: -1 }); // Latest first
+    res.status(200).json(scores);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // Delete score by ID
 exports.deleteScore = async (req, res) => {
   try {

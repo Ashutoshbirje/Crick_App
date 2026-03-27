@@ -11,6 +11,7 @@ import Form from "../components/Form/Form";
 import TossFlip from "../components/TossFlip/TossFlip";
 import HelpContact from "../components/Help/HelpContact";
 import Photo from "../components/Photos/Photo";
+import Scorecard from "../components/Scorecards/Scorecard";
 
 import { Fab } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -90,25 +91,35 @@ const Main = () => {
   };
 
   // ✅ Back button logic
-  const handleBack = () => {
-    if (isAdmin) {
-      if (
-        ["/form", "/EditPassward", "/MatchData", "/help", "/Photos"].includes(
-          location.pathname
-        )
-      ) {
-        navigate("/score");
-      }
-    } else {
-      if (
-        ["/score", "/Toss", "/help", "/LoginSignUp"].includes(
-          location.pathname
-        )
-      ) {
-        navigate("/");
-      }
+const handleBack = () => {
+  if (isAdmin) {
+    if (
+      [
+        "/form",
+        "/EditPassward",
+        "/MatchData",
+        "/help",
+        "/Photos",
+      ].includes(location.pathname) ||
+      location.pathname.startsWith("/scorecard/")
+    ) {
+      navigate("/score");
     }
-  };
+  } else {
+    if (
+      [
+        "/score",
+        "/Toss",
+        "/help",
+        "/LoginSignUp",
+      ].includes(location.pathname) 
+    ) {
+      navigate("/");
+    } else if (location.pathname.startsWith("/scorecard/")) {
+      navigate("/score")
+    }
+  }
+};
 
   return (
     <div
@@ -199,6 +210,8 @@ const Main = () => {
 
         <Route path="/Photos" element={<Photo />} />
         
+        <Route path="/scorecard/:id" element={<Scorecard/>} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

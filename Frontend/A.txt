@@ -17,5 +17,3 @@ npm start
 // Prime Mode (New Feature : Admin -> Name Owner: (Other Payment details) -> Payment -> Email -> Admin login page eable)
 // Registration for match + Payment (New Feature)
 // States (New Feature)
-
-// Past (New Feature : Show past matches scorecard)

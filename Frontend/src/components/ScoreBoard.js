@@ -19,7 +19,7 @@ import MathUtil from "../util/MathUtil";
 import "./ScoreBoard.css";
 import { radioGroupBoxstyle } from "./ui/RadioGroupBoxStyle";
 import SportsCricketIcon from "@mui/icons-material/SportsCricket"; // Import the icon
-import { FaTrash } from "react-icons/fa"; // Using react-icons for delete icon
+import { FaTrash, FaEye} from "react-icons/fa"; // Using react-icons for delete icon
 import AutoRefresh from "../components/AutoRefresh/AutoRefresh";
 
 const ScoreBoard = (props) => {
@@ -158,7 +158,7 @@ const ScoreBoard = (props) => {
   // const [loading, setLoading] = useState(true);
   // const [error, setError] = useState("");
 
-   useEffect(() => {
+  useEffect(() => {
     const fetchSetup = async () => {
       try {
         const res = await fetch(
@@ -714,87 +714,90 @@ const ScoreBoard = (props) => {
   /////////////
 
   // Settings
-  const handleClick = async (type) => {
-    try {
-      let newMatchValue = null;
+    const handleClick = async (type, id = null) => {
+      try {
+        let newMatchValue = null;
 
-      switch (type) {
-        case "new":
-          newMatchValue = false;
-          break;
+        switch (type) {
+          case "new":
+            newMatchValue = false;
+            break;
+          default:
+            break;
+        }
 
-        default:
-          break;
+        // 🔹 Update newmatch
+        if (newMatchValue !== null && matchData?._id) {
+          await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ newmatch: newMatchValue }),
+            }
+          );
+
+          props.setNewMatch(newMatchValue);
+        }
+
+        switch (type) {
+          case "new":
+            await createLiveMatch({
+              inningNo,
+              totalRuns,
+              wicketCount,
+              totalOvers,
+              overCount,
+              ballCount,
+              hasMatchEnded,
+              remainingRuns,
+              remainingBalls,
+              match,
+              batter1,
+              batter2,
+              bowler,
+              bowlers,
+              extras,
+              recentOvers,
+            });
+
+            navigate("/form", { state: { newMatch: true } });
+            break;
+
+          case "edit":
+            navigate("/EditPassward");
+            break;
+
+          case "photo":
+            navigate("/Photos");
+            break;
+
+          case "add":
+            navigate("/MatchData");
+            break;
+
+          case "help":
+            navigate("/help");
+            break;
+
+          case "score":
+            console.log(id);
+            navigate(`/scorecard/${id}`);
+            break;
+
+          case "logout":
+            localStorage.removeItem("token");
+            props.setAdmin(false);
+            navigate("/");
+            break;
+
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error("Error updating values:", error);
       }
-
-      // 🔹 Update newmatch
-      if (newMatchValue !== null && matchData?._id) {
-        await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ newmatch: newMatchValue }),
-          },
-        );
-
-        props.setNewMatch(newMatchValue);
-      }
-
-      // 🔹 Existing actions
-      switch (type) {
-        case "new":
-          await createLiveMatch({
-            inningNo,
-            totalRuns,
-            wicketCount,
-            totalOvers,
-            overCount,
-            ballCount,
-            hasMatchEnded,
-            remainingRuns,
-            remainingBalls,
-            match,
-            batter1,
-            batter2,
-            bowler,
-            bowlers,
-            extras,
-            recentOvers,
-          });
-
-          navigate("/form", { state: { newMatch: true } });
-          break;
-        
-        case "edit": 
-          navigate("/EditPassward"); 
-          break; 
-        
-        case "photo": 
-          navigate("/Photos"); 
-          break; 
-
-        case "add": 
-          navigate("/MatchData"); 
-          break;
-
-        case "help":
-          navigate("/help");
-          break;
-
-        case "logout":
-          localStorage.removeItem("token");
-          props.setAdmin(false);
-          navigate("/");
-          break;
-
-        default:
-          break;
-      }
-    } catch (error) {
-      console.error("Error updating values:", error);
-    }
-  };
+    };
 
   const getBowlersForTable = ({ tableInning }) => {
     // ================= USER SIDE =================
@@ -967,6 +970,8 @@ const ScoreBoard = (props) => {
       winnerCard3: winningMessage,
       maxOver,
       date: currentDate,
+      matchId: matchData._id,
+      scoreId: liveData._id,
     };
 
     if (matchData?._id) {
@@ -1026,7 +1031,6 @@ const ScoreBoard = (props) => {
         // Add here logic for save data in databsae
         handleSave();
         handleEndInning1();
-        // window.location.reload(); // Refresh the page
         // endInningButton.textContent = "Reset";
         // console.log("Press");
         setRecentOvers([]);
@@ -1237,6 +1241,7 @@ const ScoreBoard = (props) => {
           ////
           // endInningButton.disabled = true;
           ////
+          // window.location.reload(); // Refresh the page
         } else {
           setMatch((state) => {
             const totalFours = batters
@@ -1275,9 +1280,11 @@ const ScoreBoard = (props) => {
           endInningButton.textContent = "Save";
           setreset(false);
           setMatchEnded(true);
+          // window.location.reload(); // Refresh the page
         }
       }
     }
+
   };
 
   // const handleLIVEscore = () => {
@@ -2944,6 +2951,19 @@ const ScoreBoard = (props) => {
 const pointsTable = React.useMemo(() => {
   const table = {};
 
+  // 🔥 convert "2.3" → total balls = 2*6 + 3
+  const convertToBalls = (overs) => {
+    if (!overs) return 0;
+
+    const [o, b] = overs.toString().split(".");
+    const oversNum = parseInt(o) || 0;
+    const ballsNum = parseInt(b) || 0;
+
+    if (ballsNum >= 6) return oversNum * 6; // safety
+
+    return oversNum * 6 + ballsNum;
+  };
+
   (scores || []).forEach((match) => {
     // ❌ Skip Final & Semifinal
     if (["Final", "Semifinal"].includes(match.matchType)) return;
@@ -2956,8 +2976,9 @@ const pointsTable = React.useMemo(() => {
     const runs1 = match.inning1?.runs || 0;
     const runs2 = match.inning2?.runs || 0;
 
-    const overs1 = parseFloat(match.inning1?.overs || 0);
-    const overs2 = parseFloat(match.inning2?.overs || 0);
+    // ✅ convert to balls
+    const balls1 = convertToBalls(match.inning1?.overs);
+    const balls2 = convertToBalls(match.inning2?.overs);
 
     const winner = match.winnerCard3?.includes("won")
       ? match.winnerCard3.split(" won")[0]
@@ -2974,8 +2995,8 @@ const pointsTable = React.useMemo(() => {
         points: 0,
         runsScored: 0,
         runsConceded: 0,
-        oversFaced: 0,
-        oversBowled: 0,
+        ballsFaced: 0,
+        ballsBowled: 0,
       };
     }
 
@@ -2989,8 +3010,8 @@ const pointsTable = React.useMemo(() => {
         points: 0,
         runsScored: 0,
         runsConceded: 0,
-        oversFaced: 0,
-        oversBowled: 0,
+        ballsFaced: 0,
+        ballsBowled: 0,
       };
     }
 
@@ -3002,7 +3023,6 @@ const pointsTable = React.useMemo(() => {
         const winTeam = winner;
         const loseTeam = winner === team1 ? team2 : team1;
 
-        // 🔥 remove tie effect ONLY ONCE
         if (table[team1].tie > 0 && table[team2].tie > 0) {
           table[team1].points -= 1;
           table[team2].points -= 1;
@@ -3011,13 +3031,12 @@ const pointsTable = React.useMemo(() => {
           table[team2].tie = 0;
         }
 
-        // apply final win/loss
         table[winTeam].win++;
         table[winTeam].points += 2;
         table[loseTeam].loss++;
       }
 
-      return; // 🚫 no stats counted for super over
+      return;
     }
 
     // ===============================
@@ -3028,25 +3047,23 @@ const pointsTable = React.useMemo(() => {
 
     table[team1].runsScored += runs1;
     table[team1].runsConceded += runs2;
-    table[team1].oversFaced += overs1;
-    table[team1].oversBowled += overs2;
+    table[team1].ballsFaced += balls1;
+    table[team1].ballsBowled += balls2;
 
     table[team2].runsScored += runs2;
     table[team2].runsConceded += runs1;
-    table[team2].oversFaced += overs2;
-    table[team2].oversBowled += overs1;
+    table[team2].ballsFaced += balls2;
+    table[team2].ballsBowled += balls1;
 
     // ===============================
     // 🔹 RESULT LOGIC
     // ===============================
     if (runs1 === runs2) {
-      // ✅ first tie → give points
       if (table[team1].tie === 0 && table[team2].tie === 0) {
         table[team1].points += 1;
         table[team2].points += 1;
       }
 
-      // track tie count (no extra points after first)
       table[team1].tie++;
       table[team2].tie++;
     } else if (winner === team1) {
@@ -3061,14 +3078,17 @@ const pointsTable = React.useMemo(() => {
   });
 
   // ===============================
-  // 🔹 FINAL TABLE FORMAT
+  // 🔹 FINAL TABLE (NRR using balls)
   // ===============================
   return Object.values(table)
     .map((t) => {
+      const oversFaced = t.ballsFaced / 6;
+      const oversBowled = t.ballsBowled / 6;
+
       const nrr =
-        t.oversFaced > 0 && t.oversBowled > 0
-          ? t.runsScored / t.oversFaced -
-            t.runsConceded / t.oversBowled
+        oversFaced > 0 && oversBowled > 0
+          ? t.runsScored / oversFaced -
+            t.runsConceded / oversBowled
           : 0;
 
       return {
@@ -3078,7 +3098,7 @@ const pointsTable = React.useMemo(() => {
     })
     .sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
-      return b.nrr - a.nrr;
+      return parseFloat(b.nrr) - parseFloat(a.nrr);
     });
 }, [scores]);
 
@@ -4783,15 +4803,24 @@ const pointsTable = React.useMemo(() => {
           {activeSection === "result" &&
             scores.length > 0 &&
             scores.map((score, index) => (
-              <div className="score-container1" key={index}>
+              
+              <div className="score-container1" {...(!props.Admin && {
+    onClick: () => handleClick("score", score._id),
+  })} key={index}>
+                
                 {props.Admin && (
                   <>
                     <div className="delete-container">
-                      <FaTrash
+<FaEye
+  className="view-icon"
+  onClick={() => handleClick("score", score._id)}
+/>
+                       <FaTrash
                         className="delete-icon"
                         onClick={() => handleDelete(score._id)}
                       />
                     </div>
+                    
                     <div className="line"></div>
                   </>
                 )}
@@ -4848,6 +4877,8 @@ const pointsTable = React.useMemo(() => {
 
                 {/* Match Result */}
                 <div className="result">{score.winnerCard3}</div>
+
+                
               </div>
             ))}
 
@@ -4912,7 +4943,7 @@ const pointsTable = React.useMemo(() => {
               </div>
               {props.newMatch && (
                 <div
-                  className="score-board-settings"
+                  className="score-board-settings1"
                   onClick={handleEndInning1}
                 >
                   RESET

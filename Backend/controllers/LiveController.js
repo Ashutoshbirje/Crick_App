@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Live = require("../models/Live");
 
 // Create new match
@@ -8,6 +9,36 @@ exports.createMatch = async (req, res) => {
     res.status(201).json({ message: "Match created", match });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getAllMatches = async (req, res) => {
+  try {
+    const matches = await Live.find();
+    res.status(200).json(matches);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getMatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const match = await Live.findById(id).lean();
+
+    if (!match) {
+      return res.status(404).json({ message: 'Score not found' });
+    }
+
+    res.status(200).json(match);
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid score ID format' });
+    }
+
+    console.error('Server error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -90,4 +121,23 @@ exports.deleteLatestUnendedMatch = async (req, res) => {
   }
 };
 
+exports.deleteMatchById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('Delete request for ID:', id);
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid match ID format' });
+    }
+
+    const deleted = await Live.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'match not found' });
+    }
+
+    res.status(200).json({ message: 'match deleted successfully' });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
