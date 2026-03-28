@@ -292,7 +292,7 @@ const Form = () => {
               type="file"
               multiple
               accept="image/png, image/jpeg, image/jpg"
-              capture="environment" 
+              // capture="environment" 
               onChange={(e) => handlePhotoUpload(e.target.files)}
             />
 
