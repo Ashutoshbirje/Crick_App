@@ -3386,19 +3386,19 @@ const pointsTable = React.useMemo(() => {
             className={`tab ${activeSection === "result" ? "active-tab" : ""}`}
             onClick={() => setActiveSection("result")}
           >
-            Results
+            Result
           </button>
           <button
             className={`tab ${activeSection === "pointtable" ? "active-tab" : ""}`}
             onClick={() => setActiveSection("pointtable")}
           >
-            Points
+            Point
           </button>
           <button
             className={`tab ${activeSection === "Leaderboard" ? "active-tab" : ""}`}
             onClick={() => setActiveSection("Leaderboard")}
           >
-            Stars
+            Star
           </button>
           {props.Admin && (
             <button
@@ -3407,7 +3407,7 @@ const pointsTable = React.useMemo(() => {
               }`}
               onClick={() => setActiveSection("setting")}
             >
-              Settings
+              Setting
             </button>
           )}
         </div>
