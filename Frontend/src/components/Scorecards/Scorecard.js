@@ -975,7 +975,7 @@ useEffect(() => {
                             </tr>
                           </thead>
                           <tbody>
-                            {getBowlersForTable({ tableInning: 1 }).map(
+                            {getBowlersForTable({ tableInning: 2 }).map(
                               (blr, index) => {
                                 
 

@@ -939,6 +939,14 @@ const ScoreBoard = (props) => {
           },
         );
         props.setNewMatch(false);
+
+        await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/matches/delete/${matchData._id}`,
+          {
+            method: "DELETE",
+          },
+        );
+        console.log("Deleted latest unended match");
       }
 
       // 3. Navigate to score page
