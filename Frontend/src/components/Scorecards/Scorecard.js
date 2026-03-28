@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import axios from "axios";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -10,6 +11,7 @@ import "./Scorecard.css";
 const TABS = {
   MATCH: "match",
   SCORE: "score",
+  POINT: "point",
 };
 
 const Scorecard = () => {
@@ -17,7 +19,7 @@ const Scorecard = () => {
   console.log(id);
 
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [scores, setScores] = useState([]);
   const activeTab = searchParams.get("tab") || TABS.MATCH;
   
   const [score,setScore] = useState(null);
@@ -33,6 +35,23 @@ const Scorecard = () => {
     if (!Object.values(TABS).includes(tab)) return;
     setSearchParams({ tab });
   }, [setSearchParams]);
+
+  useEffect(() => {
+      const fetchScores = async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_BASE_URL}/score/all`,
+          );
+          const allScores = response.data;
+          if (Array.isArray(allScores)) {
+            setScores(allScores);
+          }
+        } catch (error) {
+          console.error("Error fetching scores:", error);
+        }
+      };
+      fetchScores();
+    }, []);
 
   /* ================= FETCH DATA ================= */
 useEffect(() => {
@@ -102,6 +121,161 @@ useEffect(() => {
 
   const toggleSlide1 = () => setIsSlideOpen1((prev) => !prev);
   const toggleSlide2 = () => setIsSlideOpen2((prev) => !prev);
+
+  const pointsTable = React.useMemo(() => {
+    const table = {};
+  
+    // 🔥 convert "2.3" → total balls = 2*6 + 3
+    const convertToBalls = (overs) => {
+      if (!overs) return 0;
+  
+      const [o, b] = overs.toString().split(".");
+      const oversNum = parseInt(o) || 0;
+      const ballsNum = parseInt(b) || 0;
+  
+      if (ballsNum >= 6) return oversNum * 6; // safety
+  
+      return oversNum * 6 + ballsNum;
+    };
+  
+    (scores || []).forEach((match) => {
+      // ❌ Skip Final & Semifinal
+      if (["Final", "Semifinal"].includes(match.matchType)) return;
+  
+      const team1 = match.scoringTeam;
+      const team2 = match.chessingTeam;
+  
+      if (!team1 || !team2) return;
+  
+      const runs1 = match.inning1?.runs || 0;
+      const runs2 = match.inning2?.runs || 0;
+  
+      // ✅ convert to balls
+      const balls1 = convertToBalls(match.inning1?.overs);
+      const balls2 = convertToBalls(match.inning2?.overs);
+  
+      const winner = match.winnerCard3?.includes("won")
+        ? match.winnerCard3.split(" won")[0]
+        : null;
+  
+      // 🔹 Init teams
+      if (!table[team1]) {
+        table[team1] = {
+          team: team1,
+          played: 0,
+          win: 0,
+          loss: 0,
+          tie: 0,
+          points: 0,
+          runsScored: 0,
+          runsConceded: 0,
+          ballsFaced: 0,
+          ballsBowled: 0,
+        };
+      }
+  
+      if (!table[team2]) {
+        table[team2] = {
+          team: team2,
+          played: 0,
+          win: 0,
+          loss: 0,
+          tie: 0,
+          points: 0,
+          runsScored: 0,
+          runsConceded: 0,
+          ballsFaced: 0,
+          ballsBowled: 0,
+        };
+      }
+  
+      // ===============================
+      // 🔹 SUPER OVER HANDLING
+      // ===============================
+      if (match.matchType === "SuperOver") {
+        if (winner === team1 || winner === team2) {
+          const winTeam = winner;
+          const loseTeam = winner === team1 ? team2 : team1;
+  
+          if (table[team1].tie > 0 && table[team2].tie > 0) {
+            table[team1].points -= 1;
+            table[team2].points -= 1;
+  
+            table[team1].tie = 0;
+            table[team2].tie = 0;
+          }
+  
+          table[winTeam].win++;
+          table[winTeam].points += 2;
+          table[loseTeam].loss++;
+        }
+  
+        return;
+      }
+  
+      // ===============================
+      // 🔹 NORMAL MATCH STATS
+      // ===============================
+      table[team1].played++;
+      table[team2].played++;
+  
+      table[team1].runsScored += runs1;
+      table[team1].runsConceded += runs2;
+      table[team1].ballsFaced += balls1;
+      table[team1].ballsBowled += balls2;
+  
+      table[team2].runsScored += runs2;
+      table[team2].runsConceded += runs1;
+      table[team2].ballsFaced += balls2;
+      table[team2].ballsBowled += balls1;
+  
+      // ===============================
+      // 🔹 RESULT LOGIC
+      // ===============================
+      if (runs1 === runs2) {
+        if (table[team1].tie === 0 && table[team2].tie === 0) {
+          table[team1].points += 1;
+          table[team2].points += 1;
+        }
+  
+        table[team1].tie++;
+        table[team2].tie++;
+      } else if (winner === team1) {
+        table[team1].win++;
+        table[team1].points += 2;
+        table[team2].loss++;
+      } else if (winner === team2) {
+        table[team2].win++;
+        table[team2].points += 2;
+        table[team1].loss++;
+      }
+    });
+  
+    // ===============================
+    // 🔹 FINAL TABLE (NRR using balls)
+    // ===============================
+    return Object.values(table)
+      .map((t) => {
+        const oversFaced = t.ballsFaced / 6;
+        const oversBowled = t.ballsBowled / 6;
+  
+        const nrr =
+          oversFaced > 0 && oversBowled > 0
+            ? t.runsScored / oversFaced -
+              t.runsConceded / oversBowled
+            : 0;
+  
+        return {
+          ...t,
+          nrr: nrr.toFixed(2),
+        };
+      })
+      .sort((a, b) => {
+        if (b.points !== a.points) return b.points - a.points;
+        return parseFloat(b.nrr) - parseFloat(a.nrr);
+      });
+  }, [scores]);
+  
   const getBowlersForTable = ({ tableInning }) => {
 
       if (tableInning === 1) {
@@ -125,6 +299,7 @@ useEffect(() => {
  
     return EMPTY_EXTRAS;
   };
+
 
 
   return (
@@ -233,6 +408,13 @@ useEffect(() => {
           onClick={() => setTab(TABS.SCORE)}
         >
           Score
+        </button>
+
+        <button
+          className={`tab ${activeTab === TABS.POINT ? "active-tab" : ""}`}
+          onClick={() => setTab(TABS.POINT)}
+        >
+          Points
         </button>
        </div>
        </div>
@@ -957,6 +1139,55 @@ useEffect(() => {
                   )}
                 </div>
               </div>
+            </div>
+      )}
+
+      {activeTab === TABS.POINT && scores && pointsTable?.length > 0 && (
+       <div className="sb-batting">
+              <table>
+                <thead>
+                  <tr>
+                    <td className="score-types padding-left">
+                      <div className="sb">Team</div>
+                    </td>
+                    <td className="score-types text-center data">M</td>
+                    <td className="score-types text-center data">W</td>
+                    <td className="score-types text-center data">L</td>
+                    <td className="score-types text-center data">T</td>
+                    <td className="score-types text-center data">Pts</td>
+                    <td className="score-types text-center data">NRR</td>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {pointsTable.map((team, index) => (
+                    <tr key={index}>
+                      <td className="score-types padding-left">
+                        <div className="sb">{team.team}</div>
+                      </td>
+
+                      <td className="score-types text-center data">
+                        {team.played}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.win}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.loss}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.tie}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.points}
+                      </td>
+                      <td className="score-types text-center data">
+                        {team.nrr}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
       )}
     </div>

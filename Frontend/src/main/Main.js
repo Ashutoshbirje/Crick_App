@@ -12,10 +12,12 @@ import TossFlip from "../components/TossFlip/TossFlip";
 import HelpContact from "../components/Help/HelpContact";
 import Photo from "../components/Photos/Photo";
 import Scorecard from "../components/Scorecards/Scorecard";
+import Stars from "../components/LeaderBoard/Stars";
 
 import { Fab } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+// import { Leaderboard } from "@mui/icons-material";
 
 const Main = () => {
   const [toss, setToss] = useState();
@@ -100,6 +102,7 @@ const handleBack = () => {
         "/MatchData",
         "/help",
         "/Photos",
+        "/Leaderboard"
       ].includes(location.pathname) ||
       location.pathname.startsWith("/scorecard/")
     ) {
@@ -112,6 +115,7 @@ const handleBack = () => {
         "/Toss",
         "/help",
         "/LoginSignUp",
+        "/Leaderboard"
       ].includes(location.pathname) 
     ) {
       navigate("/");
@@ -211,6 +215,8 @@ const handleBack = () => {
         <Route path="/Photos" element={<Photo />} />
         
         <Route path="/scorecard/:id" element={<Scorecard/>} />
+
+        <Route path="/Leaderboard" element={<Stars/>}/>
 
         <Route path="*" element={<NotFound />} />
       </Routes>

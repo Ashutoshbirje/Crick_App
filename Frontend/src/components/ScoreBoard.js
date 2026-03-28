@@ -21,6 +21,8 @@ import { radioGroupBoxstyle } from "./ui/RadioGroupBoxStyle";
 import SportsCricketIcon from "@mui/icons-material/SportsCricket"; // Import the icon
 import { FaTrash, FaEye} from "react-icons/fa"; // Using react-icons for delete icon
 import AutoRefresh from "../components/AutoRefresh/AutoRefresh";
+import Stars from "../components/LeaderBoard/Stars";
+
 
 const ScoreBoard = (props) => {
   const navigate = useNavigate();
@@ -3384,6 +3386,12 @@ const pointsTable = React.useMemo(() => {
           >
             Points
           </button>
+          <button
+            className={`tab ${activeSection === "Leaderboard" ? "active-tab" : ""}`}
+            onClick={() => setActiveSection("Leaderboard")}
+          >
+            Stars
+          </button>
           {props.Admin && (
             <button
               className={`tab ${
@@ -4883,7 +4891,7 @@ const pointsTable = React.useMemo(() => {
             ))}
 
           {/*Section 5 : Pointtable */}
-          {activeSection === "pointtable" && pointsTable?.length > 0 && (
+          {activeSection === "pointtable" && pointsTable?.length > 0 && scores && (
             <div className="sb-batting">
               <table>
                 <thead>
@@ -4930,6 +4938,10 @@ const pointsTable = React.useMemo(() => {
                 </tbody>
               </table>
             </div>
+          )}
+
+          {activeSection === "Leaderboard" && (
+            <Stars />
           )}
 
           {/*Section 5 :  settings */}

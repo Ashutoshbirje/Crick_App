@@ -1,0 +1,97 @@
+.stars-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* CARD */
+.table-card {
+  background: #fff;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.table-title {
+  text-align: center;
+  margin-bottom: 10px;
+  background-color: #1976d2;
+  padding: 10px;
+  color: white;
+}
+
+/* TABLE */
+.table-container {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.table th {
+  background: #f4f4f4;
+  position: sticky;
+  top: 0;
+}
+
+.left {
+  text-align: left !important;
+}
+
+/* PLAYER */
+.player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: #1976d2;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.team {
+  font-size: 11px;
+  color: gray;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .table {
+    font-size: 12px;
+    min-width: 500px;
+  }
+
+  .avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .name {
+    font-size: 13px;
+  }
+}
