@@ -729,26 +729,11 @@ const ScoreBoard = (props) => {
         }
 
         // 🔹 Update newmatch
-        
-        try {
-          // 1. Check if match exists
-          const checkRes = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}`
-          );
-
-          if (checkRes.status === 404) {
-            console.error("Match not found, aborting PATCH");
-            return;
-          }
-
-          if (!checkRes.ok) {
-            console.error("Error verifying match");
-            return;
-          }
+    
 
           // 2. Perform PATCH only if exists
           const patchRes = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
+            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData?._id}/toggle`,
             {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
@@ -763,9 +748,6 @@ const ScoreBoard = (props) => {
 
           props.setNewMatch(newMatchValue);
 
-        } catch (err) {
-          console.error("Error:", err);
-        }
 
         switch (type) {
           case "new":

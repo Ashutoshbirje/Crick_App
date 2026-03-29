@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import heic2any from "heic2any";
 import "./Form.css";
 
 const Form = () => {
@@ -28,6 +29,8 @@ const Form = () => {
 
   const [photos, setPhotos] = useState([]);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [loadingImages, setLoadingImages] = useState({});
 
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`;
 
@@ -70,52 +73,75 @@ const Form = () => {
     try {
       if (!files || files.length === 0) return;
 
-      const validFiles = Array.from(files).filter((file) => {
-        // 🔥 handle mobile formats (including HEIC fallback)
-        if (!file.type.startsWith("image/")) {
-          console.warn("Skipping non-image:", file.name);
-          return false;
-        }
+      const validFiles = await Promise.all(
+        Array.from(files).map(async (file) => {
+          let uploadFile = file;
 
-        if (file.size > 5 * 1024 * 1024) {
-          alert(`${file.name} > 5MB`);
-          return false;
-        }
+          // HEIC → JPEG
+          if (
+            file.type === "image/heic" ||
+            file.type === "image/heif" ||
+            file.name.toLowerCase().endsWith(".heic")
+          ) {
+            try {
+              const blob = await heic2any({
+                blob: file,
+                toType: "image/jpeg",
+                quality: 0.8,
+              });
 
-        return true;
-      });
+              uploadFile = new File(
+                [blob],
+                file.name.replace(/\.heic/i, ".jpg"),
+                { type: "image/jpeg" }
+              );
+            } catch (err) {
+              console.error("HEIC conversion failed:", err);
+              return null;
+            }
+          }
 
-      if (validFiles.length === 0) return;
+          if (!uploadFile.type.startsWith("image/")) return null;
 
-      const uploads = validFiles.map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append(
-          "upload_preset",
-          process.env.REACT_APP_UPLOAD_PRESET
-        );
+          if (uploadFile.size > 5 * 1024 * 1024) {
+            alert(`${uploadFile.name} > 5MB`);
+            return null;
+          }
 
-        const res = await fetch(CLOUDINARY_URL, {
-          method: "POST",
-          body: formData,
+          return uploadFile;
+        })
+      );
+
+      const uploads = validFiles
+        .filter(Boolean)
+        .map(async (file) => {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append(
+            "upload_preset",
+            process.env.REACT_APP_UPLOAD_PRESET
+          );
+
+          const res = await fetch(CLOUDINARY_URL, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (!data.secure_url) {
+            console.error("Cloudinary error:", data);
+            return null;
+          }
+
+          return {
+            name: file.name,
+            url: data.secure_url,
+            public_id: data.public_id,
+          };
         });
 
-        const data = await res.json();
-
-        if (!data.secure_url) {
-          console.error("Cloudinary error:", data);
-          return null;
-        }
-
-        return {
-          name: file.name,
-          url: data.secure_url,
-          public_id: data.public_id,
-        };
-      });
-
       const results = await Promise.all(uploads);
-
       const filtered = results.filter(Boolean);
 
       setPhotos((prev) => [...prev, ...filtered]);
@@ -149,7 +175,7 @@ const Form = () => {
     }
   };
 
-  // ---------------- SUBMIT PHOTOS (INDEPENDENT) ----------------
+  // ---------------- SUBMIT PHOTOS ----------------
   const handleSavePhotos = async () => {
     if (photos.length === 0) {
       setError("Upload at least one photo");
@@ -157,6 +183,8 @@ const Form = () => {
     }
 
     try {
+      setUploading(true);
+
       const res = await fetch(
         `${process.env.REACT_APP_API_BASE_URL}/admin/photo`,
         {
@@ -172,6 +200,8 @@ const Form = () => {
       navigate("/score");
     } catch {
       setError("Photo save failed");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -191,121 +221,80 @@ const Form = () => {
 
             {/* ADMIN */}
             <h4 className="heading">Admin</h4>
-            <input
-              placeholder="Name"
-              value={admin.name}
-              onChange={(e) =>
-                setAdmin({ ...admin, name: e.target.value })
-              }
-            />
-            <input
-              placeholder="Email"
-              value={admin.email}
-              onChange={(e) =>
-                setAdmin({
-                  ...admin,
-                  email: e.target.value.trim(),
-                })
-              }
-            />
-            <input
-              placeholder="Phone"
-              value={admin.phone}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                setAdmin({ ...admin, phone: value });
-              }}
-            />
-            <input
-              placeholder="Address"
-              value={admin.address}
-              onChange={(e) =>
-                setAdmin({ ...admin, address: e.target.value })
-              }
-            />
+            <input placeholder="Name" value={admin.name} onChange={(e) => setAdmin({ ...admin, name: e.target.value })} />
+            <input placeholder="Email" value={admin.email} onChange={(e) => setAdmin({ ...admin, email: e.target.value.trim() })} />
+            <input placeholder="Phone" value={admin.phone} onChange={(e) => setAdmin({ ...admin, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })} />
+            <input placeholder="Address" value={admin.address} onChange={(e) => setAdmin({ ...admin, address: e.target.value })} />
 
             {/* LEAGUE */}
             <h4 className="heading">League</h4>
-            <input
-              placeholder="League Name"
-              value={info.names}
-              onChange={(e) =>
-                setInfo({ ...info, names: e.target.value })
-              }
-            />
-            <input
-              placeholder="Series"
-              value={info.series}
-              onChange={(e) =>
-                setInfo({ ...info, series: e.target.value })
-              }
-            />
-            <input
-              placeholder="Type"
-              value={info.types}
-              onChange={(e) =>
-                setInfo({ ...info, types: e.target.value })
-              }
-            />
+            <input placeholder="League Name" value={info.names} onChange={(e) => setInfo({ ...info, names: e.target.value })} />
+            <input placeholder="Series" value={info.series} onChange={(e) => setInfo({ ...info, series: e.target.value })} />
+            <input placeholder="Type" value={info.types} onChange={(e) => setInfo({ ...info, types: e.target.value })} />
 
             {/* VENUE */}
             <h4 className="heading">Venue</h4>
-            <input
-              placeholder="Stadium"
-              value={venue.stadium}
-              onChange={(e) =>
-                setVenue({ ...venue, stadium: e.target.value })
-              }
-            />
-            <input
-              placeholder="Location"
-              value={venue.location}
-              onChange={(e) =>
-                setVenue({ ...venue, location: e.target.value })
-              }
-            />
-            <input
-              placeholder="Country"
-              value={venue.country}
-              onChange={(e) =>
-                setVenue({ ...venue, country: e.target.value })
-              }
-            />
+            <input placeholder="Stadium" value={venue.stadium} onChange={(e) => setVenue({ ...venue, stadium: e.target.value })} />
+            <input placeholder="Location" value={venue.location} onChange={(e) => setVenue({ ...venue, location: e.target.value })} />
+            <input placeholder="Country" value={venue.country} onChange={(e) => setVenue({ ...venue, country: e.target.value })} />
 
             {/* ERROR */}
             {error && <p className="error-msg">{error}</p>}
 
             {/* SUBMIT INFO */}
             <div style={{ margin: "20px 0" }}>
-              <button
-                className="login-btn"
-                onClick={handleSubmitSetup}
-                style={{ width: "100%" }}
-              >
+              <button className="login-btn" onClick={handleSubmitSetup} style={{ width: "100%" }}>
                 Submit
               </button>
             </div>
 
             {/* PHOTOS */}
             <h4 className="heading">Photos</h4>
-            <input
-              type="file"
-              multiple
-              accept="image/png, image/jpeg, image/jpg"
-              // capture="environment" 
-              onChange={(e) => handlePhotoUpload(e.target.files)}
-            />
+            <input type="file" multiple accept="image/*" onChange={(e) => handlePhotoUpload(e.target.files)} />
 
-            {/* PREVIEW */}
+            {/* PREVIEW WITH SPINNER */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {photos.map((p, i) => (
-                <div key={i} style={{ textAlign: "center" }}>
+                <div key={i} style={{ textAlign: "center", position: "relative" }}>
+                  
+                  {loadingImages[i] !== false && (
+                    <div
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        background: "rgba(255,255,255,0.6)",
+                        borderRadius: "8px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          border: "3px solid #ccc",
+                          borderTop: "3px solid #333",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite",
+                        }}
+                      />
+                    </div>
+                  )}
+
                   <img
                     src={p.url}
                     alt=""
                     width="80"
                     style={{ borderRadius: "8px" }}
+                    onLoad={() =>
+                      setLoadingImages((prev) => ({ ...prev, [i]: false }))
+                    }
                   />
+
                   <div style={{ fontSize: "12px" }}>{p.name}</div>
                 </div>
               ))}
@@ -317,10 +306,12 @@ const Form = () => {
                 className="login-btn"
                 onClick={handleSavePhotos}
                 style={{ width: "100%" }}
+                disabled={uploading}
               >
-                Upload
+                {uploading ? "Uploading..." : "Upload"}
               </button>
             </div>
+
           </div>
         </div>
       </div>
