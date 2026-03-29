@@ -729,8 +729,25 @@ const ScoreBoard = (props) => {
         }
 
         // 🔹 Update newmatch
-        if (newMatchValue !== null && matchData?._id) {
-          await fetch(
+        
+        try {
+          // 1. Check if match exists
+          const checkRes = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}`
+          );
+
+          if (checkRes.status === 404) {
+            console.error("Match not found, aborting PATCH");
+            return;
+          }
+
+          if (!checkRes.ok) {
+            console.error("Error verifying match");
+            return;
+          }
+
+          // 2. Perform PATCH only if exists
+          const patchRes = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
             {
               method: "PATCH",
@@ -739,7 +756,15 @@ const ScoreBoard = (props) => {
             }
           );
 
+          if (!patchRes.ok) {
+            console.error("Failed to update match");
+            return;
+          }
+
           props.setNewMatch(newMatchValue);
+
+        } catch (err) {
+          console.error("Error:", err);
         }
 
         switch (type) {
@@ -907,14 +932,9 @@ const ScoreBoard = (props) => {
   //   console.error("Error ending inning and updating newmatch:", error);
   //   }
   // };
-
-  const handleEndInning1 = async (e) => {
-    try {
-      // console.log("Press");
-      // setBatter1({});
-      // setBatter2({});
-      // setBowlers([]);
-      // setRecentOvers([]);
+  
+  const handleReset = async (e) => {
+      try {
 
       // 1. Check and delete latest unended match
       if (liveData && liveData.hasMatchEnded === false) {
@@ -941,12 +961,38 @@ const ScoreBoard = (props) => {
         props.setNewMatch(false);
 
         await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/matches/delete/${matchData._id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/matches/delete/${matchData._id}`,
+        { method: "DELETE" }
+        );
+      }
+
+      // 3. Navigate to score page
+      navigate("/score");
+    } catch (error) {
+      console.error("Error ending inning and deleting unended match:", error);
+    }
+  }
+  const handleEndInning1 = async (e) => {
+    try {
+      // console.log("Press");
+      // setBatter1({});
+      // setBatter2({});
+      // setBowlers([]);
+      // setRecentOvers([]);
+
+      // 2. Update the match state in DB (optional if needed)
+      if (matchData?._id) {
+        console.log("Match ID:", matchData._id);
+        await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData._id}/toggle`,
           {
-            method: "DELETE",
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ newmatch: false }),
           },
         );
-        console.log("Deleted latest unended match");
+        props.setNewMatch(false);
+
       }
 
       // 3. Navigate to score page
@@ -1011,27 +1057,59 @@ const ScoreBoard = (props) => {
   };
 
   const handleDelete = async (id) => {
-    console.log("Deleting ID:", id);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/score/delete/${id}`,
-        {
-          method: "DELETE",
-        },
-      );
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Success:", data.message);
-        window.location.reload(); // 🔄 This reloads the entire page
+  try {
+    // 1. Fetch score to get matchId & scoreId
+    const scoreRes = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/score/${id}`
+    );
 
-        // Optionally, refresh your list or update UI here
-      } else {
-        console.error("Deletion failed:", data.message || "Unknown error");
-      }
-    } catch (error) {
-      console.error("Server error during deletion:", error);
+    const scoreData = await scoreRes.json();
+
+    if (!scoreRes.ok) {
+      console.error("Failed to fetch score");
+      return;
     }
-  };
+
+    const { matchId, scoreId } = scoreData;
+
+    // 2. Delete match
+    if (matchId) {
+      await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/matches/delete/${matchId}`,
+        { method: "DELETE" }
+      );
+    }
+
+    // 3. Delete live (scoreId)
+    if (scoreId) {
+      await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/live/delete/${scoreId}`,
+        { method: "DELETE" }
+      );
+    }
+
+    // 4. Delete score
+    const deleteScoreRes = await fetch(
+      `${process.env.REACT_APP_API_BASE_URL}/score/delete/${id}`,
+      { method: "DELETE" }
+    );
+
+    const deleteData = await deleteScoreRes.json();
+
+    if (deleteScoreRes.ok) {
+      console.log("Deleted successfully:", deleteData.message);
+
+      // Better than reload → update state
+      // setScores(prev => prev.filter(s => s._id !== id));
+      window.location.reload();
+    } else {
+      console.error("Score deletion failed");
+    }
+
+  } catch (err) {
+    console.error("Error during deletion:", err);
+  }
+};
 
   // Live Score and scoreboard
   const handleEndInning = (e) => {
@@ -4964,7 +5042,7 @@ const pointsTable = React.useMemo(() => {
               {props.newMatch && (
                 <div
                   className="score-board-settings1"
-                  onClick={handleEndInning1}
+                  onClick={handleReset}
                 >
                   RESET
                 </div>

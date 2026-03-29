@@ -64,7 +64,9 @@ useEffect(() => {
       const result = await res.json();
       
       setScore(result);
-
+      
+      console.log(result);
+      
       const match = await fetch(`${process.env.REACT_APP_API_BASE_URL}/matches/${result.matchId}`)
 
       if (!match.ok) throw new Error(await match.text());

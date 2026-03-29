@@ -195,7 +195,7 @@ const Stars = () => {
     </div>
   );
 
-  if (!stats.mostRuns) {
+  if (stats.mostRuns?.length === 0) {
     return (
       <div className="Imgdiv">
         <img
@@ -205,7 +205,9 @@ const Stars = () => {
         />
       </div>
     );
-  }
+  } else {
+
+
 
   return (
     <div className="stars-container">
@@ -281,6 +283,7 @@ const Stars = () => {
 
     </div>
   );
+}
 };
 
 export default Stars;
