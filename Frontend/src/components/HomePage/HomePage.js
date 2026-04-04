@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import Footer from "../Footer/Footer";
 import "./HomePage.css"; // Import the external CSS file
+import NotFound from "../NotFound/NotFound";
 
 const LandingPage = ({ Admin, setIsAdmin, setNewMatch }) => {
   const navigate = useNavigate();
@@ -102,6 +103,8 @@ const LandingPage = ({ Admin, setIsAdmin, setNewMatch }) => {
             ADMIN
           </Button>
         </div>
+
+        <NotFound />
 
         {/* Circular Photos and Text */}
         <div className="profile-container">

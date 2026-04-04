@@ -774,7 +774,7 @@ const ScoreBoard = (props) => {
             break;
 
           case "edit":
-            navigate("/EditPassward");
+            // navigate("/EditPassward");
             break;
 
           case "photo":
