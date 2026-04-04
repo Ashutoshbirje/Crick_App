@@ -543,10 +543,13 @@ const HelpContact = () => {
                 <Grid item xs={12} lg={6}>
                   <Card className="contact-info-card">
                     <CardContent>
-                      <Typography variant="h4" className="section-title">
-                        Get in Touch
-                      </Typography>
-
+                      <Box className="section-header">
+                        <SupportIcon className="section-icon" />
+                        <Typography variant="h4" className="section-title">
+                          Get in Touch
+                        </Typography>
+                      </Box>
+              
                       <List className="contact-list">
                         {contactInfo.map((contact, index) => (
                           <ListItem key={index} className="contact-list-item">

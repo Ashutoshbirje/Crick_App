@@ -23,7 +23,7 @@ import { FaTrash, FaEye} from "react-icons/fa"; // Using react-icons for delete 
 import AutoRefresh from "../components/AutoRefresh/AutoRefresh";
 import Stars from "../components/LeaderBoard/Stars";
 
-
+// 
 const ScoreBoard = (props) => {
   const navigate = useNavigate();
   const getStoredData = (key, defaultValue) => {
@@ -947,7 +947,24 @@ const ScoreBoard = (props) => {
         { method: "DELETE" }
         );
       }
-
+        setRecentOvers([]);
+        setRecentOvers1([]);
+        setInningNo(1);
+        setCurrentRunStack([]);
+        setTotalRuns(0);
+        setExtras({ total: 0, wide: 0, noBall: 0, Lb: 0 });
+        setRunsByOver(0);
+        setWicketCount(0);
+        setTotalOvers(0);
+        setBallCount(0);
+        setOverCount(0);
+        setBatter1({});
+        setBatter2({});
+        setBatters([]);
+        setBowlers([]);
+        setBattingOrder(0);
+        setInputBowler("");
+        setBowler({});
       // 3. Navigate to score page
       navigate("/score");
     } catch (error) {
@@ -976,7 +993,7 @@ const ScoreBoard = (props) => {
         props.setNewMatch(false);
 
       }
-
+ 
       // 3. Navigate to score page
       navigate("/score");
     } catch (error) {
@@ -1665,6 +1682,9 @@ const ScoreBoard = (props) => {
       setBattingOrder(battingOrder + 1);
     }
   };
+
+  // 
+
   // Keypad blur
   const handleBatter2Blur = (e) => {
     let name = e.target.value;
@@ -3473,7 +3493,7 @@ const pointsTable = React.useMemo(() => {
         </div>
         {/* All section */}
         <div>
-          {activeSection === "matchInfo" &&
+           {activeSection === "matchInfo" &&
             !props.newMatch && (
               <div className="Imgdiv">
                 <img
@@ -3484,7 +3504,7 @@ const pointsTable = React.useMemo(() => {
               </div>
             )}
 
-           { activeSection === "liveScore"  &&
+           {activeSection === "liveScore"  &&
             !props.newMatch && (
               <div className="Imgdiv">
                 <img
@@ -3495,7 +3515,7 @@ const pointsTable = React.useMemo(() => {
               </div>
             )}
 
-             {activeSection === "scoreCard" &&
+            {activeSection === "scoreCard" &&
             !props.newMatch && (
               <div className="Imgdiv">
                 <img
@@ -3964,6 +3984,8 @@ const pointsTable = React.useMemo(() => {
                             <td
                               className="score-types"
                               onClick={() => {
+                                setOutType("");          // ✅ reset selection
+                                setRunOutPlayerId("");
                                 setModalOpen(true);
                                 handleCurrentBall(0);
                               }}

@@ -11,6 +11,9 @@ npm start
 // disable bowler name after every over (refresh is req - avoid)
 // disable wicket table after click on w button (refresh is req - avoid) 
 // Screen Orientation 
+// clear state after match end 
+// refresh required to save correct data in database 
+// scoreboard > save (handle state)
 
 // Feature acpects 
 // Advertisement (New Feature)
