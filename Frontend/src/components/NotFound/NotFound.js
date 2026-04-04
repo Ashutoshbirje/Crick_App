@@ -11,7 +11,8 @@ const NotFound = () => {
       {/* <h2>Page Not Found</h2> */}
       <h2>WORK IN PROGRESS</h2>
       <p style={{ marginTop: '1%' }}>Ashutosh Birje</p>
-      <button
+     
+      {/* <button
         onClick={goToHome}
         style={{
           backgroundColor: 'transparent',
@@ -23,7 +24,10 @@ const NotFound = () => {
         }}
       >
         Go Back Home
-      </button>
+      </button> */}
+       <p style={{ marginTop: '10px', color: 'red' }}>
+  Password has been changed temporarily.
+</p>
     </div>
   );
 };

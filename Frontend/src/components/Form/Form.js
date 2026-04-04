@@ -229,8 +229,8 @@ const Form = () => {
             {/* LEAGUE */}
             <h4 className="heading">League</h4>
             <input placeholder="League Name" value={info.names} onChange={(e) => setInfo({ ...info, names: e.target.value })} />
-            <input placeholder="Series" value={info.series} onChange={(e) => setInfo({ ...info, series: e.target.value })} />
-            <input placeholder="Type" value={info.types} onChange={(e) => setInfo({ ...info, types: e.target.value })} />
+            <input placeholder="Short Form" value={info.series} onChange={(e) => setInfo({ ...info, series: e.target.value })} />
+            <input placeholder="Match Type" value={info.types} onChange={(e) => setInfo({ ...info, types: e.target.value })} />
 
             {/* VENUE */}
             <h4 className="heading">Venue</h4>
