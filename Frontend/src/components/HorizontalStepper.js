@@ -594,7 +594,9 @@ const HorizontalStepper = ({
                         <FormControlLabel value="Normal" control={<Radio />} label="Normal" />
                         <FormControlLabel value="SuperOver" control={<Radio />} label="Superover" />
                         <FormControlLabel value="Final" control={<Radio />} label="Final" />
-                        <FormControlLabel value="Semifinal" control={<Radio />} label="SemiFinal" />
+                        <FormControlLabel value="Qualifier 2" control={<Radio />} label="Qualifier 2" />
+                        <FormControlLabel value="Qualifier 1" control={<Radio />} label="Qualifier 1" />
+                        <FormControlLabel value="Eliminator" control={<Radio />} label="Eliminator" />
                       </RadioGroup>
                     </FormControl>
                   )}

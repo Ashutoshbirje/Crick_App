@@ -28,7 +28,7 @@ const matchSchema = new mongoose.Schema({
   },
   matchType: {
     type: String,
-    enum: ['Normal', 'Final', 'Semi-Final', 'Super-Over'],
+    enum: ['Normal', 'Final', 'Qualifier 1','Qualifier 2','Eliminator', 'Super-Over'],
   },
   newmatch: {
     type: Boolean,

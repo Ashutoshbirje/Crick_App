@@ -9,9 +9,9 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import heic2any from "heic2any";
-import "./Photo.css";
+import "./AdvertiseSetup.css";
 
-const Photo = () => {
+const AdvertiseSetup = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -27,18 +27,19 @@ const Photo = () => {
 
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUD_NAME}/image/upload`;
 
-  // ---------------- UPLOAD ----------------
+  // ---------------- UPLOAD TO CLOUDINARY ----------------
   const handlePhotoUpload = async (files) => {
     try {
       if (!files || files.length === 0) return;
 
-      setUploading(true); // ✅ FIX
+      setUploading(true); // ✅ important
       setError("");
 
       const validFiles = await Promise.all(
         Array.from(files).map(async (file) => {
           let uploadFile = file;
 
+          // HEIC → JPG
           if (
             file.type === "image/heic" ||
             file.type === "image/heif" ||
@@ -73,7 +74,7 @@ const Photo = () => {
         formData.append("file", file);
         formData.append(
           "upload_preset",
-          process.env.REACT_APP_UPLOAD_PRESET
+          process.env.REACT_APP_UPLOAD_PRESET_1 // ✅ Advertise preset
         );
 
         const res = await fetch(CLOUDINARY_URL, {
@@ -100,19 +101,19 @@ const Photo = () => {
     } catch {
       setError("Upload failed");
     } finally {
-      setUploading(false); // ✅ FIX
+      setUploading(false); // ✅ important
     }
   };
 
-  // ---------------- FETCH ----------------
+  // ---------------- FETCH ADS ----------------
   useEffect(() => {
-    fetchPhotos();
+    fetchAds();
   }, []);
 
-  const fetchPhotos = async () => {
+  const fetchAds = async () => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/admin/photo`
+        `${process.env.REACT_APP_API_BASE_URL}/admin/advertise`
       );
       const data = await res.json();
       setPhotos(data?.photos || []);
@@ -125,7 +126,7 @@ const Photo = () => {
   const handleDelete = async (public_id) => {
     try {
       await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/admin/photo/${public_id}`,
+        `${process.env.REACT_APP_API_BASE_URL}/admin/advertise/${public_id}`,
         { method: "DELETE" }
       );
 
@@ -142,9 +143,9 @@ const Photo = () => {
   };
 
   // ---------------- SAVE ----------------
-  const handleSavePhotos = async () => {
+  const handleSaveAds = async () => {
     if (newPhotos.length === 0) {
-      setError("Please upload at least one photo first");
+      setError("Please upload at least one advertisement first");
       return;
     }
 
@@ -153,7 +154,7 @@ const Photo = () => {
       setError("");
 
       const res = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/admin/photo`,
+        `${process.env.REACT_APP_API_BASE_URL}/admin/advertise`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -165,7 +166,7 @@ const Photo = () => {
 
       setSnackbar({
         open: true,
-        message: "Photos saved successfully",
+        message: "Advertisements saved successfully",
         severity: "success",
       });
 
@@ -178,7 +179,7 @@ const Photo = () => {
     } catch {
       setSnackbar({
         open: true,
-        message: "Photo save operation failed",
+        message: "Advertisement save failed",
         severity: "error",
       });
     } finally {
@@ -195,15 +196,16 @@ const Photo = () => {
     <div className="landing-container">
       <AppBar position="fixed" className="appbar">
         <Toolbar>
-          <Typography variant="h6">PHOTO PANEL</Typography>
+          <Typography variant="h6">ADVERTISEMENT PANEL</Typography>
         </Toolbar>
       </AppBar>
 
+      {/* Upload Section */}
       <div className="adjusted-container">
         <div className="login-container">
           <div className="login-right">
-            <h2 className="admin-title">PHOTO PANEL</h2>
-            <h4 className="heading">Photos</h4>
+            <h2 className="admin-title">ADVERTISEMENT PANEL</h2>
+            <h4 className="heading">Upload Ads</h4>
 
             <input
               ref={fileInputRef}
@@ -213,22 +215,22 @@ const Photo = () => {
               onChange={(e) => handlePhotoUpload(e.target.files)}
             />
 
-            {/* ✅ Upload indicator */}
+            {/* Uploading indicator */}
             {uploading && <p className="upload-msg">Uploading image...</p>}
 
             {error && <p className="error-msg">{error}</p>}
 
             <button
               className="login-btn"
-              onClick={handleSavePhotos}
-              disabled={uploading || newPhotos.length === 0} // ✅ FIX
+              onClick={handleSaveAds}
+              disabled={uploading || newPhotos.length === 0}
               style={{ width: "100%" }}
             >
-              {uploading ? "Uploading..." : "Upload"}
+              {uploading ? "Uploading..." : "Upload Ads"}
             </button>
 
             <p className="photo-instruction">
-              Rename your photo with your name
+              Upload banner-style advertisement images
             </p>
           </div>
         </div>
@@ -237,29 +239,30 @@ const Photo = () => {
       {/* Showcase */}
       <div className="main-content1">
         <div className="profile-container1">
-          {photos.map((profile, index) => (
+          {photos.map((ad, index) => (
             <div key={index} className="photo-wrapper">
               <IconButton
                 className="delete-btn"
-                onClick={() => handleDelete(profile.public_id)}
+                onClick={() => handleDelete(ad.public_id)}
               >
                 <DeleteIcon fontSize="small" />
               </IconButton>
 
               <img
-                src={profile.url}
-                alt={profile.name}
+                src={ad.url}
+                alt={ad.name}
                 className="circular-photo"
               />
 
               <Typography variant="h6" className="profile-name">
-                {profile.name?.replace(/\.[^/.]+$/, "")}
+                {ad.name?.replace(/\.[^/.]+$/, "")}
               </Typography>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -274,4 +277,4 @@ const Photo = () => {
   );
 };
 
-export default Photo;
+export default AdvertiseSetup;

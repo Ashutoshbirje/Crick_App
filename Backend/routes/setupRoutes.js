@@ -12,3 +12,4 @@ router.get("/photo", setupController.getPhotos);
 router.delete("/photo/:public_id", setupController.deletePhoto);
 
 module.exports = router;
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 
 import NotFound from "../components/NotFound/NotFound";
@@ -13,6 +13,7 @@ import HelpContact from "../components/Help/HelpContact";
 import Photo from "../components/Photos/Photo";
 import Scorecard from "../components/Scorecards/Scorecard";
 import Stars from "../components/LeaderBoard/Stars";
+import AdvertiseSetup from "../components/AdvertiseSetup/AdvertiseSetup";
 
 import { Fab } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -102,6 +103,7 @@ const handleBack = () => {
         "/MatchData",
         "/help",
         "/Photos",
+        "/Advertise",
         "/Leaderboard"
       ].includes(location.pathname) ||
       location.pathname.startsWith("/scorecard/")
@@ -213,6 +215,8 @@ const handleBack = () => {
         <Route path="/help" element={<HelpContact />} />
 
         <Route path="/Photos" element={<Photo />} />
+
+        <Route path="/Advertise" element={<AdvertiseSetup/>}/>
         
         <Route path="/scorecard/:id" element={<Scorecard/>} />
 

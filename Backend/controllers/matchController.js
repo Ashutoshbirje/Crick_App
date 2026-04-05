@@ -79,7 +79,7 @@ exports.updateMatchType = async (req, res) => {
     const { matchId } = req.params;
     const { matchType } = req.body;
 
-    const allowedTypes = ['Normal', 'Final', 'Semifinal', 'SuperOver'];
+    const allowedTypes = ['Normal', 'Final', 'Qualifier 2','Qualifier 1','Eliminator', 'SuperOver'];
 
     if (!allowedTypes.includes(matchType)) {
       return res.status(400).json({ message: "Invalid matchType" });

@@ -7,6 +7,8 @@ const scoreRoutes = require("./routes/scoreRoutes"); // NEW
 const matchRoutes = require("./routes/matchRoutes");
 const liveRoutes = require("./routes/LiveRoutes");
 const AdminRoutes = require("./routes/setupRoutes");
+const advertiseRoutes = require("./routes/advertiseRoutes");
+
 const { ensureDefaultAdmin } = require("./controllers/authController");
 
 dotenv.config(); // Load .env first
@@ -24,6 +26,7 @@ app.use("/api/score", scoreRoutes); // NEW
 app.use("/api/matches", matchRoutes);
 app.use("/api/live", liveRoutes);
 app.use("/api/admin", AdminRoutes);
+app.use("/api/admin", advertiseRoutes);
 
 // Health check route
 app.get("/", (req, res) => {

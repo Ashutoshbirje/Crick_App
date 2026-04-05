@@ -718,35 +718,33 @@ const ScoreBoard = (props) => {
   // Settings
     const handleClick = async (type, id = null) => {
       try {
-        let newMatchValue = null;
+        // let newMatchValue = null;
 
-        switch (type) {
-          case "new":
-            newMatchValue = false;
-            break;
-          default:
-            break;
-        }
+        // switch (type) {
+        //   case "new":
+        //     newMatchValue = false;
+        //     break;
+        //   default:
+        //     break;
+        // }
 
-        // 🔹 Update newmatch
-    
+          // 🔹 Update newmatch
+          // // 2. Perform PATCH only if exists
+          // const patchRes = await fetch(
+          //   `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData?._id}/toggle`,
+          //   {
+          //     method: "PATCH",
+          //     headers: { "Content-Type": "application/json" },
+          //     body: JSON.stringify({ newmatch: newMatchValue }),
+          //   }
+          // );
 
-          // 2. Perform PATCH only if exists
-          const patchRes = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/matches/${matchData?._id}/toggle`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ newmatch: newMatchValue }),
-            }
-          );
+          // if (!patchRes.ok) {
+          //   console.error("Failed to update match");
+          //   return;
+          // }
 
-          if (!patchRes.ok) {
-            console.error("Failed to update match");
-            return;
-          }
-
-          props.setNewMatch(newMatchValue);
+          // props.setNewMatch(newMatchValue);
 
 
         switch (type) {
@@ -774,11 +772,15 @@ const ScoreBoard = (props) => {
             break;
 
           case "edit":
-            // navigate("/EditPassward");
+            navigate("/EditPassward");
             break;
 
           case "photo":
             navigate("/Photos");
+            break;
+
+          case "advertise":
+            navigate("/Advertise");
             break;
 
           case "add":
@@ -3056,7 +3058,7 @@ const pointsTable = React.useMemo(() => {
 
   (scores || []).forEach((match) => {
     // ❌ Skip Final & Semifinal
-    if (["Final", "Semifinal"].includes(match.matchType)) return;
+    if (["Final", "Qualifier 1", "Qualifier 2", "Eliminator"].includes(match.matchType)) return;
 
     const team1 = match.scoringTeam;
     const team2 = match.chessingTeam;
@@ -5063,7 +5065,14 @@ const pointsTable = React.useMemo(() => {
                 onClick={() => handleClick("photo")}
               >
                 {/* edit */}
-                VIEW Photos
+                PHOTOS
+              </div>
+               <div
+                className="score-board-settings"
+                onClick={() => handleClick("advertise")}
+              >
+                {/* edit */}
+                ADVERTISE
               </div>
               <div
                 className="score-board-settings"

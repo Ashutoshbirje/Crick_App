@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Typography,
@@ -51,7 +51,7 @@ import {
 } from "@mui/icons-material";
 import "./HelpContact.css";
 import Footer from "../Footer/Footer";
-import photo from './Image/Photo1.jpeg'; 
+import photo from '../Image/Photo1.jpeg'; 
 
 const HelpContact = () => {
   const [formData, setFormData] = useState({
@@ -275,7 +275,7 @@ const HelpContact = () => {
     setSnackbar({
       open: true,
       message:
-        "Thank you! Your message has been sent successfully. We'll get back to you within 24 hours.",
+        "Thank you ! Your message has been sent successfully",
       severity: "success",
     });
 
@@ -292,37 +292,11 @@ const HelpContact = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  const [info, setInfo] = useState(null);
-  
-  useEffect(() => {
-      const fetchSetup = async () => {
-        try {
-          const res = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/admin/setup`
-          );
-  
-          if (!res.ok) throw new Error("API failed");
-  
-          const data = await res.json();
-  
-          if (data.success && data.data) {
-            setInfo(data.data.info || {});
-          } else {
-          }
-        } catch (err) {
-          console.error(err);
-        } finally {
-        }
-      };
-  
-      fetchSetup();
-    }, []);
-
   return (
     <div className="help-contact-container">
       <AppBar position="fixed" className="appbar">
         <Toolbar>
-          <Typography variant="h6">{info?.names}</Typography>
+          <Typography variant="h6">WELCOME</Typography>
         </Toolbar>
       </AppBar>
 
@@ -692,7 +666,7 @@ const HelpContact = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           onClose={handleCloseSnackbar}
